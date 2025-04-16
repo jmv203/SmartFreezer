@@ -1,0 +1,21 @@
+<resources>
+    <!--Style para EditText -->
+    <style name="CustomEditTextStyle">
+        <item name="android:fontFamily">@font/roboto</item>
+        <item name="android:textColor">@android:color/black</item>
+        <item name="android:textSize">16sp</item>
+    </style>
+
+    <!--Style para TextView -->
+    <style name="CustomTextStyle">
+        <item name="android:fontFamily">@font/roboto</item>
+        <item name="android:textColor">@color/white</item>
+        <item name="android:textSize">16sp</item>
+    </style>
+
+    <!--Style para Button -->
+    <style name="CustomButtonStyle">
+        <item name="android:fontFamily">@font/roboto</item>
+        <item name="android:textSize">18sp</item>
+    </style>
+</resources>

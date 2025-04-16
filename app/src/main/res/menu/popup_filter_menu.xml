@@ -1,0 +1,36 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <group android:checkableBehavior="single">
+        <item
+            android:title="Categoría">
+            <menu>
+                <item
+                    android:id="@+id/filter_fruit"
+                    android:icon="@drawable/ic_fruit"
+                    android:title="Fruta" />
+                <item
+                    android:id="@+id/filter_vegetable"
+                    android:icon="@drawable/ic_vegetable"
+                    android:title="Verdura" />
+            </menu>
+        </item>
+
+        <item
+            android:title="Condición">
+            <menu>
+                <item
+                    android:id="@+id/filter_fresh"
+                    android:icon="@drawable/ic_fruit"
+                    android:title="Fresco" />
+                <item
+                    android:id="@+id/filter_rotten"
+                    android:icon="@drawable/ic_vegetable"
+                    android:title="Podrido" />
+            </menu>
+        </item>
+
+        <item
+            android:id="@+id/filter_clear"
+            android:title="Limpiar filtros" />
+    </group>
+</menu>

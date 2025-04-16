@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/inventoryFragment">
+
+    <fragment
+        android:id="@+id/inventoryFragment"
+        android:name="com.example.smartfreezer.navigation.InventoryFragment"
+        android:label="Inicio">
+        <action
+            android:id="@+id/action_inventoryFragment_to_selectCategoryFragment"
+            app:destination="@id/selectCategoryFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/listFragment"
+        android:name="com.example.smartfreezer.navigation.ShoppingListFragment"
+        android:label="Lista" />
+
+    <fragment
+        android:id="@+id/scannerFragment"
+        android:name="com.example.smartfreezer.navigation.ScannerFragment"
+        android:label="Escáner" />
+
+    <fragment
+        android:id="@+id/recipesFragment"
+        android:name="com.example.smartfreezer.navigation.RecipesFragment"
+        android:label="Recetas" />
+
+    <fragment
+        android:id="@+id/alertsFragment"
+        android:name="com.example.smartfreezer.navigation.AlertsFragment"
+        android:label="Alertas" />
+
+    <fragment
+        android:id="@+id/selectCategoryFragment"
+        android:name="com.example.smartfreezer.navigation.SelectCategoryFragment"
+        android:label="Seleccionar categoría">
+        <action
+            android:id="@+id/action_selectCategoryFragment_to_selectProductFragment"
+            app:destination="@id/selectProductFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/selectProductFragment"
+        android:name="com.example.smartfreezer.navigation.SelectProductFragment"
+        android:label="Seleccionar producto">
+        <argument
+            android:name="category"
+            app:argType="string" />
+        <action
+            android:id="@+id/action_selectProductFragment_to_addProductFragment"
+            app:destination="@id/addProductFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/addProductFragment"
+        android:name="com.example.smartfreezer.navigation.AddProductFragment"
+        android:label="Formulario producto">
+        <argument
+            android:name="productId"
+            app:argType="string" />
+        <argument
+            android:name="icon"
+            app:argType="string" />
+        <argument
+            android:name="category"
+            app:argType="string" />
+    </fragment>
+
+</navigation>

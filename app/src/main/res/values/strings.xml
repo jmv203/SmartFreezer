@@ -1,0 +1,32 @@
+<resources>
+    <string name="app_name" translatable="false">SmartFreezer</string>
+    <string name="main_tittle">¡Bienvenido!</string>
+    <string name="main_text">Vamos a organizar tus alimentos y sugerirte las mejores recetas.</string>
+    <string name="main_button">Vamos allá</string>
+    <string name="keeploggedin">Mantener sesión iniciada</string>
+    <string name="login">Iniciar Sesión</string>
+    <string name="noaccount"><u>¿No tienes cuenta? Regístrate</u></string>
+    <string name="forgotpass"><u>¿Olvidaste tu contraseña?</u></string>
+    <string name="password">Contraseña</string>
+    <string name="mail">Correo electrónico</string>
+    <string name="icono_de_email">Icono de email</string>
+    <string name="icono_de_candado">Icono de candado</string>
+    <string name="logo_de_la_aplicaci_n">Logo de la aplicación</string>
+    <string name="mostrar_u_ocultar_contrase_a">Mostrar u ocultar contraseña</string>
+    <string name="terms">Acepto los términos y condiciones</string>
+    <string name="signin">Registrar</string>
+    <string name="alreaysignin"><u>¿Ya tienes una cuenta registrada? Inicia sesión</u></string>
+    <string name="createuser">Crear un usuario</string>
+    <string name="name_user">Nombre</string>
+    <string name="repeatpassword">Repetir Contraseña</string>
+    <string name="login_user">Iniciar usuario</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="inicio">Inicio</string>
+    <string name="recetas">Recetas</string>
+    <string name="alertas">Alertas</string>
+    <string name="esc_ner">Escáner</string>
+    <string name="lista">Lista</string>
+
+
+</resources>
