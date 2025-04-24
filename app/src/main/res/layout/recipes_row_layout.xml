@@ -1,0 +1,91 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:padding="12dp"
+    android:background="@android:color/white"
+    android:layout_marginBottom="8dp"
+    android:elevation="2dp"
+    android:gravity="center_vertical">
+    <data>
+        <variable
+            name="result"
+            type="com.example.smartfreezer.models.Result" />
+
+    </data>
+
+    <ImageView
+        android:id="@+id/recipeImage"
+        android:src="@drawable/carrot"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:scaleType="centerCrop" />
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:gravity="center_vertical"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/recipeTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:text="Título de la receta"
+            android:textColor="@color/purpleButton"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/recipeDuration"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="Duración: 20 min"
+            android:textColor="@android:color/darker_gray"
+            android:textSize="14sp" />
+
+        <RatingBar
+            android:id="@+id/ratingBar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center|center_vertical"
+            android:layout_marginTop="4dp"
+            android:isIndicator="true"
+            android:numStars="5"
+            android:scaleX="0.5"
+            android:scaleY="0.5"
+            android:stepSize="0.5" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="46dp"
+        android:layout_height="match_parent"
+        android:gravity="center_vertical|end"
+        android:orientation="vertical">
+
+        <ImageButton
+            android:id="@+id/btnSaveRecipe"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="Guardar receta"
+            android:src="@android:drawable/btn_star_big_off"
+            app:tint="@android:color/holo_orange_light" />
+
+        <ImageButton
+            android:id="@+id/btnDetailsRecipe"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="Ver detalles"
+            android:src="@android:drawable/ic_menu_search"
+            app:tint="@color/purpleButton" />
+
+    </LinearLayout>
+</LinearLayout>
