@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:fillViewport="true"
+    android:background="@drawable/bottom_sheet_background"
+    android:padding="16dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <TextView
+            android:text="Filtrar Recetas"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="12dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        <!-- Tipo de plato -->
+        <TextView
+            android:text="Tipo de plato"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textStyle="bold" />
+
+        <RadioGroup
+            android:id="@+id/radioGroupDishType"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <RadioButton
+                android:id="@+id/rbAll"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Todos" />
+
+            <RadioButton
+                android:id="@+id/rbMainCourse"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Principal" />
+
+            <RadioButton
+                android:id="@+id/rbSalad"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Ensalada" />
+
+            <RadioButton
+                android:id="@+id/rbSoup"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Sopa" />
+
+            <RadioButton
+                android:id="@+id/rbDessert"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Postre" />
+
+            <RadioButton
+                android:id="@+id/rbDrink"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Bebida" />
+
+        </RadioGroup>
+
+        <!-- Ingredientes disponibles -->
+        <TextView
+            android:text="Ingredientes disponibles"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textStyle="bold"
+            android:layout_marginTop="16dp" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/ingredientsRecyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="120dp"
+            android:overScrollMode="never"
+            android:scrollbars="vertical" />
+
+        <!-- Dieta -->
+        <TextView
+            android:text="Tipo de dieta"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textStyle="bold"
+            android:layout_marginTop="16dp" />
+
+        <RadioGroup
+            android:id="@+id/radioGroupDiet"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <RadioButton
+            android:id="@+id/rbAllDiet"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Todas" />
+            <RadioButton
+                android:id="@+id/rbVegan"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Vegana" />
+            <RadioButton
+                android:id="@+id/rbVegetarian"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Vegetariana" />
+            <RadioButton
+                android:id="@+id/rbGlutenFree"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Sin gluten" />
+        </RadioGroup>
+
+        <!-- Valoración -->
+        <TextView
+            android:text="Valoración mínima"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textStyle="bold"
+            android:layout_marginTop="16dp" />
+
+        <RatingBar
+            android:id="@+id/ratingBarFilter"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:numStars="5"
+            android:stepSize="0.5" />
+
+        <Button
+            android:id="@+id/btnApplyFilters"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Aplicar Filtros"
+            android:layout_marginTop="24dp"
+            android:backgroundTint="@color/purpleButton"
+            android:textColor="@android:color/white"
+            android:fontFamily="@font/roboto_medium" />
+    </LinearLayout>
+</androidx.core.widget.NestedScrollView>
