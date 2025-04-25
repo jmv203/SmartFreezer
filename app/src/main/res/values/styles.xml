@@ -21,13 +21,9 @@
 
     <!--Style para PopUpMenu -->
     <style name="PopupMenuPurple" parent="ThemeOverlay.AppCompat.Light">
-        <item name="android:popupBackground">@color/purpleButton</item>
-        <item name="android:textColorPrimary">@android:color/white</item>
-    </style>
-
-    <!--Style para Spinner -->
-    <style name="SpinnerThemePurpleText" parent="Theme.AppCompat.Light">
-        <item name="android:textColor">@color/purpleButton</item>
+        <item name="android:textColor">@android:color/white</item>
+        <item name="android:background">@color/colorNavBar</item>
+        <item name="android:fontFamily">@font/roboto</item>
     </style>
 
 </resources>

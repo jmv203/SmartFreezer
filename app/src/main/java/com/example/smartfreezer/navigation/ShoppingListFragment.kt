@@ -1,60 +1,127 @@
 package com.example.smartfreezer.navigation
 
 import android.os.Bundle
-import androidx.fragment.app.Fragment
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
+import android.widget.TextView
+import android.widget.Toast
+import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.example.smartfreezer.R
+import com.example.smartfreezer.adapters.ShoppingListAdapter
+import com.example.smartfreezer.models.ShoppingItem
+import com.google.android.material.floatingactionbutton.FloatingActionButton
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
+class ShoppingListFragment : Fragment(R.layout.fragment_shopping_list) {
 
-/**
- * A simple [Fragment] subclass.
- * Use the [ShoppingListFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
-class ShoppingListFragment : Fragment() {
-    // TODO: Rename and change types of parameters
-    private var param1: String? = null
-    private var param2: String? = null
+    private lateinit var recyclerView: RecyclerView
+    private lateinit var adapter: ShoppingListAdapter
+    private lateinit var tvProductCount: TextView
+    private lateinit var fabAddProduct: FloatingActionButton
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
+    private val shoppingList = mutableListOf<ShoppingItem>()
+    private val firestore = FirebaseFirestore.getInstance()
+    private val user = FirebaseAuth.getInstance().currentUser
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        recyclerView = view.findViewById(R.id.rvShoppingList)
+        tvProductCount = view.findViewById(R.id.tvProductCountShoppingList)
+        fabAddProduct = view.findViewById(R.id.fabAddProductShoppingList)
+
+        adapter = ShoppingListAdapter(shoppingList,
+            onIncrease = { item ->
+                item.quantity++
+                updateItemInFirestore(item)
+            },
+            onDecrease = { item ->
+                if (item.quantity > 1) {
+                    item.quantity--
+                    updateItemInFirestore(item)
+                } else {
+                    deleteItemFromFirestore(item)
+                }
+            })
+
+        recyclerView.layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
+        recyclerView.adapter = adapter
+
+        fabAddProduct.setOnClickListener {
+            findNavController().navigate(R.id.action_listFragment_to_addShoppingListFragment)
+        }
+
+        setupGreeting(view)
+        loadShoppingList()
+    }
+
+    private fun setupGreeting(view: View) {
+        val currentUser = FirebaseAuth.getInstance().currentUser ?: return
+        firestore.collection("users").document(currentUser.uid).get()
+            .addOnSuccessListener { document ->
+                document.getString("name")?.let { name ->
+                    view.findViewById<TextView>(R.id.tvGreetingShoppingList).text = "Hola, $name"
+                }
+            }
+    }
+
+    private fun loadShoppingList() {
+        val uid = user?.uid ?: return
+
+        firestore.collection("users")
+            .document(uid)
+            .collection("shopping_list")
+            .get()
+            .addOnSuccessListener { snapshot ->
+                shoppingList.clear()
+                for (doc in snapshot) {
+                    val name = doc.getString("name") ?: continue
+                    val icon = doc.getString("icon") ?: continue
+                    val quantity = doc.getLong("quantity")?.toInt() ?: 1
+                    shoppingList.add(ShoppingItem(name = name, icon = icon, quantity = quantity))
+                }
+                adapter.notifyDataSetChanged()
+                updateProductCount()
+            }
+            .addOnFailureListener {
+                Toast.makeText(requireContext(), "Error al cargar la lista", Toast.LENGTH_SHORT).show()
+            }
+    }
+
+    private fun updateItemInFirestore(item: ShoppingItem) {
+        val uid = user?.uid ?: return
+        val ref = firestore.collection("users").document(uid)
+            .collection("shopping_list").document(item.name)
+
+        ref.set(mapOf(
+            "name" to item.name,
+            "icon" to item.icon,
+            "quantity" to item.quantity
+        )).addOnSuccessListener {
+            adapter.notifyDataSetChanged()
+            updateProductCount()
         }
     }
 
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_shopping_list, container, false)
+    private fun deleteItemFromFirestore(item: ShoppingItem) {
+        val uid = user?.uid ?: return
+        firestore.collection("users")
+            .document(uid)
+            .collection("shopping_list")
+            .document(item.name)
+            .delete()
+            .addOnSuccessListener {
+                shoppingList.remove(item)
+                adapter.notifyDataSetChanged()
+                updateProductCount()
+            }
     }
 
-    companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment ShoppingListFragment.
-         */
-        // TODO: Rename and change types and number of parameters
-        @JvmStatic
-        fun newInstance(param1: String, param2: String) =
-            ShoppingListFragment().apply {
-                arguments = Bundle().apply {
-                    putString(ARG_PARAM1, param1)
-                    putString(ARG_PARAM2, param2)
-                }
-            }
+    private fun updateProductCount() {
+        val total = shoppingList.sumOf { it.quantity }
+        tvProductCount.text = "$total productos"
     }
 }

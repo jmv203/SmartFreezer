@@ -3,9 +3,7 @@ package com.example.smartfreezer.navigation
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
-import android.view.MenuInflater
-import android.view.MenuItem
-import android.view.View
+import android.view.*
 import android.widget.*
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
@@ -16,19 +14,21 @@ import com.example.smartfreezer.adapters.UserProductAdapter
 import com.example.smartfreezer.models.UserProduct
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import com.skydoves.powerspinner.PowerSpinnerView
 
 class InventoryFragment : Fragment(R.layout.fragment_inventory) {
 
-    private lateinit var spinnerLocation: Spinner
+    private lateinit var spinnerLocation: PowerSpinnerView
     private lateinit var tvProductCount: TextView
     private lateinit var searchBar: EditText
     private lateinit var recyclerView: RecyclerView
     private lateinit var adapter: UserProductAdapter
     private lateinit var btnFilterOptions: Button
+    private lateinit var filterBadge: TextView
+
 
     private var fullItemList: List<UserProduct> = emptyList()
     private val firestore = FirebaseFirestore.getInstance()
-    private val currentUserEmail = FirebaseAuth.getInstance().currentUser?.email
 
     private var currentCategoryFilter: String = "Todos"
     private var currentConditionFilter: String = "Todos"
@@ -37,86 +37,93 @@ class InventoryFragment : Fragment(R.layout.fragment_inventory) {
         super.onViewCreated(view, savedInstanceState)
 
         spinnerLocation = view.findViewById(R.id.spinnerLocation)
+
         tvProductCount = view.findViewById(R.id.tvProductCount)
         searchBar = view.findViewById(R.id.searchBar)
         recyclerView = view.findViewById(R.id.rvInventory)
         btnFilterOptions = view.findViewById(R.id.btnFilterOptions)
+        filterBadge = view.findViewById(R.id.filterBadge)
+
 
         adapter = UserProductAdapter(emptyList())
         recyclerView.layoutManager = GridLayoutManager(requireContext(), 2)
         recyclerView.adapter = adapter
 
-        setupSpinners()
+        setupSpinner()
+        setupSearch()
+        setupFilterMenu()
 
-        spinnerLocation.onItemSelectedListener = spinnerListener
+        setupGreeting(view)
+        setupAddButton(view)
+
+        loadItemsFromFirestore()
+    }
+
+    private fun setupSpinner() {
+        val locations = listOf("Todos", "Nevera", "Congelador", "Despensa")
+        spinnerLocation.setItems(locations)
+        spinnerLocation.selectItemByIndex(0)
+        spinnerLocation.setOnSpinnerItemSelectedListener<String> { _, _, _, _ ->
+            applyFilters()
+
+        }
+
+        spinnerLocation.setOnSpinnerOutsideTouchListener { view, motionEvent ->
+            spinnerLocation.dismiss()
+        }
+    }
+
+    private fun setupSearch() {
         searchBar.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(s: Editable?) = applyFilters()
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
         })
-
-        btnFilterOptions.setOnClickListener { showPopupMenu(it) }
-
-        // Saludo al usuario
-        val currentUser = FirebaseAuth.getInstance().currentUser
-        currentUser?.let { user ->
-            val userRef = firestore.collection("users").document(user.uid)
-            userRef.get().addOnSuccessListener { document ->
-                if (document != null && document.exists()) {
-                    val userName = document.getString("name")
-                    view.findViewById<TextView>(R.id.tvGreeting).text = "Hola, $userName"
-                }
-            }
-        }
-
-        val fabAddProduct = view.findViewById<View>(R.id.fabAddProduct)
-        fabAddProduct.setOnClickListener {
-            findNavController().navigate(R.id.action_inventoryFragment_to_selectCategoryFragment)
-        }
-
-        loadItemsFromFirestore()
     }
 
-    private fun setupSpinners() {
-        val locations = listOf("Todos", "nevera", "congelador", "despensa")
-        spinnerLocation.adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_dropdown_item, locations)
+    private fun setupFilterMenu() {
+        btnFilterOptions.setOnClickListener { showPopupMenu(it) }
+    }
+
+    private fun setupGreeting(view: View) {
+        val currentUser = FirebaseAuth.getInstance().currentUser ?: return
+        firestore.collection("users").document(currentUser.uid).get()
+            .addOnSuccessListener { document ->
+                document.getString("name")?.let { name ->
+                    view.findViewById<TextView>(R.id.tvGreeting).text = "Hola, $name"
+                }
+            }
+    }
+
+    private fun setupAddButton(view: View) {
+        view.findViewById<View>(R.id.fabAddProduct).setOnClickListener {
+            findNavController().navigate(R.id.action_inventoryFragment_to_selectCategoryFragment)
+        }
     }
 
     private fun loadItemsFromFirestore() {
         val user = FirebaseAuth.getInstance().currentUser ?: return
-        val email = user.email ?: return
-        val uid = user.uid
-
         firestore.collection("users")
-            .document(uid)
+            .document(user.uid)
             .collection("products")
             .get()
             .addOnSuccessListener { snapshot ->
-                val products = snapshot.mapNotNull { doc ->
-                    val idProduct = doc.id
+                fullItemList = snapshot.mapNotNull { doc ->
                     val name = doc.getString("name") ?: return@mapNotNull null
-                    val iconName = doc.getString("icon") ?: return@mapNotNull null
-                    val iconRes = resources.getIdentifier(iconName, "drawable", requireContext().packageName)
+                    val icon = doc.getString("icon") ?: return@mapNotNull null
+                    val iconRes = resources.getIdentifier(icon, "drawable", requireContext().packageName)
 
                     UserProduct(
-                        idProduct = idProduct,
+                        idProduct = doc.id,
                         name = name,
-                        icon = iconName,
+                        icon = icon,
                         category = doc.getString("category") ?: "",
                         condition = doc.getString("condition") ?: "",
                         location = doc.getString("location") ?: "",
-                        expirationDate = doc.getDate("expirationDate"),
-                        purchaseDate = doc.getDate("purchaseDate"),
-                        idUser = email,
-                        nutritionFacts = mapOf(),
-                        startSeason = 0,
-                        lastSeason = 0
-                    ).apply {
-                        iconDrawableRes = iconRes
-                    }
+                        idUser = user.email ?: "",
+                        nutritionFacts = mapOf()
+                    ).apply { iconDrawableRes = iconRes }
                 }
-
-                fullItemList = products
                 applyFilters()
             }
             .addOnFailureListener {
@@ -124,17 +131,12 @@ class InventoryFragment : Fragment(R.layout.fragment_inventory) {
             }
     }
 
-    private val spinnerListener = object : AdapterView.OnItemSelectedListener {
-        override fun onItemSelected(parent: AdapterView<*>, view: View?, position: Int, id: Long) = applyFilters()
-        override fun onNothingSelected(parent: AdapterView<*>) {}
-    }
-
     private fun applyFilters() {
-        val location = spinnerLocation.selectedItem.toString()
+        val location = spinnerLocation.text.toString().lowercase()
         val query = searchBar.text.toString().lowercase()
 
         val filtered = fullItemList.filter { item ->
-            (location == "Todos" || item.location == location) &&
+            (location == "todos" || item.location == location) &&
                     (currentCategoryFilter == "Todos" || item.category == currentCategoryFilter) &&
                     (currentConditionFilter == "Todos" || item.condition == currentConditionFilter) &&
                     (query.isBlank() || item.name.lowercase().contains(query))
@@ -145,25 +147,45 @@ class InventoryFragment : Fragment(R.layout.fragment_inventory) {
     }
 
     private fun showPopupMenu(anchor: View) {
-        val popup = PopupMenu(requireContext(), anchor)
-        val inflater: MenuInflater = popup.menuInflater
-        inflater.inflate(R.menu.popup_filter_menu, popup.menu)
+        val themedContext = ContextThemeWrapper(requireContext(), R.style.PopupMenuPurple)
+        val popup = PopupMenu(themedContext, anchor)
+        popup.menuInflater.inflate(R.menu.popup_filter_menu, popup.menu)
+
+        // Set the initial checked states if needed (e.g., based on current filters)
+        val menu = popup.menu
+        menu.findItem(R.id.filter_fruit)?.isChecked = currentCategoryFilter == "fruta"
+        menu.findItem(R.id.filter_vegetable)?.isChecked = currentCategoryFilter == "verdura"
+        menu.findItem(R.id.filter_fresh)?.isChecked = currentConditionFilter == "fresco"
+        menu.findItem(R.id.filter_rotten)?.isChecked = currentConditionFilter == "podrido"
 
         popup.setOnMenuItemClickListener { item: MenuItem ->
             when (item.itemId) {
-                R.id.filter_fruit -> currentCategoryFilter = "fruta"
-                R.id.filter_vegetable -> currentCategoryFilter = "verdura"
-                R.id.filter_fresh -> currentConditionFilter = "fresco"
-                R.id.filter_rotten -> currentConditionFilter = "podrido"
+                R.id.filter_fruit -> currentCategoryFilter = if (item.isChecked) "Todos" else "fruta" // Toggle
+                R.id.filter_vegetable -> currentCategoryFilter = if (item.isChecked) "Todos" else "verdura" // Toggle
+                R.id.filter_fresh -> currentConditionFilter = if (item.isChecked) "Todos" else "fresco" // Toggle
+                R.id.filter_rotten -> currentConditionFilter = if (item.isChecked) "Todos" else "podrido" // Toggle
                 R.id.filter_clear -> {
                     currentCategoryFilter = "Todos"
                     currentConditionFilter = "Todos"
+                    // Uncheck all filter items
+                    menu.findItem(R.id.filter_fruit)?.isChecked = false
+                    menu.findItem(R.id.filter_vegetable)?.isChecked = false
+                    menu.findItem(R.id.filter_fresh)?.isChecked = false
+                    menu.findItem(R.id.filter_rotten)?.isChecked = false
                 }
             }
+            item.isChecked = !item.isChecked // Update the checked state visually
             applyFilters()
+
+            val activeFilters = listOf(currentCategoryFilter, currentConditionFilter).count { it != "Todos" }
+            if (activeFilters > 0) {
+                filterBadge.visibility = View.VISIBLE
+                filterBadge.text = activeFilters.toString()
+            } else {
+                filterBadge.visibility = View.GONE
+            }
             true
         }
-
         popup.show()
     }
 }

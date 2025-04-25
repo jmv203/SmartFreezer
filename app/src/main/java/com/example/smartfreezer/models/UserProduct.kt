@@ -1,5 +1,4 @@
 package com.example.smartfreezer.models
-import java.util.Date
 
 data class UserProduct(
     val idProduct: String = "",
@@ -8,8 +7,6 @@ data class UserProduct(
     val category: String = "",
     val condition: String = "",
     val location: String = "",
-    val expirationDate: Date? = null,
-    val purchaseDate: Date? = null,
     val idUser: String = "",
     val nutritionFacts: Map<String, String> = emptyMap(),
     val startSeason: Int = 0,

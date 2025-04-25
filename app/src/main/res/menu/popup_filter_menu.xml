@@ -6,12 +6,12 @@
             <menu>
                 <item
                     android:id="@+id/filter_fruit"
-                    android:icon="@drawable/ic_fruit"
-                    android:title="Fruta" />
+                    android:title="Fruta"
+                    android:checkable="true" />
                 <item
                     android:id="@+id/filter_vegetable"
-                    android:icon="@drawable/ic_vegetable"
-                    android:title="Verdura" />
+                    android:title="Verdura"
+                    android:checkable="true" />
             </menu>
         </item>
 
@@ -20,12 +20,12 @@
             <menu>
                 <item
                     android:id="@+id/filter_fresh"
-                    android:icon="@drawable/ic_fruit"
-                    android:title="Fresco" />
+                    android:title="Fresco"
+                    android:checkable="true" />
                 <item
                     android:id="@+id/filter_rotten"
-                    android:icon="@drawable/ic_vegetable"
-                    android:title="Podrido" />
+                    android:title="Podrido"
+                    android:checkable="true" />
             </menu>
         </item>
 

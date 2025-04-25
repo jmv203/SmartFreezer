@@ -16,7 +16,17 @@
     <fragment
         android:id="@+id/listFragment"
         android:name="com.example.smartfreezer.navigation.ShoppingListFragment"
-        android:label="Lista" />
+        android:label="Lista">
+
+        <action
+            android:id="@+id/action_listFragment_to_addShoppingListFragment"
+            app:destination="@id/addShoppingListFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/addShoppingListFragment"
+        android:name="com.example.smartfreezer.navigation.AddShoppingListFragment"
+        android:label="Añadir a la Lista" />
 
     <fragment
         android:id="@+id/scannerFragment"

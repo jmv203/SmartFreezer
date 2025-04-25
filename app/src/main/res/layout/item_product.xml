@@ -6,7 +6,7 @@
     android:layout_height="wrap_content"
     android:layout_margin="8dp"
     app:cardCornerRadius="12dp"
-    app:cardBackgroundColor="@color/colorNavBar"
+    app:cardBackgroundColor="@color/white"
     app:cardElevation="4dp">
 
     <LinearLayout
@@ -29,7 +29,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Manzana"
-            android:textColor="@color/white"
+            android:textColor="@color/purpleButton"
             android:textSize="16sp"
             android:textStyle="bold"
             android:layout_marginTop="8dp"
