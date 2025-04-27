@@ -47,7 +47,7 @@ class ShoppingListFragment : Fragment(R.layout.fragment_shopping_list) {
                 }
             })
 
-        recyclerView.layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
+        recyclerView.layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
         recyclerView.adapter = adapter
 
         fabAddProduct.setOnClickListener {

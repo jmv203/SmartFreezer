@@ -49,7 +49,7 @@ class AddProductFragment : Fragment(R.layout.fragment_add_product) {
         btnDecrease = view.findViewById(R.id.btnDecrease)
 
         // Botón de retroceso
-        btnBack = view.findViewById(R.id.btnBack)
+        btnBack = view.findViewById(R.id.btnBackAddProduct)
 
         val locations = listOf("nevera", "congelador", "despensa")
         val conditions = listOf("fresco", "podrido")

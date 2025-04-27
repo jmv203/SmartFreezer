@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:fillViewport="true"
     android:background="@drawable/bottom_sheet_background"
+    android:fillViewport="true"
     android:padding="16dp">
 
     <LinearLayout
@@ -12,136 +13,146 @@
         android:orientation="vertical">
 
         <TextView
-            android:text="Filtrar Recetas"
-            android:textSize="20sp"
-            android:textStyle="bold"
-            android:layout_marginBottom="12dp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
-
-        <!-- Tipo de plato -->
-        <TextView
-            android:text="Tipo de plato"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:text="Filtrar Recetas"
+            android:textColor="@color/purpleButton"
+            android:textSize="20sp"
             android:textStyle="bold" />
 
-        <RadioGroup
-            android:id="@+id/radioGroupDishType"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <RadioButton
-                android:id="@+id/rbAll"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Todos" />
-
-            <RadioButton
-                android:id="@+id/rbMainCourse"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Principal" />
-
-            <RadioButton
-                android:id="@+id/rbSalad"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Ensalada" />
-
-            <RadioButton
-                android:id="@+id/rbSoup"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Sopa" />
-
-            <RadioButton
-                android:id="@+id/rbDessert"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Postre" />
-
-            <RadioButton
-                android:id="@+id/rbDrink"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Bebida" />
-
-        </RadioGroup>
-
-        <!-- Ingredientes disponibles -->
         <TextView
-            android:text="Ingredientes disponibles"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textStyle="bold"
-            android:layout_marginTop="16dp" />
+            android:text="Tipo de plato"
+            android:layout_marginBottom="8dp"
+            android:textColor="@color/purpleButton"
+            android:textStyle="bold" />
+
+        <com.google.android.material.chip.ChipGroup
+            android:id="@+id/chipGroupDishType"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:singleSelection="true"
+            app:selectionRequired="false">
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chipMainCourse"
+                style="@style/Widget.MaterialComponents.Chip.Filter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:backgroundTint="@color/colorNavBar"
+                android:textColor="@color/white"
+                android:text="Principal" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chipSalad"
+                style="@style/Widget.MaterialComponents.Chip.Filter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:backgroundTint="@color/colorNavBar"
+                android:textColor="@color/white"
+                android:text="Ensalada" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chipSoup"
+                style="@style/Widget.MaterialComponents.Chip.Filter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:backgroundTint="@color/colorNavBar"
+                android:textColor="@color/white"
+                android:text="Sopa" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chipDessert"
+                style="@style/Widget.MaterialComponents.Chip.Filter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:backgroundTint="@color/colorNavBar"
+                android:textColor="@color/white"
+                android:text="Postre" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chipDrink"
+                style="@style/Widget.MaterialComponents.Chip.Filter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:backgroundTint="@color/colorNavBar"
+                android:textColor="@color/white"
+                android:text="Bebida" />
+        </com.google.android.material.chip.ChipGroup>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="Ingredientes disponibles"
+            android:textColor="@color/purpleButton"
+            android:textStyle="bold" />
+
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/ingredientsRecyclerView"
             android:layout_width="match_parent"
-            android:layout_height="120dp"
+            android:layout_height="wrap_content"
             android:overScrollMode="never"
-            android:scrollbars="vertical" />
+            android:scrollbars="vertical"
+            android:layout_marginTop="8dp"
+            android:orientation="horizontal"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
 
-        <!-- Dieta -->
         <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
             android:text="Tipo de dieta"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textStyle="bold"
-            android:layout_marginTop="16dp" />
+            android:layout_marginBottom="8dp"
+            android:textColor="@color/purpleButton"
+            android:textStyle="bold" />
 
-        <RadioGroup
-            android:id="@+id/radioGroupDiet"
+        <com.google.android.material.chip.ChipGroup
+            android:id="@+id/chipGroupDiet"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <RadioButton
-            android:id="@+id/rbAllDiet"
-            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Todas" />
-            <RadioButton
-                android:id="@+id/rbVegan"
+            app:singleSelection="true"
+            app:selectionRequired="false">
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chipVegan"
+                style="@style/Widget.MaterialComponents.Chip.Filter"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:backgroundTint="@color/colorNavBar"
+                android:textColor="@color/white"
                 android:text="Vegana" />
-            <RadioButton
-                android:id="@+id/rbVegetarian"
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chipVegetarian"
+                style="@style/Widget.MaterialComponents.Chip.Filter"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:backgroundTint="@color/colorNavBar"
+                android:textColor="@color/white"
                 android:text="Vegetariana" />
-            <RadioButton
-                android:id="@+id/rbGlutenFree"
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chipGlutenFree"
+                style="@style/Widget.MaterialComponents.Chip.Filter"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:backgroundTint="@color/colorNavBar"
+                android:textColor="@color/white"
                 android:text="Sin gluten" />
-        </RadioGroup>
-
-        <!-- Valoración -->
-        <TextView
-            android:text="Valoración mínima"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textStyle="bold"
-            android:layout_marginTop="16dp" />
-
-        <RatingBar
-            android:id="@+id/ratingBarFilter"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:numStars="5"
-            android:stepSize="0.5" />
+        </com.google.android.material.chip.ChipGroup>
 
         <Button
             android:id="@+id/btnApplyFilters"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Aplicar Filtros"
             android:layout_marginTop="24dp"
             android:backgroundTint="@color/purpleButton"
-            android:textColor="@android:color/white"
-            android:fontFamily="@font/roboto_medium" />
+            android:fontFamily="@font/roboto_medium"
+            android:text="Aplicar Filtros"
+            android:textColor="@android:color/white" />
     </LinearLayout>
 </androidx.core.widget.NestedScrollView>

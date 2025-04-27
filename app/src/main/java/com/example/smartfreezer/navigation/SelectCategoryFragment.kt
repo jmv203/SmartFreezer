@@ -21,7 +21,7 @@ class SelectCategoryFragment : Fragment(R.layout.fragment_select_category) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         recyclerView = view.findViewById(R.id.recyclerCategories)
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
-        btnBack = view.findViewById(R.id.btnBack) // Inicializa el botón de retroceso
+        btnBack = view.findViewById(R.id.btnBackSelectCategory) // Inicializa el botón de retroceso
 
         val categories = listOf(
             Category("Fruta", R.drawable.ic_fruit),

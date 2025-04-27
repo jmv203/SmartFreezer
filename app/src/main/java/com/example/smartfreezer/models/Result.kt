@@ -1,12 +1,9 @@
 package com.example.smartfreezer.models
 
 
-import android.os.Parcelable
+
 import com.google.gson.annotations.SerializedName
-import kotlinx.android.parcel.Parcelize
 
-
-@Parcelize
 data class Result(
     @SerializedName("dishTypes")
     val dishTypes: List<String>,
@@ -20,4 +17,4 @@ data class Result(
     val spoonacularScore: Double,
     @SerializedName("title")
     val title: String,
-): Parcelable
+)

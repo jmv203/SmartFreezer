@@ -63,15 +63,5 @@ class HomeActivity : AppCompatActivity() {
             binding.bottomBar.itemActiveIndex = index
         }
 
-        // Maneja el botón "Atrás"
-        onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
-            override fun handleOnBackPressed() {
-                if (navController.currentDestination?.id != R.id.inventoryFragment) {
-                    navController.navigate(R.id.inventoryFragment)
-                } else {
-                    finish()
-                }
-            }
-        })
     }
 }

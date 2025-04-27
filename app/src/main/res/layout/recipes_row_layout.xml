@@ -23,6 +23,7 @@
             android:layout_width="100dp"
             android:layout_height="100dp"
             android:scaleType="centerCrop"
+            android:layout_marginEnd="16dp"
             app:loadImageFromUrl="@{result.image}" />
 
         <LinearLayout
@@ -61,8 +62,8 @@
                 android:layout_marginTop="4dp"
                 android:isIndicator="true"
                 android:numStars="5"
-                android:scaleX="0.5"
-                android:scaleY="0.5"
+                android:scaleX="0.3"
+                android:scaleY="0.3"
                 android:stepSize="0.5"
                 android:rating="@{(float)(result.spoonacularScore / 20f)}" />
         </LinearLayout>

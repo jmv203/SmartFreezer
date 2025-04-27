@@ -62,7 +62,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Lista de compra"
-            android:textSize="38sp"
+            android:textSize="34sp"
             android:textColor="@android:color/white"
             android:fontFamily="@font/roboto_light" />
 
@@ -102,17 +102,13 @@
     <!-- FAB añadir producto -->
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fabAddProductShoppingList"
-        android:layout_width="60dp"
-        android:layout_height="60dp"
-        android:layout_marginEnd="30dp"
-        android:layout_marginBottom="40dp"
-        android:clickable="true"
-        android:focusable="true"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
         android:src="@drawable/add"
+        android:contentDescription="Add Chart"
         app:backgroundTint="@color/purpleButton"
-        app:borderWidth="25dp"
-        app:fabCustomSize="60dp"
-        app:rippleColor="@color/white"
+        app:tint="@android:color/white"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -31,7 +31,7 @@ class AddShoppingListFragment : Fragment(R.layout.fragment_add_shopping_list) {
 
         recyclerView = view.findViewById(R.id.rvBasicProducts)
         searchBar = view.findViewById(R.id.searchBar)
-        val btnBack = view.findViewById<ImageView>(R.id.btnBack)
+        val btnBack = view.findViewById<ImageView>(R.id.btnBackAddShoppingProduct)
 
         recyclerView.layoutManager = GridLayoutManager(requireContext(), 2)
         adapter = BasicProductAdapter(emptyList()) { product ->

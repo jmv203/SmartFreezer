@@ -30,12 +30,22 @@ class RecipesViewModel @Inject constructor(
     private val _recipesResponse = MutableLiveData<NetworkResult<List<Result>>>()
     val recipesResponse: LiveData<NetworkResult<List<Result>>> get() = _recipesResponse
 
+    var selectedType: String = ""
+    var selectedDiet: String = ""
+    var selectedRating: Int = 0
+    var selectedIngredients: List<String> = emptyList()
+
+    var offset: Int = 0
+
     fun getRecipes(queries: Map<String, String>) {
         _recipesResponse.value = NetworkResult.Loading()
 
         viewModelScope.launch {
             if (hasInternetConnection()) {
                 try {
+                    val queryString = queries.map { "${it.key}=${it.value}" }.joinToString("&")
+                    val fullUrl = "https://api.spoonacular.com/recipes/complexSearch?$queryString"
+                    android.util.Log.d("API_REQUEST_URL", fullUrl)
                     val response = foodRecipesApi.getRecipes(queries)
                     _recipesResponse.value = handleResponse(response)
                 } catch (e: Exception) {
@@ -53,7 +63,7 @@ class RecipesViewModel @Inject constructor(
             if (data != null && data.isNotEmpty()) {
                 NetworkResult.Success(data)
             } else {
-                NetworkResult.Error("Error: No data found")
+                NetworkResult.Error("No recipes found")
             }
         } else {
             NetworkResult.Error("Error: ${response.message()}")
@@ -61,9 +71,7 @@ class RecipesViewModel @Inject constructor(
     }
 
     private fun hasInternetConnection(): Boolean {
-        val connectivityManager = context.getSystemService(
-            Context.CONNECTIVITY_SERVICE
-        ) as ConnectivityManager
+        val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
         val activeNetwork = connectivityManager.activeNetwork ?: return false
         val capabilities = connectivityManager.getNetworkCapabilities(activeNetwork) ?: return false
         return capabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) ||
@@ -73,12 +81,34 @@ class RecipesViewModel @Inject constructor(
 
     fun applyQueries(): HashMap<String, String> {
         val queries = HashMap<String, String>()
-        queries[QUERY_NUMBER] = "50"
+        queries[QUERY_NUMBER] = "20"
         queries[QUERY_API_KEY] = API_KEY
-        queries[QUERY_TYPE] = "main course"
-        queries[QUERY_DIET] = "vegan"
+        queries[QUERY_TYPE] = selectedType
+        queries[QUERY_DIET] = selectedDiet
         queries[QUERY_ADD_RECIPE_INFORMATION] = "true"
         queries[QUERY_FILL_INGREDIENTS] = "true"
+        queries["offset"] = offset.toString()
+
+        if (selectedIngredients.isNotEmpty()) {
+            queries["includeIngredients"] = selectedIngredients.joinToString(",")
+        }
+
         return queries
+    }
+
+    fun updateFilters(type: String, diet: String, rating: Int, ingredients: List<String>) {
+        selectedType = type
+        selectedDiet = diet
+        selectedRating = rating
+        selectedIngredients = ingredients
+        offset = 0
+    }
+
+    fun resetOffset() {
+        offset = 0
+    }
+
+    fun increaseOffset() {
+        offset += 20
     }
 }

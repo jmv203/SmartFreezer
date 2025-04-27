@@ -1,5 +1,6 @@
 package com.example.smartfreezer.adapters
 
+
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
@@ -16,7 +17,6 @@ class RecipesAdapter : RecyclerView.Adapter<RecipesAdapter.MyViewHolder>() {
 
         fun bind(result: Result){
             binding.result = result
-
             binding.executePendingBindings()
         }
 

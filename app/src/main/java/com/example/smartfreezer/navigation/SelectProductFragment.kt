@@ -22,7 +22,7 @@ class SelectProductFragment : Fragment(R.layout.fragment_select_product) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         recyclerView = view.findViewById(R.id.recyclerProducts)
         recyclerView.layoutManager = GridLayoutManager(requireContext(), 2)
-        btnBack = view.findViewById(R.id.btnBack) // Inicializa el botón de retroceso
+        btnBack = view.findViewById(R.id.btnBackSelectProduct) // Inicializa el botón de retroceso
 
         val category = arguments?.getString("category")?.lowercase() ?: return
         Log.d("SelectProductFragment", "Categoría recibida: $category")
