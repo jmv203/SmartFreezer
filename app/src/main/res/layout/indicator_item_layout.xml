@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+        <import type="android.view.View" />
+        <variable
+            name="iconRes"
+            type="Integer" />
+        <variable
+            name="text"
+            type="String" />
+        <variable
+            name="isVisible"
+            type="Boolean" />
+    </data>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:padding="8dp"
+        android:visibility="@{isVisible ? View.VISIBLE : View.GONE}">
+
+        <ImageView
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            app:drawableResource="@{iconRes}"
+            app:tint="@color/purpleButton"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@{text}"
+            android:textSize="12sp"
+            android:textColor="@android:color/black"
+            android:fontFamily="@font/roboto"
+            android:gravity="center" />
+    </LinearLayout>
+</layout>

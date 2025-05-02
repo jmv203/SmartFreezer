@@ -41,7 +41,6 @@
                 style="@style/Widget.MaterialComponents.Chip.Filter"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:backgroundTint="@color/colorNavBar"
                 android:textColor="@color/white"
                 android:text="Principal" />
 
@@ -50,7 +49,6 @@
                 style="@style/Widget.MaterialComponents.Chip.Filter"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:backgroundTint="@color/colorNavBar"
                 android:textColor="@color/white"
                 android:text="Ensalada" />
 
@@ -59,7 +57,6 @@
                 style="@style/Widget.MaterialComponents.Chip.Filter"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:backgroundTint="@color/colorNavBar"
                 android:textColor="@color/white"
                 android:text="Sopa" />
 
@@ -68,7 +65,6 @@
                 style="@style/Widget.MaterialComponents.Chip.Filter"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:backgroundTint="@color/colorNavBar"
                 android:textColor="@color/white"
                 android:text="Postre" />
 
@@ -77,7 +73,6 @@
                 style="@style/Widget.MaterialComponents.Chip.Filter"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:backgroundTint="@color/colorNavBar"
                 android:textColor="@color/white"
                 android:text="Bebida" />
         </com.google.android.material.chip.ChipGroup>
@@ -122,7 +117,6 @@
                 style="@style/Widget.MaterialComponents.Chip.Filter"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:backgroundTint="@color/colorNavBar"
                 android:textColor="@color/white"
                 android:text="Vegana" />
 
@@ -131,7 +125,6 @@
                 style="@style/Widget.MaterialComponents.Chip.Filter"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:backgroundTint="@color/colorNavBar"
                 android:textColor="@color/white"
                 android:text="Vegetariana" />
 
@@ -140,7 +133,6 @@
                 style="@style/Widget.MaterialComponents.Chip.Filter"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:backgroundTint="@color/colorNavBar"
                 android:textColor="@color/white"
                 android:text="Sin gluten" />
         </com.google.android.material.chip.ChipGroup>

@@ -5,9 +5,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.smartfreezer.adapters.IngredientsAdapter
+import com.example.smartfreezer.adapters.UserIngredientsAdapter
 import com.example.smartfreezer.databinding.DialogRecipesFilterBinding
-import com.example.smartfreezer.models.Ingredients
+import com.example.smartfreezer.models.UserIngredient
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
@@ -28,7 +28,7 @@ class RecipesFilterBottomSheet(
     private val db = FirebaseFirestore.getInstance()
     private val auth = FirebaseAuth.getInstance()
 
-    private lateinit var ingredientsAdapter: IngredientsAdapter
+    private lateinit var userIngredientsAdapter: UserIngredientsAdapter
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -71,9 +71,9 @@ class RecipesFilterBottomSheet(
     }
 
     private fun setupRecyclerView() {
-        ingredientsAdapter = IngredientsAdapter()
+        userIngredientsAdapter = UserIngredientsAdapter()
         binding.ingredientsRecyclerView.apply {
-            adapter = ingredientsAdapter
+            adapter = userIngredientsAdapter
             layoutManager = LinearLayoutManager(requireContext())
         }
     }
@@ -87,9 +87,9 @@ class RecipesFilterBottomSheet(
             .get()
             .addOnSuccessListener { result ->
                 val ingredients = result.documents.mapNotNull { document ->
-                    document.toObject<Ingredients>()
+                    document.toObject<UserIngredient>()
                 }
-                ingredientsAdapter.setIngredients(ingredients)
+                userIngredientsAdapter.setIngredients(ingredients)
             }
             .addOnFailureListener {
                 // Handle error

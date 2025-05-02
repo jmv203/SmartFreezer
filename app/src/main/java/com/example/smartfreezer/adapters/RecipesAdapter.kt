@@ -11,6 +11,11 @@ import com.example.smartfreezer.models.Result
 class RecipesAdapter : RecyclerView.Adapter<RecipesAdapter.MyViewHolder>() {
 
     private var recipes = emptyList<Result>()
+    private var onItemClickListener: ((Int) -> Unit)? = null
+
+    fun setOnItemClickListener(listener: (Int) -> Unit) {
+        onItemClickListener = listener
+    }
 
 
     class MyViewHolder(private val binding: RecipesRowLayoutBinding) : RecyclerView.ViewHolder(binding.root) {
@@ -41,6 +46,11 @@ class RecipesAdapter : RecyclerView.Adapter<RecipesAdapter.MyViewHolder>() {
     override fun onBindViewHolder(holder: MyViewHolder, position: Int) {
         val currentRecipe = recipes[position]
         holder.bind(currentRecipe)
+
+        // Set click listener on the item view
+        holder.itemView.setOnClickListener {
+            onItemClickListener?.invoke(currentRecipe.id)
+        }
 
     }
 

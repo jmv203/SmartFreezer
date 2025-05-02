@@ -3,18 +3,20 @@ package com.example.smartfreezer.viewmodels
 import android.content.Context
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
+import android.util.Log
 import androidx.lifecycle.*
 import com.example.smartfreezer.api.FoodRecipesApi
-import com.example.smartfreezer.models.FoodRecipe
-import com.example.smartfreezer.models.Result
-import com.example.smartfreezer.util.NetworkResult
+import com.example.smartfreezer.models.*
 import com.example.smartfreezer.util.Constants.Companion.API_KEY
+import com.example.smartfreezer.util.Constants.Companion.QUERY_ADD_NUTRITION
 import com.example.smartfreezer.util.Constants.Companion.QUERY_ADD_RECIPE_INFORMATION
 import com.example.smartfreezer.util.Constants.Companion.QUERY_API_KEY
 import com.example.smartfreezer.util.Constants.Companion.QUERY_DIET
 import com.example.smartfreezer.util.Constants.Companion.QUERY_FILL_INGREDIENTS
+import com.example.smartfreezer.util.Constants.Companion.QUERY_INSTRUCTION_REQUIRED
 import com.example.smartfreezer.util.Constants.Companion.QUERY_NUMBER
 import com.example.smartfreezer.util.Constants.Companion.QUERY_TYPE
+import com.example.smartfreezer.util.NetworkResult
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.launch
@@ -29,6 +31,12 @@ class RecipesViewModel @Inject constructor(
 
     private val _recipesResponse = MutableLiveData<NetworkResult<List<Result>>>()
     val recipesResponse: LiveData<NetworkResult<List<Result>>> get() = _recipesResponse
+
+    private val _recipeDetailsResponse = MutableLiveData<NetworkResult<RecipeDetails>>()
+    val recipeDetailsResponse: LiveData<NetworkResult<RecipeDetails>> get() = _recipeDetailsResponse
+
+    private val _recipeInstructionsResponse = MutableLiveData<NetworkResult<List<RecipeDetails>>>()
+    val recipeInstructionsResponse: LiveData<NetworkResult<List<RecipeDetails>>> get() = _recipeInstructionsResponse
 
     var selectedType: String = ""
     var selectedDiet: String = ""
@@ -45,9 +53,9 @@ class RecipesViewModel @Inject constructor(
                 try {
                     val queryString = queries.map { "${it.key}=${it.value}" }.joinToString("&")
                     val fullUrl = "https://api.spoonacular.com/recipes/complexSearch?$queryString"
-                    android.util.Log.d("API_REQUEST_URL", fullUrl)
+                    Log.d("API_REQUEST_URL", fullUrl)
                     val response = foodRecipesApi.getRecipes(queries)
-                    _recipesResponse.value = handleResponse(response)
+                    _recipesResponse.value = handleRecipesResponse(response)
                 } catch (e: Exception) {
                     _recipesResponse.value = NetworkResult.Error("Error: ${e.message}")
                 }
@@ -57,7 +65,7 @@ class RecipesViewModel @Inject constructor(
         }
     }
 
-    private fun handleResponse(response: Response<FoodRecipe>): NetworkResult<List<Result>> {
+    private fun handleRecipesResponse(response: Response<FoodRecipe>): NetworkResult<List<Result>> {
         return if (response.isSuccessful) {
             val data = response.body()?.results
             if (data != null && data.isNotEmpty()) {
@@ -65,6 +73,58 @@ class RecipesViewModel @Inject constructor(
             } else {
                 NetworkResult.Error("No recipes found")
             }
+        } else {
+            NetworkResult.Error("Error: ${response.message()}")
+        }
+    }
+
+    fun getRecipeDetails(recipeId: Int) {
+        _recipeDetailsResponse.value = NetworkResult.Loading()
+        viewModelScope.launch {
+            if (hasInternetConnection()) {
+                try {
+                    val response = foodRecipesApi.getRecipeDetails(recipeId, API_KEY, true) // Include nutrition
+                    _recipeDetailsResponse.value = handleRecipeDetailsResponse(response)
+                } catch (e: Exception) {
+                    _recipeDetailsResponse.value = NetworkResult.Error("Error: ${e.message}")
+                }
+            } else {
+                _recipeDetailsResponse.value = NetworkResult.Error("No Internet Connection")
+            }
+        }
+    }
+
+    private fun handleRecipeDetailsResponse(response: Response<RecipeDetails>): NetworkResult<RecipeDetails> {
+        return if (response.isSuccessful) {
+            response.body()?.let {
+                NetworkResult.Success(it)
+            } ?: NetworkResult.Error("No se encontraron detalles de la receta")
+        } else {
+            NetworkResult.Error("Error: ${response.message()}")
+        }
+    }
+
+    fun getRecipeInstructions(recipeId: Int, stepBreakdown: Boolean = false) {
+        _recipeInstructionsResponse.value = NetworkResult.Loading()
+        viewModelScope.launch {
+            if (hasInternetConnection()) {
+                try {
+                    val response = foodRecipesApi.getAnalyzedRecipeInstructions(recipeId, API_KEY, stepBreakdown)
+                    _recipeInstructionsResponse.value = handleRecipeInstructionsResponse(response)
+                } catch (e: Exception) {
+                    _recipeInstructionsResponse.value = NetworkResult.Error("Error: ${e.message}")
+                }
+            } else {
+                _recipeInstructionsResponse.value = NetworkResult.Error("No Internet Connection")
+            }
+        }
+    }
+
+    private fun handleRecipeInstructionsResponse(response: Response<List<RecipeDetails>>): NetworkResult<List<RecipeDetails>> {
+        return if (response.isSuccessful) {
+            response.body()?.let {
+                NetworkResult.Success(it)
+            } ?: NetworkResult.Error("No se encontraron instrucciones")
         } else {
             NetworkResult.Error("Error: ${response.message()}")
         }
@@ -85,8 +145,10 @@ class RecipesViewModel @Inject constructor(
         queries[QUERY_API_KEY] = API_KEY
         queries[QUERY_TYPE] = selectedType
         queries[QUERY_DIET] = selectedDiet
+        queries[QUERY_INSTRUCTION_REQUIRED] = "true"
         queries[QUERY_ADD_RECIPE_INFORMATION] = "true"
         queries[QUERY_FILL_INGREDIENTS] = "true"
+        queries[QUERY_ADD_NUTRITION] = "true"
         queries["offset"] = offset.toString()
 
         if (selectedIngredients.isNotEmpty()) {

@@ -3,7 +3,7 @@ package com.example.smartfreezer.models
 
 import com.google.gson.annotations.SerializedName
 
-data class ResultX(
+data class RecipeDetails(
     @SerializedName("aggregateLikes")
     val aggregateLikes: Int?,
     @SerializedName("analyzedInstructions")

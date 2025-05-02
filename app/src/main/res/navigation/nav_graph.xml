@@ -36,7 +36,20 @@
     <fragment
         android:id="@+id/recipesFragment"
         android:name="com.example.smartfreezer.navigation.RecipesFragment"
-        android:label="Recetas" />
+        android:label="Recetas">
+        <action
+            android:id="@+id/action_recipesFragment_to_recipeDetailsFragment"
+            app:destination="@id/recipeDetailsFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/recipeDetailsFragment"
+        android:name="com.example.smartfreezer.navigation.RecipeDetailsFragment"
+        android:label="Detalles de la Receta">
+        <argument
+            android:name="recipeId"
+            app:argType="integer" />
+    </fragment>
 
     <fragment
         android:id="@+id/alertsFragment"

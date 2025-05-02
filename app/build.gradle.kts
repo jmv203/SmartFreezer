@@ -88,6 +88,10 @@ dependencies {
     implementation("com.facebook.shimmer:shimmer:0.5.0")
     //Swipe Refresh Layout
     implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.1.0")
+    //Rounded Image
+    implementation ("com.makeramen:roundedimageview:2.3.0")
+    //Palette
+    implementation("androidx.palette:palette-ktx:1.0.0")
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)

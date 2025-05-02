@@ -6,7 +6,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.smartfreezer.databinding.ItemIngredientBinding
 import com.example.smartfreezer.models.UserIngredient
 
-class IngredientsUserAdapter : RecyclerView.Adapter<IngredientsUserAdapter.IngredientViewHolder>() {
+class UserIngredientsAdapter : RecyclerView.Adapter<UserIngredientsAdapter.IngredientViewHolder>() {
 
     private var userIngredientList = listOf<UserIngredient>()
     private val selectedIngredientIcons = mutableSetOf<String>() // Store icons

@@ -2,17 +2,17 @@ package com.example.smartfreezer.navigation
 
 import android.os.Bundle
 import android.view.View
-import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.smartfreezer.R
-import com.example.smartfreezer.adapters.IngredientsAdapter
+import com.example.smartfreezer.adapters.UserIngredientsAdapter
 import com.example.smartfreezer.adapters.RecipesAdapter
 import com.example.smartfreezer.databinding.FragmentRecipesBinding
 import com.example.smartfreezer.databinding.DialogRecipesFilterBinding
-import com.example.smartfreezer.models.Ingredients
+import com.example.smartfreezer.models.UserIngredient
 import com.example.smartfreezer.util.NetworkResult
 import com.example.smartfreezer.viewmodels.RecipesViewModel
 import com.google.android.material.bottomsheet.BottomSheetDialog
@@ -38,6 +38,7 @@ class RecipesFragment : Fragment(R.layout.fragment_recipes) {
 
         setupGreeting()
         setupRecyclerView()
+        setupRecyclerView()
         setupPullToRefresh()
         setupLoadMoreButton()
         setupFilterButton()
@@ -59,6 +60,12 @@ class RecipesFragment : Fragment(R.layout.fragment_recipes) {
         binding.recipesRecyclerView.apply {
             layoutManager = LinearLayoutManager(requireContext())
             adapter = recipesAdapter
+        }
+
+        // Set the item click listener
+        recipesAdapter.setOnItemClickListener { recipeId ->
+            val action = RecipesFragmentDirections.actionRecipesFragmentToRecipeDetailsFragment(recipeId)
+            findNavController().navigate(action)
         }
     }
 
@@ -139,6 +146,7 @@ class RecipesFragment : Fragment(R.layout.fragment_recipes) {
             "drink" -> filterBinding.chipDrink.isChecked = true
         }
 
+        // Listener del ChipGroup de tipo de plato (SIN LLAMADA A LA API)
         filterBinding.chipGroupDishType.setOnCheckedChangeListener { group, checkedId ->
             selectedType = when (checkedId) {
                 R.id.chipMainCourse -> "main course"
@@ -148,14 +156,6 @@ class RecipesFragment : Fragment(R.layout.fragment_recipes) {
                 R.id.chipDrink -> "drink"
                 else -> ""
             }
-            recipesViewModel.updateFilters(
-                type = selectedType,
-                diet = selectedDiet,
-                rating = selectedRating,
-                ingredients = selectedIngredients
-            )
-            recipesList.clear()
-            requestApiData()
         }
 
         // Configuración inicial del tipo de dieta
@@ -165,6 +165,7 @@ class RecipesFragment : Fragment(R.layout.fragment_recipes) {
             "gluten free" -> filterBinding.chipGlutenFree.isChecked = true
         }
 
+        // Listener del ChipGroup de tipo de dieta
         filterBinding.chipGroupDiet.setOnCheckedChangeListener { group, checkedId ->
             selectedDiet = when (checkedId) {
                 R.id.chipVegan -> "vegan"
@@ -172,20 +173,12 @@ class RecipesFragment : Fragment(R.layout.fragment_recipes) {
                 R.id.chipGlutenFree -> "gluten free"
                 else -> ""
             }
-            recipesViewModel.updateFilters(
-                type = selectedType,
-                diet = selectedDiet,
-                rating = selectedRating,
-                ingredients = selectedIngredients
-            )
-            recipesList.clear()
-            requestApiData()
         }
 
-        val ingredientsAdapter = IngredientsAdapter()
+        val userIngredientsAdapter = UserIngredientsAdapter()
         filterBinding.ingredientsRecyclerView.apply {
             layoutManager = GridLayoutManager(requireContext(), 2)
-            adapter = ingredientsAdapter
+            adapter = userIngredientsAdapter
         }
 
         val db = FirebaseFirestore.getInstance()
@@ -197,13 +190,14 @@ class RecipesFragment : Fragment(R.layout.fragment_recipes) {
                 .collection("products")
                 .get()
                 .addOnSuccessListener { documents ->
-                    val products = documents.mapNotNull { it.toObject<Ingredients>() }
-                    ingredientsAdapter.setIngredients(products, recipesViewModel.selectedIngredients)
+                    val products = documents.mapNotNull { it.toObject<UserIngredient>() }
+                    userIngredientsAdapter.setIngredients(products, recipesViewModel.selectedIngredients)
                 }
         }
 
+        // OnClickListener del botón "Aplicar Filtros"
         filterBinding.btnApplyFilters.setOnClickListener {
-            val selectedIngredientIcons = ingredientsAdapter.getSelectedIngredientIcons()
+            val selectedIngredientIcons = userIngredientsAdapter.getSelectedIngredientIcons()
 
             recipesViewModel.updateFilters(
                 type = selectedType,
