@@ -8,14 +8,16 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.smartfreezer.R
-import com.example.smartfreezer.adapters.UserIngredientsAdapter
 import com.example.smartfreezer.adapters.RecipesAdapter
-import com.example.smartfreezer.databinding.FragmentRecipesBinding
+import com.example.smartfreezer.adapters.UserIngredientsAdapter
 import com.example.smartfreezer.databinding.DialogRecipesFilterBinding
+import com.example.smartfreezer.databinding.FragmentRecipesBinding
+import com.example.smartfreezer.models.Result
 import com.example.smartfreezer.models.UserIngredient
 import com.example.smartfreezer.util.NetworkResult
 import com.example.smartfreezer.viewmodels.RecipesViewModel
 import com.google.android.material.bottomsheet.BottomSheetDialog
+import com.google.android.material.chip.Chip
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.toObject
@@ -30,7 +32,7 @@ class RecipesFragment : Fragment(R.layout.fragment_recipes) {
     private val firestore = FirebaseFirestore.getInstance()
     private val user = FirebaseAuth.getInstance().currentUser
 
-    private var recipesList = mutableListOf<com.example.smartfreezer.models.Result>()
+    private var recipesList = mutableListOf<Result>()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -38,11 +40,12 @@ class RecipesFragment : Fragment(R.layout.fragment_recipes) {
 
         setupGreeting()
         setupRecyclerView()
-        setupRecyclerView()
         setupPullToRefresh()
         setupLoadMoreButton()
         setupFilterButton()
+        setupClearFiltersButton()
 
+        updateFilterIndicatorsVisibility(false) // Inicialmente, no hay filtros aplicados
         requestApiData()
     }
 
@@ -64,7 +67,8 @@ class RecipesFragment : Fragment(R.layout.fragment_recipes) {
 
         // Set the item click listener
         recipesAdapter.setOnItemClickListener { recipeId ->
-            val action = RecipesFragmentDirections.actionRecipesFragmentToRecipeDetailsFragment(recipeId)
+            val action =
+                RecipesFragmentDirections.actionRecipesFragmentToRecipeDetailsFragment(recipeId)
             findNavController().navigate(action)
         }
     }
@@ -74,6 +78,7 @@ class RecipesFragment : Fragment(R.layout.fragment_recipes) {
             recipesViewModel.resetOffset()
             recipesList.clear()
             requestApiData()
+            updateFilterIndicatorsVisibility(false) // Al refrescar, no hay filtros
         }
     }
 
@@ -99,7 +104,6 @@ class RecipesFragment : Fragment(R.layout.fragment_recipes) {
                         if (!isLoadMore) {
                             recipesList.clear()
                         }
-                        recipesList.clear()
                         recipesList.addAll(newRecipes)
                         recipesAdapter.setData(recipesList)
                     }
@@ -135,7 +139,7 @@ class RecipesFragment : Fragment(R.layout.fragment_recipes) {
         var selectedType = recipesViewModel.selectedType
         var selectedDiet = recipesViewModel.selectedDiet
         var selectedRating = recipesViewModel.selectedRating
-        var selectedIngredients = recipesViewModel.selectedIngredients.toMutableList()
+        val selectedIngredientIcons = recipesViewModel.selectedIngredients.toMutableList()
 
         // Configuración inicial del tipo de plato
         when (selectedType) {
@@ -191,7 +195,10 @@ class RecipesFragment : Fragment(R.layout.fragment_recipes) {
                 .get()
                 .addOnSuccessListener { documents ->
                     val products = documents.mapNotNull { it.toObject<UserIngredient>() }
-                    userIngredientsAdapter.setIngredients(products, recipesViewModel.selectedIngredients)
+                    userIngredientsAdapter.setIngredients(
+                        products,
+                        recipesViewModel.selectedIngredients
+                    )
                 }
         }
 
@@ -205,11 +212,42 @@ class RecipesFragment : Fragment(R.layout.fragment_recipes) {
                 rating = selectedRating,
                 ingredients = selectedIngredientIcons
             )
+
+            val appliedFilterCount = calculateAppliedFilterCount()
+            updateFilterCountRecipe(appliedFilterCount)
+            updateFilterIndicatorsVisibility(appliedFilterCount > 0)
+
             recipesList.clear()
             requestApiData()
             dialog.dismiss()
         }
 
         dialog.show()
+    }
+
+    private fun setupClearFiltersButton() {
+        binding.btnClearFilters.setOnClickListener {
+            recipesViewModel.updateFilters("", "", 0, emptyList())  // Reset filters
+            recipesList.clear()
+            requestApiData()
+            updateFilterIndicatorsVisibility(false)
+        }
+    }
+
+    private fun updateFilterIndicatorsVisibility(filtersApplied: Boolean) {
+        binding.filterCountRecipe.visibility = if (filtersApplied) View.VISIBLE else View.GONE
+        binding.btnClearFilters.visibility = if (filtersApplied) View.VISIBLE else View.GONE
+    }
+
+    private fun updateFilterCountRecipe(count: Int) {
+        binding.filterCountRecipe.text = count.toString()
+    }
+
+    private fun calculateAppliedFilterCount(): Int {
+        var count = 0
+        if (recipesViewModel.selectedType.isNotEmpty()) count++
+        if (recipesViewModel.selectedDiet.isNotEmpty()) count++
+        if (recipesViewModel.selectedIngredients.isNotEmpty()) count += recipesViewModel.selectedIngredients.size
+        return count
     }
 }

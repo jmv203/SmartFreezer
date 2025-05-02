@@ -173,4 +173,11 @@ class RecipesViewModel @Inject constructor(
     fun increaseOffset() {
         offset += 20
     }
+
+    fun resetFilters() {
+        selectedType = ""
+        selectedDiet = ""
+        selectedRating = 0
+        selectedIngredients = emptyList()
+    }
 }
