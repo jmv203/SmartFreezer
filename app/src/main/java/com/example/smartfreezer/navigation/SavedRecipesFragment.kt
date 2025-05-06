@@ -1,7 +1,9 @@
 package com.example.smartfreezer.navigation
 
 import android.app.AlertDialog
+import android.content.Context
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -20,6 +22,7 @@ import com.example.smartfreezer.databinding.FragmentSavedRecipesBinding
 import com.example.smartfreezer.models.Result
 import com.example.smartfreezer.models.UserIngredient
 import com.example.smartfreezer.util.NetworkResult
+import com.example.smartfreezer.util.OnRecipeTabSelectedListener
 import com.example.smartfreezer.viewmodels.RecipesViewModel
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.firebase.auth.FirebaseAuth
@@ -28,13 +31,30 @@ import com.google.firebase.firestore.toObject
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
-class SavedRecipesFragment : Fragment() {
+class SavedRecipesFragment : Fragment(R.layout.fragment_saved_recipes) {
 
     private var _binding: FragmentSavedRecipesBinding? = null
     private val binding get() = _binding!!
-    private val recipesViewModel: RecipesViewModel by activityViewModels()
-    private var recipesList = mutableListOf<Result>()
+    private var tabSelectedListener: OnRecipeTabSelectedListener? = null
     private val savedRecipeAdapter by lazy { RecipesAdapter() }
+    private val recipesViewModel: RecipesViewModel by activityViewModels()
+
+    private var recipesList = mutableListOf<Result>()
+
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        if (context is OnRecipeTabSelectedListener) {
+            tabSelectedListener = context
+        } else {
+            throw ClassCastException("$context must implement OnRecipeTabSelectedListener")
+        }
+    }
+
+    override fun onDetach() {
+        super.onDetach()
+        tabSelectedListener = null
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -46,28 +66,22 @@ class SavedRecipesFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        setupTabLayout()
         setupGreeting()
         setupRecyclerView()
         setupFilterButton()
         setupClearFiltersButton()
         setupClearSavedRecipesButton()
+
+        updateFilterIndicatorsVisibility(false)
         requestSavedRecipes()
-        setupTabLayout()
     }
 
     private fun setupTabLayout() {
         binding.tabSelectorSavedRecipe.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
             override fun onTabSelected(tab: TabLayout.Tab) {
-                when (tab.position) {
-                    0 -> {
-                        // "Recetas guardadas" (Stay in this fragment, no action needed)
-                    }
-                    1 -> {
-                        // "Recetas disponibles" -> Navigate to RecipesFragment
-                        val action = SavedRecipesFragmentDirections.actionSavedRecipesFragmentToRecipesFragment()
-                        findNavController().navigate(action)
-                    }
-                }
+                tabSelectedListener?.onRecipeTabSelected(tab.position)
             }
 
             override fun onTabUnselected(tab: TabLayout.Tab) {}
@@ -86,6 +100,108 @@ class SavedRecipesFragment : Fragment() {
             val action = SavedRecipesFragmentDirections.actionSavedRecipesFragmentToRecipeDetailsFragment(recipeId)
             findNavController().navigate(action)
         }
+
+        savedRecipeAdapter.setOnSaveClickListener { result ->
+            toggleSaveRecipe(result)
+        }
+
+        updateAdapterSavedRecipeIds()
+    }
+
+
+    private fun updateAdapterSavedRecipeIds() {
+        getSavedRecipeIds { ids ->
+            savedRecipeAdapter.setSavedRecipeIds(ids)
+        }
+    }
+
+    private fun getSavedRecipeIds(callback: (Set<Int>) -> Unit) {
+        val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return
+        val savedRecipeRef = FirebaseFirestore.getInstance()
+            .collection("users")
+            .document(userId)
+            .collection("savedRecipes")
+
+        savedRecipeRef.get()
+            .addOnSuccessListener { snapshot ->
+                val ids = snapshot.documents.mapNotNull { it.getLong("recipeId")?.toInt() }.toSet()
+                callback(ids)
+            }
+            .addOnFailureListener {
+                Log.e("SavedRecipesFragment", "Error getting saved recipe IDs", it)
+                callback(emptySet())
+            }
+    }
+
+    private fun toggleSaveRecipe(result: Result) {
+        checkSavedStatus(result) { isSaved ->
+            if (isSaved) {
+                deleteSavedRecipe(result)
+            } else {
+                saveRecipe(result)
+            }
+        }
+    }
+
+    private fun saveRecipe(result: Result) {
+        val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return
+        val savedRecipeRef = FirebaseFirestore.getInstance()
+            .collection("users")
+            .document(userId)
+            .collection("savedRecipes")
+            .document(result.id.toString())
+
+        val data = mapOf(
+            "recipeId" to result.id,
+            "title" to result.title
+        )
+
+        savedRecipeRef.set(data)
+            .addOnSuccessListener {
+                Toast.makeText(requireContext(), "Receta guardada", Toast.LENGTH_SHORT).show()
+                updateAdapterSavedRecipeIds() // Update saved IDs in adapter
+            }
+            .addOnFailureListener {
+                Toast.makeText(requireContext(), "Error al guardar", Toast.LENGTH_SHORT).show()
+            }
+    }
+
+    private fun deleteSavedRecipe(result: Result) {
+        val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return
+        val savedRecipeRef = FirebaseFirestore.getInstance()
+            .collection("users")
+            .document(userId)
+            .collection("savedRecipes")
+            .document(result.id.toString())
+
+        savedRecipeRef.delete()
+            .addOnSuccessListener {
+                Toast.makeText(requireContext(), "Receta eliminada", Toast.LENGTH_SHORT).show()
+                updateAdapterSavedRecipeIds() // Update saved IDs in adapter
+                recipesList.removeIf { it.id == result.id } // Remove deleted item from list
+                savedRecipeAdapter.setData(recipesList) // Update adapter data
+            }
+            .addOnFailureListener {
+                Toast.makeText(requireContext(), "Error al eliminar", Toast.LENGTH_SHORT).show()
+            }
+    }
+
+    private fun checkSavedStatus(result: Result, callback: (Boolean) -> Unit) {
+        val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return
+        val savedRecipeRef = FirebaseFirestore.getInstance()
+            .collection("users")
+            .document(userId)
+            .collection("savedRecipes")
+            .document(result.id.toString())
+
+        savedRecipeRef.get()
+            .addOnSuccessListener { document ->
+                callback(document.exists())
+            }
+            .addOnFailureListener {
+                Log.e("RecipesFragment", "Error checking saved status", it)
+                callback(false) // Assume not saved on error
+            }
     }
 
     private fun setupGreeting() {
@@ -102,6 +218,7 @@ class SavedRecipesFragment : Fragment() {
         showLoading()
 
         val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return
+        Log.d("SavedRecipes", "Fetching saved recipes for user: $userId")
 
         FirebaseFirestore.getInstance()
             .collection("users")
@@ -109,36 +226,73 @@ class SavedRecipesFragment : Fragment() {
             .collection("savedRecipes")
             .get()
             .addOnSuccessListener { snapshot ->
-                val recipeIds = snapshot.documents.mapNotNull { it.getLong("id")?.toInt() }
+                val recipesData = snapshot.documents.mapNotNull { document ->
+                    val recipeId = document.getLong("recipeId")?.toInt()
+                    val recipeTitle = document.getString("title")
+                    if (recipeId != null && recipeTitle != null) {
+                        Pair(recipeId, recipeTitle)
+                    } else {
+                        null
+                    }
+                }
 
-                if (recipeIds.isEmpty()) {
+                Log.d("SavedRecipes", "Retrieved recipes data: $recipesData")
+                if (recipesData.isEmpty()) {
+                    Log.d("SavedRecipes", "No saved recipes found in Firestore")
+                    hideLoading()
+                    savedRecipeAdapter.setData(emptyList())
+                    binding.tvEmpty.visibility = View.VISIBLE
+                    return@addOnSuccessListener
+                }
+                binding.tvEmpty.visibility = View.GONE
+
+                recipesList.clear()
+                val searchResults = mutableListOf<Result>()
+                var completedRequests = 0
+                val totalRequests = recipesData.size
+
+                if (totalRequests == 0) {
                     hideLoading()
                     savedRecipeAdapter.setData(emptyList())
                     return@addOnSuccessListener
                 }
-                //No hay recetas guardadas
-                binding.tvEmpty.visibility = View.GONE
 
-                val idsString = recipeIds.joinToString(",")
-                recipesViewModel.getBulkRecipes(idsString)
+                recipesData.forEach { (recipeId, recipeTitle) ->
 
-                recipesViewModel.savedRecipesResponse.observe(viewLifecycleOwner) { result ->
-                    when (result) {
-                        is NetworkResult.Success -> {
-                            hideLoading()
-                            result.data?.let { recipes ->
-                                savedRecipeAdapter.setData(recipes)
+                    recipesViewModel.searchRecipesByTitle(recipeTitle) { result ->
+                        when (result) {
+                            is NetworkResult.Success -> {
+                                result.data?.let { recipes ->
+                                    if (recipes.isNotEmpty()) {
+                                        searchResults.add(recipes.first()) // Add the first result
+                                        Log.d("SavedRecipes", "Recipe found for $recipeTitle: ${recipes.first()}")
+                                    } else {
+                                        Log.w("SavedRecipes", "No recipe found for $recipeTitle")
+                                    }
+
+                                }
+                            }
+                            is NetworkResult.Error -> {
+                                Log.e("SavedRecipes", "Error searching for $recipeTitle: ${result.message}")
+                                Toast.makeText(requireContext(), "Error searching for $recipeTitle: ${result.message}", Toast.LENGTH_SHORT).show()
+                            }
+                            is NetworkResult.Loading -> {
+                                showLoading()
                             }
                         }
-                        is NetworkResult.Error -> {
+
+                        completedRequests++
+                        if (completedRequests == totalRequests) {
                             hideLoading()
-                            Toast.makeText(requireContext(), result.message, Toast.LENGTH_SHORT).show()
+                            val distinctRecipes = searchResults.distinctBy { it.id }
+                            savedRecipeAdapter.setData(distinctRecipes)
+                            Log.d("SavedRecipes", "All searches completed. Updating adapter with ${distinctRecipes.size} recipes")
                         }
-                        is NetworkResult.Loading -> showLoading()
                     }
                 }
             }
-            .addOnFailureListener {
+            .addOnFailureListener { exception ->
+                Log.e("SavedRecipes", "Error fetching from Firestore", exception)
                 hideLoading()
                 Toast.makeText(requireContext(), "Error loading saved recipes", Toast.LENGTH_SHORT).show()
             }
@@ -311,6 +465,10 @@ class SavedRecipesFragment : Fragment() {
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+        binding.tabSelectorSavedRecipe.selectTab(binding.tabSelectorSavedRecipe.getTabAt(1))
+    }
 
     override fun onDestroyView() {
         super.onDestroyView()

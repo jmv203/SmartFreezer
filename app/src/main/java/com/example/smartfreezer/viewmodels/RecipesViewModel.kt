@@ -15,10 +15,12 @@ import com.example.smartfreezer.util.Constants.Companion.QUERY_DIET
 import com.example.smartfreezer.util.Constants.Companion.QUERY_FILL_INGREDIENTS
 import com.example.smartfreezer.util.Constants.Companion.QUERY_INSTRUCTION_REQUIRED
 import com.example.smartfreezer.util.Constants.Companion.QUERY_NUMBER
+import com.example.smartfreezer.util.Constants.Companion.QUERY_QUERY
 import com.example.smartfreezer.util.Constants.Companion.QUERY_TYPE
 import com.example.smartfreezer.util.NetworkResult
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
+
 import kotlinx.coroutines.launch
 import retrofit2.Response
 import javax.inject.Inject
@@ -136,16 +138,24 @@ class RecipesViewModel @Inject constructor(
     fun getBulkRecipes(ids: String) {
         viewModelScope.launch {
             _savedRecipesResponse.value = NetworkResult.Loading()
+            Log.d("RecipesViewModel", "getBulkRecipes called with IDs: $ids") // Log
             try {
-                val response = foodRecipesApi.getBulkRecipes(ids)
+                val response = foodRecipesApi.getBulkRecipes(
+                    ids = ids,
+                    apiKey = API_KEY
+                )
+                Log.d("RecipesViewModel", "getBulkRecipes - Response: ${response.raw()}") // Log raw response
                 _savedRecipesResponse.value = handleBulkRecipesResponse(response)
+                Log.d("RecipesViewModel", "getBulkRecipes - Result: ${_savedRecipesResponse.value}") // Log the result
             } catch (e: Exception) {
-                _savedRecipesResponse.value = NetworkResult.Error("Error fetching bulk recipes")
+                Log.e("RecipesViewModel", "getBulkRecipes - Error: ${e.message}", e) // Log error
+                _savedRecipesResponse.value = NetworkResult.Error("Error fetching bulk recipes: ${e.message}")
             }
         }
     }
 
     private fun handleBulkRecipesResponse(response: Response<List<Result>>): NetworkResult<List<Result>> {
+
         return when {
             response.message().toString().contains("timeout") -> {
                 NetworkResult.Error("Timeout")
@@ -171,6 +181,28 @@ class RecipesViewModel @Inject constructor(
                 capabilities.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET)
     }
 
+    fun searchRecipesByTitle(title: String, callback: (NetworkResult<List<Result>>) -> Unit) {
+        viewModelScope.launch {
+            if (hasInternetConnection()) {
+                try {
+                    val queries: MutableMap<String, String> = HashMap()
+                    queries[QUERY_API_KEY] = API_KEY
+                    queries[QUERY_QUERY] = title  // Usar el título como query
+                    queries[QUERY_ADD_RECIPE_INFORMATION] = "true"
+                    queries[QUERY_NUMBER] = "1" // Limitar a 1 resultado por título
+
+                    val response = foodRecipesApi.getRecipes(queries)
+                    val searchResult = handleRecipesResponse(response)
+                    callback(searchResult)
+                } catch (e: Exception) {
+                    callback(NetworkResult.Error("Error: ${e.message}"))
+                }
+            } else {
+                callback(NetworkResult.Error("No Internet Connection"))
+            }
+        }
+    }
+
     fun applyQueries(): HashMap<String, String> {
         val queries = HashMap<String, String>()
         queries[QUERY_NUMBER] = "20"
@@ -184,7 +216,9 @@ class RecipesViewModel @Inject constructor(
         queries["offset"] = offset.toString()
 
         if (selectedIngredients.isNotEmpty()) {
-            queries["includeIngredients"] = selectedIngredients.joinToString(",")
+            val ingredients = selectedIngredients.joinToString(",")
+            queries["includeIngredients"] = ingredients
+
         }
 
         return queries

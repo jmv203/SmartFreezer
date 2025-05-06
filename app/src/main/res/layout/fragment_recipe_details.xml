@@ -55,7 +55,6 @@
                     android:layout_height="wrap_content"
                     android:layout_margin="16dp"
                     android:src="@drawable/ic_save"
-                    app:tint="@color/white"
                     app:fabSize="normal"
                     android:layout_gravity="top|end"
                     app:layout_constraintTop_toTopOf="@id/recipeDetailImage"
@@ -121,7 +120,7 @@
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:layout_marginStart="4dp"
-                                    app:loadScoreValue='@{(details.spoonacularScore)}'
+                                    app:loadScoreValue="@{details.spoonacularScore}"
                                     android:textColor="@color/purpleButton"
                                     android:textSize="20sp"
                                     tools:text="4.5" />

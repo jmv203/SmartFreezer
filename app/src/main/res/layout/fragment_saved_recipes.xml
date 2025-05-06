@@ -142,40 +142,53 @@
             android:focusable="true" />
     </FrameLayout>
 
-    <com.facebook.shimmer.ShimmerFrameLayout
-        android:id="@+id/shimmerLayoutSavedRecipe"
+    <FrameLayout
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_marginTop="16dp"
         app:layout_constraintTop_toBottomOf="@id/filterButtonContainerSavedRecipe"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toBottomOf="parent">
 
-        <LinearLayout
+        <com.facebook.shimmer.ShimmerFrameLayout
+            android:id="@+id/shimmerLayoutSavedRecipe"
             android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="16dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <include layout="@layout/item_recipe_shimmer" />
+                <include layout="@layout/item_recipe_shimmer" />
+                <include layout="@layout/item_recipe_shimmer" />
+            </LinearLayout>
+
+        </com.facebook.shimmer.ShimmerFrameLayout>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/savedRecipesRecyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:clipToPadding="false"
+            android:visibility="gone"
+            android:padding="8dp"
+            tools:listitem="@layout/recipes_row_layout" />
+
+        <TextView
+            android:id="@+id/tvEmptySavedRecipes"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
-
-            <include layout="@layout/item_recipe_shimmer" />
-            <include layout="@layout/item_recipe_shimmer" />
-            <include layout="@layout/item_recipe_shimmer" />
-        </LinearLayout>
-
-    </com.facebook.shimmer.ShimmerFrameLayout>
-
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/savedRecipesRecyclerView"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:clipToPadding="false"
-        android:visibility="gone"
-        android:padding="8dp"
-        app:layout_constraintTop_toBottomOf="@id/filterButtonContainerSavedRecipe"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        tools:listitem="@layout/recipes_row_layout" />
+            android:text="No se pudieron cargar tus recetas guardadas.\nDesliza hacia abajo para actualizar."
+            android:textAlignment="center"
+            android:gravity="center"
+            android:padding="16dp"
+            android:textColor="@android:color/darker_gray"
+            android:layout_gravity="center"
+            android:visibility="gone"/>
+    </FrameLayout>
 
     <TextView
         android:id="@+id/tvEmpty"

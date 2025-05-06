@@ -35,7 +35,7 @@ interface FoodRecipesApi {
     @GET("recipes/informationBulk")
     suspend fun getBulkRecipes(
         @Query("ids") ids: String,
-        @Query("apiKey") apiKey: String = Constants.API_KEY
+        @Query("apiKey") apiKey: String
     ): Response<List<Result>>
 
 

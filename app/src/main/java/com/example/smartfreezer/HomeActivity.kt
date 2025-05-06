@@ -7,11 +7,12 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import com.example.smartfreezer.databinding.ActivityHomeBinding
+import com.example.smartfreezer.util.OnRecipeTabSelectedListener
 import com.google.firebase.auth.FirebaseAuth
 import dagger.hilt.android.AndroidEntryPoint
 import me.ibrahimsn.lib.SmoothBottomBar
 @AndroidEntryPoint
-class HomeActivity : AppCompatActivity() {
+class HomeActivity : AppCompatActivity(), OnRecipeTabSelectedListener {
 
     private lateinit var binding: ActivityHomeBinding
     private lateinit var navController: NavController
@@ -58,10 +59,30 @@ class HomeActivity : AppCompatActivity() {
                 R.id.inventoryFragment -> 2
                 R.id.recipesFragment -> 3
                 R.id.alertsFragment -> 4
+                R.id.addShoppingListFragment -> -1 // No cambiar la selección
                 else -> 2 // Default: inventario
             }
-            binding.bottomBar.itemActiveIndex = index
+            if (index != -1) { // Solo actualiza si no es -1
+                binding.bottomBar.itemActiveIndex = index
+            }
         }
 
     }
+
+    override fun onRecipeTabSelected(tabIndex: Int) {
+        binding.bottomBar.itemActiveIndex = 3
+        when (tabIndex) {
+            0 -> {
+                if (navController.currentDestination?.id != R.id.recipesFragment) {
+                    navController.navigate(R.id.recipesFragment)
+                }
+            }
+            1 -> {
+                if (navController.currentDestination?.id != R.id.savedRecipesFragment) {
+                    navController.navigate(R.id.savedRecipesFragment)
+                }
+            }
+        }
+    }
 }
+
