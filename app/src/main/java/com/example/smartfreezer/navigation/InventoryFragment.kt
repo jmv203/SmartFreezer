@@ -1,13 +1,16 @@
 package com.example.smartfreezer.navigation
 
+import android.app.Dialog
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
+
 import android.view.*
 import android.widget.*
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
+
 import androidx.recyclerview.widget.RecyclerView
 import com.example.smartfreezer.R
 import com.example.smartfreezer.adapters.UserProductAdapter
@@ -45,7 +48,10 @@ class InventoryFragment : Fragment(R.layout.fragment_inventory) {
         filterBadge = view.findViewById(R.id.filterBadge)
 
 
-        adapter = UserProductAdapter(emptyList())
+        adapter = UserProductAdapter(emptyList()) { userProduct  ->
+            showBasicProductDetails(userProduct.icon)
+        }
+
         recyclerView.layoutManager = GridLayoutManager(requireContext(), 2)
         recyclerView.adapter = adapter
 
@@ -63,14 +69,24 @@ class InventoryFragment : Fragment(R.layout.fragment_inventory) {
         val locations = listOf("Todos", "Nevera", "Congelador", "Despensa")
         spinnerLocation.setItems(locations)
         spinnerLocation.selectItemByIndex(0)
-        spinnerLocation.setOnSpinnerItemSelectedListener<String> { _, _, _, _ ->
-            applyFilters()
 
+        spinnerLocation.setOnClickListener {
+            if (spinnerLocation.isShowing) {
+                spinnerLocation.dismiss()
+            } else {
+                spinnerLocation.show()
+            }
         }
 
         spinnerLocation.setOnSpinnerOutsideTouchListener { view, motionEvent ->
             spinnerLocation.dismiss()
         }
+
+        spinnerLocation.setOnSpinnerItemSelectedListener<String> { _, _, _, _ ->
+            applyFilters()
+
+        }
+
     }
 
     private fun setupSearch() {
@@ -147,7 +163,7 @@ class InventoryFragment : Fragment(R.layout.fragment_inventory) {
     }
 
     private fun showPopupMenu(anchor: View) {
-        val themedContext = ContextThemeWrapper(requireContext(), R.style.PopupMenuPurple)
+        val themedContext = ContextThemeWrapper(requireContext(), R.style.PopupMenuInventory)
         val popup = PopupMenu(themedContext, anchor)
         popup.menuInflater.inflate(R.menu.popup_filter_menu, popup.menu)
 
@@ -188,4 +204,62 @@ class InventoryFragment : Fragment(R.layout.fragment_inventory) {
         }
         popup.show()
     }
+
+    private fun showBasicProductDetails(iconName: String) {
+        val dialog = Dialog(requireContext())
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
+        dialog.setContentView(R.layout.dialog_basic_product)
+
+        dialog.window?.setLayout(
+            WindowManager.LayoutParams.MATCH_PARENT,
+            WindowManager.LayoutParams.WRAP_CONTENT
+        )
+
+        val ivIcon = dialog.findViewById<ImageView>(R.id.iconImageView)
+        val tvName = dialog.findViewById<TextView>(R.id.nameTextView)
+        val tvCategory = dialog.findViewById<TextView>(R.id.categoryTextView)
+        val tvCondition = dialog.findViewById<TextView>(R.id.conditionTextView)
+        val tvLocation = dialog.findViewById<TextView>(R.id.locationTextView)
+        val tvQuantity = dialog.findViewById<TextView>(R.id.quantityTextView)
+
+        val uid = FirebaseAuth.getInstance().currentUser?.uid
+        if (uid == null) {
+            Toast.makeText(requireContext(), "Usuario no autenticado", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        FirebaseFirestore.getInstance()
+            .collection("users")
+            .document(uid)
+            .collection("products")
+            .whereEqualTo("icon", iconName)
+            .limit(1) // solo el primero
+            .get()
+            .addOnSuccessListener { documents ->
+                if (!documents.isEmpty) {
+                    val document = documents.first()
+
+                    val iconRes = resources.getIdentifier(iconName, "drawable", requireContext().packageName)
+                    ivIcon.setImageResource(iconRes)
+
+                    tvName.text = document.getString("name") ?: "Nombre no disponible"
+                    tvCategory.text = "${document.getString("category") ?: "Desconocida"}"
+                    tvCondition.text = "${document.getString("condition") ?: "Desconocida"}"
+                    tvLocation.text = "${document.getString("location") ?: "Desconocida"}"
+                    tvQuantity.text = "${document.get("quantity") ?: 0}"
+                } else {
+                    Toast.makeText(requireContext(), "Producto no encontrado", Toast.LENGTH_SHORT).show()
+                    dialog.dismiss()
+                }
+            }
+            .addOnFailureListener {
+                Toast.makeText(requireContext(), "Error al cargar detalles", Toast.LENGTH_SHORT).show()
+                dialog.dismiss()
+            }
+
+        dialog.show()
+    }
+
+
+
 }

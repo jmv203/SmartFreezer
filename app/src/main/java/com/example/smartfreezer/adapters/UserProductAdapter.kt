@@ -10,12 +10,22 @@ import com.example.smartfreezer.R
 import com.example.smartfreezer.models.UserProduct
 
 class UserProductAdapter(
-    private var productList: List<UserProduct>
+    private var productList: List<UserProduct>,
+    private val onItemClick: (UserProduct) -> Unit
 ) : RecyclerView.Adapter<UserProductAdapter.ViewHolder>() {
 
     inner class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val iconImageView: ImageView = view.findViewById(R.id.ivProductIconInventory)
         val nameTextView: TextView = view.findViewById(R.id.tvProductNameInventory)
+
+        fun bind(product: UserProduct) {
+            nameTextView.text = product.name
+            iconImageView.setImageResource(product.iconDrawableRes)
+
+            itemView.setOnClickListener {
+                onItemClick(product)
+            }
+        }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -25,10 +35,7 @@ class UserProductAdapter(
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val product = productList[position]
-
-        holder.nameTextView.text = product.name
-        holder.iconImageView.setImageResource(product.iconDrawableRes)
+        holder.bind(productList[position])
     }
 
     override fun getItemCount() = productList.size

@@ -20,10 +20,11 @@
     </style>
 
     <!--Style para PopUpMenu -->
-    <style name="PopupMenuPurple" parent="ThemeOverlay.AppCompat.Light">
-        <item name="android:textColor">@android:color/white</item>
-        <item name="android:background">@color/colorNavBar</item>
-        <item name="android:fontFamily">@font/roboto</item>
+    <style name="PopupMenuInventory" parent="Widget.AppCompat.PopupMenu">
+        <item name="android:textColor">@color/purpleButton</item>
+        <item name="android:backgroundTint">@color/boneWhite</item>
+        <item name="android:itemBackground">@drawable/popup_menu_inventory_background</item>
+        <item name="android:fontFamily">@font/roboto_light</item>
     </style>
 
     <style name="BottomSheetDialogTheme" parent="Theme.Design.Light.BottomSheetDialog">

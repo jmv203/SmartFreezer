@@ -150,13 +150,13 @@
             app:spinner_arrow_padding="2dp"
             app:spinner_arrow_tint="@color/purpleButton"
             app:spinner_debounce_duration="25"
-            app:spinner_divider_color="@color/white"
+            app:spinner_divider_color="@color/purpleButton"
             app:spinner_divider_show="true"
             app:spinner_divider_size="0.8dp"
             app:spinner_item_array="@array/locations_array"
-            app:spinner_item_height="50dp"
+            app:spinner_item_height="60dp"
             app:spinner_popup_animation="dropdown"
-            app:spinner_popup_background="@color/colorNavBar"
+            app:spinner_popup_background="@color/boneWhite"
             app:spinner_popup_elevation="14dp" />
 
         <FrameLayout
