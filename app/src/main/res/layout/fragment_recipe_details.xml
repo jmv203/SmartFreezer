@@ -41,12 +41,13 @@
                     android:layout_height="wrap_content"
                     android:layout_margin="16dp"
                     android:src="@drawable/baseline_arrow_back_24"
+                    app:tint="@color/white"
                     app:fabSize="normal"
                     android:layout_gravity="top|start"
                     app:layout_constraintTop_toTopOf="@id/recipeDetailImage"
                     app:layout_constraintStart_toStartOf="@id/recipeDetailImage"
-                    android:background="@color/purpleButton"
-                    android:alpha="0.6"/>
+                    android:backgroundTint="@color/purpleButton"
+                    android:alpha="0.7"/>
 
                 <com.google.android.material.floatingactionbutton.FloatingActionButton
                     android:id="@+id/fabSaveRecipeDetails"
@@ -54,12 +55,13 @@
                     android:layout_height="wrap_content"
                     android:layout_margin="16dp"
                     android:src="@drawable/ic_save"
+                    app:tint="@color/white"
                     app:fabSize="normal"
                     android:layout_gravity="top|end"
                     app:layout_constraintTop_toTopOf="@id/recipeDetailImage"
                     app:layout_constraintEnd_toEndOf="@id/recipeDetailImage"
-                    android:background="@color/purpleButton"
-                    android:alpha="0.6"/>
+                    android:backgroundTint="@color/purpleButton"
+                    android:alpha="0.7"/>
 
 
                 <androidx.cardview.widget.CardView

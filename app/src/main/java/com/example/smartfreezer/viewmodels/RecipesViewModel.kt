@@ -38,6 +38,9 @@ class RecipesViewModel @Inject constructor(
     private val _recipeInstructionsResponse = MutableLiveData<NetworkResult<List<RecipeDetails>>>()
     val recipeInstructionsResponse: LiveData<NetworkResult<List<RecipeDetails>>> get() = _recipeInstructionsResponse
 
+    private val _savedRecipesResponse = MutableLiveData<NetworkResult<List<Result>>>()
+    val savedRecipesResponse: LiveData<NetworkResult<List<Result>>> = _savedRecipesResponse
+
     var selectedType: String = ""
     var selectedDiet: String = ""
     var selectedRating: Int = 0
@@ -130,6 +133,35 @@ class RecipesViewModel @Inject constructor(
         }
     }
 
+    fun getBulkRecipes(ids: String) {
+        viewModelScope.launch {
+            _savedRecipesResponse.value = NetworkResult.Loading()
+            try {
+                val response = foodRecipesApi.getBulkRecipes(ids)
+                _savedRecipesResponse.value = handleBulkRecipesResponse(response)
+            } catch (e: Exception) {
+                _savedRecipesResponse.value = NetworkResult.Error("Error fetching bulk recipes")
+            }
+        }
+    }
+
+    private fun handleBulkRecipesResponse(response: Response<List<Result>>): NetworkResult<List<Result>> {
+        return when {
+            response.message().toString().contains("timeout") -> {
+                NetworkResult.Error("Timeout")
+            }
+            response.code() == 402 -> {
+                NetworkResult.Error("API Key Limited")
+            }
+            response.isSuccessful -> {
+                val recipes = response.body()
+                NetworkResult.Success(recipes ?: emptyList())
+            }
+            else -> {
+                NetworkResult.Error(response.message())
+            }
+        }
+    }
     private fun hasInternetConnection(): Boolean {
         val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
         val activeNetwork = connectivityManager.activeNetwork ?: return false

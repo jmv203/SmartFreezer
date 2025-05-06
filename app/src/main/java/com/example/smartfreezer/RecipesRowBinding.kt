@@ -27,17 +27,32 @@ class RecipesRowBinding {
 
         @BindingAdapter("loadImageFromUrl")
         @JvmStatic
-        fun loadImageFromUrl(imageView : ImageView, imageUrl : String?){
+        fun loadImageFromUrl(imageView: ImageView, imageUrl: String?) {
             imageUrl?.let {
+                val lastSlashIndex = it.lastIndexOf("/")
+                val dotIndex = it.lastIndexOf(".")
 
-                val originalSizeUrl = it.replace(Regex("-\\d+x\\d+"), "-original") // Reemplaza "-[width]x[height]" con "-original"
+                if (lastSlashIndex != -1 && dotIndex != -1 && dotIndex > lastSlashIndex) {
+                    val name = it.substring(lastSlashIndex + 1, dotIndex) // e.g. "1697885-312x231"
+                    val extension = it.substring(dotIndex + 1)             // e.g. "jpg"
 
-                imageView.load(originalSizeUrl){
-                    crossfade(600)
-                    error(R.drawable.ic_error_placeholder)
+                    val id = name.substringBefore("-")                    // e.g. "1697885"
+                    val newUrl = "https://img.spoonacular.com/recipes/${id}-556x370.${extension}"
+
+                    imageView.load(newUrl) {
+                        crossfade(600)
+                        error(R.drawable.ic_error_placeholder)
+                    }
+                } else {
+                    // URL no válida, cargar como está
+                    imageView.load(it) {
+                        crossfade(600)
+                        error(R.drawable.ic_error_placeholder)
+                    }
                 }
             }
         }
+
 
         @BindingAdapter("loadIngredientImage")
         @JvmStatic

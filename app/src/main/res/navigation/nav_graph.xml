@@ -17,7 +17,6 @@
         android:id="@+id/listFragment"
         android:name="com.example.smartfreezer.navigation.ShoppingListFragment"
         android:label="Lista">
-
         <action
             android:id="@+id/action_listFragment_to_addShoppingListFragment"
             app:destination="@id/addShoppingListFragment" />
@@ -40,6 +39,9 @@
         <action
             android:id="@+id/action_recipesFragment_to_recipeDetailsFragment"
             app:destination="@id/recipeDetailsFragment" />
+        <action
+            android:id="@+id/action_recipesFragment_to_savedRecipesFragment"
+            app:destination="@id/savedRecipesFragment" />
     </fragment>
 
     <fragment
@@ -90,6 +92,18 @@
         <argument
             android:name="category"
             app:argType="string" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/savedRecipesFragment"
+        android:name="com.example.smartfreezer.navigation.SavedRecipesFragment"
+        android:label="Recetas Guardadas">
+        <action
+            android:id="@+id/action_savedRecipesFragment_to_recipeDetailsFragment"
+            app:destination="@id/recipeDetailsFragment" />
+        <action
+            android:id="@+id/action_savedRecipesFragment_to_recipesFragment"
+            app:destination="@id/recipesFragment" />
     </fragment>
 
 </navigation>

@@ -1,66 +1,70 @@
 package com.example.smartfreezer.navigation
 
+import android.app.AlertDialog
 import android.os.Bundle
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
+import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
+import com.google.android.material.tabs.TabLayout
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.smartfreezer.R
-import com.google.android.material.tabs.TabLayout
 import com.example.smartfreezer.adapters.RecipesAdapter
 import com.example.smartfreezer.adapters.UserIngredientsAdapter
 import com.example.smartfreezer.databinding.DialogRecipesFilterBinding
-import com.example.smartfreezer.databinding.FragmentRecipesBinding
+import com.example.smartfreezer.databinding.FragmentSavedRecipesBinding
 import com.example.smartfreezer.models.Result
 import com.example.smartfreezer.models.UserIngredient
 import com.example.smartfreezer.util.NetworkResult
 import com.example.smartfreezer.viewmodels.RecipesViewModel
 import com.google.android.material.bottomsheet.BottomSheetDialog
-import com.google.android.material.chip.Chip
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.toObject
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
-class RecipesFragment : Fragment(R.layout.fragment_recipes) {
+class SavedRecipesFragment : Fragment() {
 
-    private lateinit var binding: FragmentRecipesBinding
-    private val recipesAdapter by lazy { RecipesAdapter() }
-    private val recipesViewModel: RecipesViewModel by viewModels()
-    private val firestore = FirebaseFirestore.getInstance()
-    private val user = FirebaseAuth.getInstance().currentUser
-
+    private var _binding: FragmentSavedRecipesBinding? = null
+    private val binding get() = _binding!!
+    private val recipesViewModel: RecipesViewModel by activityViewModels()
     private var recipesList = mutableListOf<Result>()
+    private val savedRecipeAdapter by lazy { RecipesAdapter() }
+
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        _binding = FragmentSavedRecipesBinding.inflate(inflater, container, false)
+        return binding.root
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        binding = FragmentRecipesBinding.bind(view)
-
         setupGreeting()
         setupRecyclerView()
-        setupPullToRefresh()
-        setupLoadMoreButton()
         setupFilterButton()
         setupClearFiltersButton()
+        setupClearSavedRecipesButton()
+        requestSavedRecipes()
         setupTabLayout()
-
-        updateFilterIndicatorsVisibility(false) // Inicialmente, no hay filtros aplicados
-        requestApiData()
     }
 
     private fun setupTabLayout() {
-        binding.tabSelectorRecipe.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
+        binding.tabSelectorSavedRecipe.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
             override fun onTabSelected(tab: TabLayout.Tab) {
                 when (tab.position) {
                     0 -> {
-                        // Recetas disponibles (ya estás en este fragmento, no haces nada)
+                        // "Recetas guardadas" (Stay in this fragment, no action needed)
                     }
                     1 -> {
-                        // Recetas guardadas
-                        val action = RecipesFragmentDirections.actionRecipesFragmentToSavedRecipesFragment()
+                        // "Recetas disponibles" -> Navigate to RecipesFragment
+                        val action = SavedRecipesFragmentDirections.actionSavedRecipesFragmentToRecipesFragment()
                         findNavController().navigate(action)
                     }
                 }
@@ -72,84 +76,90 @@ class RecipesFragment : Fragment(R.layout.fragment_recipes) {
     }
 
 
-    private fun setupGreeting() {
-        val currentUser = FirebaseAuth.getInstance().currentUser ?: return
-        firestore.collection("users").document(currentUser.uid).get()
-            .addOnSuccessListener { document ->
-                document.getString("name")?.let { name ->
-                    binding.tvGreetingRecipe.text = "Hola, $name"
-                }
-            }
-    }
-
     private fun setupRecyclerView() {
-        binding.recipesRecyclerView.apply {
+        binding.savedRecipesRecyclerView.apply {
             layoutManager = LinearLayoutManager(requireContext())
-            adapter = recipesAdapter
+            adapter = savedRecipeAdapter
         }
 
-        // Set the item click listener
-        recipesAdapter.setOnItemClickListener { recipeId ->
-            val action =
-                RecipesFragmentDirections.actionRecipesFragmentToRecipeDetailsFragment(recipeId)
+        savedRecipeAdapter.setOnItemClickListener { recipeId ->
+            val action = SavedRecipesFragmentDirections.actionSavedRecipesFragmentToRecipeDetailsFragment(recipeId)
             findNavController().navigate(action)
         }
     }
 
-    private fun setupPullToRefresh() {
-        binding.swipeRefreshLayout.setOnRefreshListener {
-            recipesViewModel.resetOffset()
-            recipesList.clear()
-            requestApiData()
-            updateFilterIndicatorsVisibility(false) // Al refrescar, no hay filtros
-        }
-    }
-
-    private fun setupLoadMoreButton() {
-        binding.btnLoadMore.setOnClickListener {
-            recipesViewModel.increaseOffset()
-            requestApiData(isLoadMore = true)
-        }
-    }
-
-    private fun requestApiData(isLoadMore: Boolean = false) {
-        recipesViewModel.getRecipes(recipesViewModel.applyQueries())
-
-        recipesViewModel.recipesResponse.observe(viewLifecycleOwner) { result ->
-            when (result) {
-                is NetworkResult.Success -> {
-                    binding.shimmerLayout.stopShimmer()
-                    binding.shimmerLayout.visibility = View.GONE
-                    binding.recipesRecyclerView.visibility = View.VISIBLE
-                    binding.swipeRefreshLayout.isRefreshing = false
-
-                    result.data?.let { newRecipes ->
-                        if (!isLoadMore) {
-                            recipesList.clear()
-                        }
-                        recipesList.addAll(newRecipes)
-                        recipesAdapter.setData(recipesList)
-                    }
-                }
-
-                is NetworkResult.Error -> {
-                    binding.shimmerLayout.stopShimmer()
-                    binding.shimmerLayout.visibility = View.GONE
-                    binding.recipesRecyclerView.visibility = View.GONE
-                    binding.swipeRefreshLayout.isRefreshing = false
-                }
-
-                is NetworkResult.Loading -> {
-                    binding.shimmerLayout.startShimmer()
-                    binding.shimmerLayout.visibility = View.VISIBLE
-                    binding.recipesRecyclerView.visibility = View.GONE
+    private fun setupGreeting() {
+        val currentUser = FirebaseAuth.getInstance().currentUser ?: return
+        FirebaseFirestore.getInstance().collection("users").document(currentUser.uid).get()
+            .addOnSuccessListener { document ->
+                document.getString("name")?.let { name ->
+                    binding.tvGreetingSavedRecipe.text = "Hola, $name"
                 }
             }
-        }
+    }
+
+    private fun requestSavedRecipes() {
+        showLoading()
+
+        val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return
+
+        FirebaseFirestore.getInstance()
+            .collection("users")
+            .document(userId)
+            .collection("savedRecipes")
+            .get()
+            .addOnSuccessListener { snapshot ->
+                val recipeIds = snapshot.documents.mapNotNull { it.getLong("id")?.toInt() }
+
+                if (recipeIds.isEmpty()) {
+                    hideLoading()
+                    savedRecipeAdapter.setData(emptyList())
+                    return@addOnSuccessListener
+                }
+                //No hay recetas guardadas
+                binding.tvEmpty.visibility = View.GONE
+
+                val idsString = recipeIds.joinToString(",")
+                recipesViewModel.getBulkRecipes(idsString)
+
+                recipesViewModel.savedRecipesResponse.observe(viewLifecycleOwner) { result ->
+                    when (result) {
+                        is NetworkResult.Success -> {
+                            hideLoading()
+                            result.data?.let { recipes ->
+                                savedRecipeAdapter.setData(recipes)
+                            }
+                        }
+                        is NetworkResult.Error -> {
+                            hideLoading()
+                            Toast.makeText(requireContext(), result.message, Toast.LENGTH_SHORT).show()
+                        }
+                        is NetworkResult.Loading -> showLoading()
+                    }
+                }
+            }
+            .addOnFailureListener {
+                hideLoading()
+                Toast.makeText(requireContext(), "Error loading saved recipes", Toast.LENGTH_SHORT).show()
+            }
+    }
+
+    private fun showLoading() {
+        binding.shimmerLayoutSavedRecipe.startShimmer()
+        binding.shimmerLayoutSavedRecipe.visibility = View.VISIBLE
+        binding.savedRecipesRecyclerView.visibility = View.GONE
+
+    }
+
+    private fun hideLoading() {
+        binding.shimmerLayoutSavedRecipe.stopShimmer()
+        binding.shimmerLayoutSavedRecipe.visibility = View.GONE
+        binding.savedRecipesRecyclerView.visibility = View.VISIBLE
+
     }
 
     private fun setupFilterButton() {
-        binding.btnFilterRecipes.setOnClickListener {
+        binding.btnFilterSavedRecipes.setOnClickListener {
             showFilterBottomSheet()
         }
     }
@@ -241,7 +251,7 @@ class RecipesFragment : Fragment(R.layout.fragment_recipes) {
             updateFilterIndicatorsVisibility(appliedFilterCount > 0)
 
             recipesList.clear()
-            requestApiData()
+            requestSavedRecipes()
             dialog.dismiss()
         }
 
@@ -249,21 +259,21 @@ class RecipesFragment : Fragment(R.layout.fragment_recipes) {
     }
 
     private fun setupClearFiltersButton() {
-        binding.btnClearFilters.setOnClickListener {
+        binding.btnClearFiltersSavedRecipe.setOnClickListener {
             recipesViewModel.updateFilters("", "", 0, emptyList())  // Reset filters
             recipesList.clear()
-            requestApiData()
+            requestSavedRecipes()
             updateFilterIndicatorsVisibility(false)
         }
     }
 
     private fun updateFilterIndicatorsVisibility(filtersApplied: Boolean) {
-        binding.filterCountRecipe.visibility = if (filtersApplied) View.VISIBLE else View.GONE
-        binding.btnClearFilters.visibility = if (filtersApplied) View.VISIBLE else View.GONE
+        binding.filterCountSavedRecipe.visibility = if (filtersApplied) View.VISIBLE else View.GONE
+        binding.btnClearFiltersSavedRecipe.visibility = if (filtersApplied) View.VISIBLE else View.GONE
     }
 
     private fun updateFilterCountRecipe(count: Int) {
-        binding.filterCountRecipe.text = count.toString()
+        binding.filterCountSavedRecipe.text = count.toString()
     }
 
     private fun calculateAppliedFilterCount(): Int {
@@ -272,5 +282,38 @@ class RecipesFragment : Fragment(R.layout.fragment_recipes) {
         if (recipesViewModel.selectedDiet.isNotEmpty()) count++
         if (recipesViewModel.selectedIngredients.isNotEmpty()) count += recipesViewModel.selectedIngredients.size
         return count
+    }
+
+    private fun setupClearSavedRecipesButton() {
+        binding.btnClearSavedRecipes.setOnClickListener {
+            AlertDialog.Builder(requireContext())
+                .setTitle("Eliminar todas las recetas")
+                .setMessage("¿Estás seguro de que quieres eliminar todas las recetas guardadas?")
+                .setPositiveButton("Sí") { _, _ -> clearAllSavedRecipes() }
+                .setNegativeButton("Cancelar", null)
+                .show()
+        }
+    }
+
+    private fun clearAllSavedRecipes() {
+        val uid = FirebaseAuth.getInstance().currentUser?.uid ?: return
+        val savedRecipesRef = FirebaseFirestore.getInstance()
+            .collection("users")
+            .document(uid)
+            .collection("savedRecipes")
+
+        savedRecipesRef.get().addOnSuccessListener { snapshot ->
+            val batch = FirebaseFirestore.getInstance().batch()
+            snapshot.documents.forEach { doc -> batch.delete(doc.reference) }
+            batch.commit().addOnSuccessListener {
+                savedRecipeAdapter.setData(emptyList())
+            }
+        }
+    }
+
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 }
