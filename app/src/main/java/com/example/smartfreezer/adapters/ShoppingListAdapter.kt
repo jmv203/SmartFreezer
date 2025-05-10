@@ -36,7 +36,9 @@ class ShoppingListAdapter(
         val item = items[position]
         val context = holder.itemView.context
 
-        holder.name.text = item.name
+        holder.name.text = item.name.replaceFirstChar {
+            if (it.isLowerCase()) it.titlecase() else it.toString()
+        }
         holder.quantity.text = item.quantity.toString()
 
         val iconRes = context.resources.getIdentifier(item.icon, "drawable", context.packageName)

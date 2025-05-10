@@ -2,11 +2,14 @@
 <androidx.cardview.widget.CardView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_margin="8dp"
+    android:clickable="true"
+    android:focusable="true"
     app:cardCornerRadius="12dp"
-    app:cardBackgroundColor="@color/white"
+    app:cardBackgroundColor="?attr/colorCardBackground"
     app:cardElevation="4dp">
 
 <LinearLayout
@@ -14,23 +17,24 @@
     android:layout_height="wrap_content"
     android:orientation="vertical"
     android:padding="12dp"
-    android:gravity="center">
+    android:gravity="center"
+    tools:ignore="UseCompoundDrawables">
 
     <ImageView
         android:id="@+id/ivProductIconInventory"
         android:layout_width="48dp"
         android:layout_height="48dp"
         android:src="@drawable/apple"
-        android:contentDescription="Icono del producto" />
+        android:contentDescription="@string/icono_del_producto" />
 
     <TextView
         android:id="@+id/tvProductNameInventory"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Nombre"
+        android:text="@string/nombre"
         android:textSize="16sp"
         android:layout_marginTop="8dp"
-        android:textColor="@color/purpleButton" />
+        android:textColor="?attr/colorTextPrimary" />
 
 </LinearLayout>
 

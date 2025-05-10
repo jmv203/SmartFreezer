@@ -1,13 +1,11 @@
     package com.example.smartfreezer.navigation
 
+    import android.annotation.SuppressLint
     import android.os.Bundle
-    import android.util.Log
     import android.view.LayoutInflater
     import android.view.View
     import android.view.ViewGroup
-    import android.widget.ImageView
     import android.widget.Toast
-    import androidx.databinding.BindingAdapter
     import androidx.fragment.app.Fragment
     import androidx.navigation.fragment.findNavController
     import androidx.fragment.app.viewModels
@@ -46,8 +44,8 @@
             super.onCreate(savedInstanceState)
             arguments?.let {
                 recipeId = it.getInt("recipeId")
-                Log.d("RecipeDetailsFragment", "Recipe ID received: $recipeId")
             }
+
         }
 
         override fun onCreateView(
@@ -55,6 +53,7 @@
         ): View {
             _binding = FragmentRecipeDetailsBinding.inflate(inflater, container, false)
             return binding.root
+
         }
 
         override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -133,7 +132,6 @@
                             val nutrients = details.nutrition?.nutrients?.filterNotNull() ?: emptyList()
                             nutrientsAdapter.setData(nutrients)
 
-                            Log.d("RecipeDetailsFragment", "Recipe Details: $details")
 
                         }
                     }
@@ -143,19 +141,18 @@
                         binding.recipeDetailsErrorTextView.visibility = View.VISIBLE
                         binding.recipeDetailsErrorTextView.text = response.message.toString()
                         Toast.makeText(context, response.message, Toast.LENGTH_SHORT).show()
-                        Log.e("RecipeDetailsFragment", "Error fetching recipe details: ${response.message}")
                     }
 
                     is NetworkResult.Loading -> {
                         binding.recipeDetailProgressBar.visibility = View.VISIBLE
                         binding.recipeDetailScrollView.visibility = View.INVISIBLE
                         binding.recipeDetailsErrorTextView.visibility = View.INVISIBLE
-                        Log.d("RecipeDetailsFragment", "Loading recipe details...")
                     }
                 }
             })
         }
 
+        @SuppressLint("StringFormatMatches")
         private fun setupIndicators(recipe: RecipeDetails) {
             val container = binding.recipeDetailIndicatorsContainer
             container.removeAllViews()
@@ -172,9 +169,12 @@
 
             addIndicator(R.drawable.ic_timer, "${recipe.readyInMinutes} min", true)
             addIndicator(R.drawable.ic_flame, "${recipe.nutrition?.nutrients?.firstOrNull { it?.name == "Calories" }?.amount?.roundToInt() ?: 0} kcal", true)
-            addIndicator(R.drawable.ic_portion, "${recipe.servings} raciones", true)
-            addIndicator(R.drawable.ic_gluten, "No gluten", recipe.glutenFree == true)
-            addIndicator(R.drawable.ic_vegan, "Vegana", recipe.vegan == true)
+            addIndicator(R.drawable.ic_portion, getString(R.string.raciones, recipe.servings), true)
+            addIndicator(R.drawable.ic_gluten,
+                getString(R.string.no_gluten), recipe.glutenFree == true)
+            addIndicator(R.drawable.ic_vegan, getString(R.string.vegana), recipe.vegan == true)
+            addIndicator(R.drawable.ic_dairy,
+                getString(R.string.no_lactosa), recipe.dairyFree == true)
 
 
         }
@@ -193,10 +193,12 @@
                     .addOnSuccessListener {
                         isRecipeSaved = false
                         binding.fabSaveRecipeDetails.isSelected = false
-                        Toast.makeText(requireContext(), "Receta eliminada", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(requireContext(),
+                            getString(R.string.receta_eliminada), Toast.LENGTH_SHORT).show()
                     }
                     .addOnFailureListener {
-                        Toast.makeText(requireContext(), "Error al eliminar", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(requireContext(),
+                            getString(R.string.error_al_eliminar), Toast.LENGTH_SHORT).show()
                     }
             } else {
                 // Guardar la receta
@@ -205,10 +207,11 @@
                     .addOnSuccessListener {
                         isRecipeSaved = true
                         binding.fabSaveRecipeDetails.isSelected = true
-                        Toast.makeText(requireContext(), "Receta guardada", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(requireContext(),
+                            getString(R.string.receta_guardada), Toast.LENGTH_SHORT).show()
                     }
                     .addOnFailureListener {
-                        Toast.makeText(requireContext(), "Error al guardar", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(requireContext(), getString(R.string.error_al_guardar), Toast.LENGTH_SHORT).show()
                     }
             }
         }
@@ -228,7 +231,6 @@
                 }
                 .addOnFailureListener {
                     // Manejar el error (opcional)
-                    Log.e("RecipeDetailsFragment", "Error checking saved status", it)
                 }
         }
 
@@ -237,18 +239,8 @@
         override fun onDestroyView() {
             super.onDestroyView()
             _binding = null
+
         }
 
-        companion object {
-            private const val ARG_RECIPE_ID = "recipeId"
-
-            fun newInstance(recipeId: Int): RecipeDetailsFragment {
-                return RecipeDetailsFragment().apply {
-                    arguments = Bundle().apply {
-                        putInt(ARG_RECIPE_ID, recipeId)
-                    }
-                }
-            }
-        }
     }
 

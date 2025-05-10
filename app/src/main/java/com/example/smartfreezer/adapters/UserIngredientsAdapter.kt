@@ -45,7 +45,7 @@ class UserIngredientsAdapter : RecyclerView.Adapter<UserIngredientsAdapter.Ingre
         RecyclerView.ViewHolder(binding.root) {
 
         fun bind(ingredient: UserIngredient) {
-            binding.ingredientCheckBox.text = ingredient.name
+            binding.ingredientCheckBox.text = ingredient.name.replaceFirstChar { it.uppercase() }
             binding.ingredientCheckBox.isChecked = selectedIngredientIcons.contains(ingredient.icon)
 
             binding.ingredientCheckBox.setOnCheckedChangeListener(null)

@@ -11,6 +11,18 @@
         <action
             android:id="@+id/action_inventoryFragment_to_selectCategoryFragment"
             app:destination="@id/selectCategoryFragment" />
+        <action
+            android:id="@+id/action_inventoryFragment_to_wastedProductsFragment"
+            app:destination="@id/wastedProductsFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/wastedProductsFragment"
+        android:name="com.example.smartfreezer.navigation.WastedProductsFragment"
+        android:label="Historial">
+    <action
+        android:id="@+id/action_wastedProductsFragment_to_inventoryFragment"
+        app:destination="@id/inventoryFragment" />
     </fragment>
 
     <fragment

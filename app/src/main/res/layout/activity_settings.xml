@@ -1,0 +1,373 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="?attr/colorBackground"
+    android:fillViewport="true"
+    tools:context=".SettingsActivity">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <!-- Header with settings info -->
+        <LinearLayout
+            android:id="@+id/headerLayoutSettings"
+            android:layout_width="match_parent"
+            android:layout_height="175dp"
+            android:orientation="vertical"
+            android:background="?attr/colorHeaderBackground"
+            android:padding="16dp">
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:paddingBottom="10dp">
+
+                <TextView
+                    android:id="@+id/tvGreetingSettings"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/roboto_light"
+                    android:text="@string/hola_usuario"
+                    android:textColor="?attr/colorHeaderText"
+                    android:textSize="24sp"
+                    tools:ignore="RelativeOverlap" />
+
+                <LinearLayout
+                    android:id="@+id/headerIconsSettings"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentEnd="true"
+                    android:orientation="horizontal">
+
+                    <ImageView
+                        android:id="@+id/btnAccountSettings"
+                        android:layout_width="34dp"
+                        android:layout_height="34dp"
+                        android:layout_marginEnd="24dp"
+                        android:contentDescription="@string/icono_perfil"
+                        android:src="@drawable/account2"
+                        app:tint="?attr/colorHeaderText"/>
+
+                    <ImageView
+                        android:id="@+id/btnSettingsSettings"
+                        android:layout_width="34dp"
+                        android:layout_height="34dp"
+                        android:contentDescription="@string/icono_ajustes"
+                        android:src="@drawable/settings"
+                        app:tint="?attr/colorHeaderText"/>
+
+                </LinearLayout>
+            </RelativeLayout>
+
+
+            <TextView
+                android:id="@+id/textInfoSettings"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:fontFamily="@font/roboto_light"
+                android:text="@string/configuraci_n"
+                android:textColor="?attr/colorHeaderText"
+                android:textSize="34sp" />
+
+        </LinearLayout>
+
+        <!-- Notification Settings Card -->
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="16dp"
+            android:layout_marginTop="24dp"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="2dp"
+            app:cardBackgroundColor="?attr/colorCardBackground">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:drawablePadding="8dp"
+                    app:drawableStartCompat="@drawable/alert"
+                    app:drawableTint="?attr/colorTextPrimary"
+                    android:text="@string/notificaciones"
+                    android:textColor="?attr/colorTextPrimary"
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:paddingVertical="8dp">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="@string/recibir_notificaciones"
+                        android:textColor="?attr/colorTextSecondary"
+                        android:textSize="16sp" />
+
+                    <com.google.android.material.switchmaterial.SwitchMaterial
+                        android:id="@+id/notificationsSwitch"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        app:trackTint="@color/switch_track"
+                        app:thumbTint="?attr/colorTextPrimary" />
+                </LinearLayout>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:text="@string/act_valas_para_recibir_alertas_importantes"
+                    android:textColor="?attr/colorTextSecondary"
+                    android:textSize="12sp" />
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
+        <!-- Appearance Settings Card -->
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="16dp"
+            android:layout_marginTop="16dp"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="2dp"
+            app:cardBackgroundColor="?attr/colorCardBackground">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:drawablePadding="8dp"
+                    app:drawableStartCompat="@drawable/dark_mode"
+                    app:drawableTint="?attr/colorTextPrimary"
+                    android:text="@string/apariencia"
+                    android:textColor="?attr/colorTextPrimary"
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:background="?attr/selectableItemBackground"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:paddingVertical="12dp">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="@string/modo_oscuro"
+                        android:textColor="?attr/colorTextSecondary"
+                        android:textSize="16sp" />
+
+                    <com.google.android.material.switchmaterial.SwitchMaterial
+                        android:id="@+id/darkModeSwitch"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        app:trackTint="@color/switch_track"
+                        app:thumbTint="?attr/colorTextPrimary" />
+                </LinearLayout>
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
+        <!-- Language Settings Card -->
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="16dp"
+            android:layout_marginTop="16dp"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="2dp"
+            app:cardBackgroundColor="?attr/colorCardBackground">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:drawablePadding="8dp"
+                    app:drawableStartCompat="@drawable/ic_language"
+                    app:drawableTint="?attr/colorTextPrimary"
+                    android:text="@string/idioma"
+                    android:textColor="?attr/colorTextPrimary"
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
+
+                <LinearLayout
+                    android:id="@+id/languageOption"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:background="?attr/selectableItemBackground"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:paddingVertical="12dp">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="@string/idioma_de_la_aplicaci_n"
+                        android:textColor="?attr/colorTextSecondary"
+                        android:textSize="16sp" />
+
+                    <TextView
+                        android:id="@+id/selectedLanguageTextView"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:text="@string/espa_ol"
+                        android:textColor="?attr/colorTextSecondary"
+                        android:textSize="16sp" />
+
+                    <ImageView
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:layout_marginStart="8dp"
+                        android:contentDescription="@string/icono"
+                        android:src="@drawable/ic_chevron_right"
+                        app:tint="?attr/colorTextSecondary" />
+                </LinearLayout>
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
+        <!-- Information Card -->
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="16dp"
+            android:layout_marginTop="16dp"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="2dp"
+            app:cardBackgroundColor="?attr/colorCardBackground">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:drawablePadding="8dp"
+                    app:drawableStartCompat="@drawable/ic_info"
+                    app:drawableTint="?attr/colorTextPrimary"
+                    android:text="@string/informaci_n"
+                    android:textColor="?attr/colorTextPrimary"
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/aboutOption"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:background="?attr/selectableItemBackground"
+                    android:drawablePadding="8dp"
+                    android:gravity="center_vertical"
+                    android:minHeight="48dp"
+                    android:paddingVertical="12dp"
+                    android:text="@string/sobre_smartfreezer"
+                    android:textColor="?attr/colorTextSecondary"
+                    android:textSize="16sp"
+                    app:drawableEndCompat="@drawable/ic_chevron_right"
+                    app:drawableTint="?attr/colorTextSecondary"
+                    tools:ignore="HardcodedText" />
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginVertical="4dp"
+                    android:background="#F0F0F0" />
+
+                <TextView
+                    android:id="@+id/termsConditionsOption"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="?attr/selectableItemBackground"
+                    android:drawablePadding="8dp"
+                    android:gravity="center_vertical"
+                    android:minHeight="48dp"
+                    android:paddingVertical="12dp"
+                    android:text="@string/t_rminos_y_condiciones"
+                    android:textColor="?attr/colorTextSecondary"
+                    android:textSize="16sp"
+                    app:drawableEndCompat="@drawable/ic_chevron_right"
+                    app:drawableTint="?attr/colorTextSecondary" />
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
+        <!-- Support Card -->
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="16dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="24dp"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="2dp"
+            app:cardBackgroundColor="?attr/colorCardBackground">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:drawablePadding="8dp"
+                    app:drawableStartCompat="@drawable/ic_support"
+                    app:drawableTint="?attr/colorTextPrimary"
+                    android:text="@string/soporte"
+                    android:textColor="?attr/colorTextPrimary"
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/contactSupportOption"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:background="?attr/selectableItemBackground"
+                    android:drawablePadding="8dp"
+                    android:gravity="center_vertical"
+                    android:minHeight="48dp"
+                    android:paddingVertical="12dp"
+                    android:text="@string/contacto_y_soporte_t_cnico"
+                    android:textColor="?attr/colorTextSecondary"
+                    android:textSize="16sp"
+                    app:drawableEndCompat="@drawable/ic_chevron_right"
+                    app:drawableTint="?attr/colorTextSecondary" />
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+    </LinearLayout>
+</androidx.core.widget.NestedScrollView>

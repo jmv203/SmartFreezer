@@ -5,6 +5,19 @@
     <!-- Base application theme. -->
     <style name="Base.Theme.SmartFreezer" parent="Theme.Material3.DayNight.NoActionBar">
         <!-- Customize your light theme here. -->
-        <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
+        <item name="colorBackground">@color/background</item>
+        <item name="colorHeaderBackground">@color/purpleButton</item>
+        <item name="colorHeaderText">@color/white</item>
+        <item name="colorCardBackground">@color/white</item>
+        <item name="colorTextPrimary">@color/purpleButton</item>
+        <item name="colorTextSecondary">@color/darker_gray</item>
+        <item name="colorTextTertiary">@color/white</item>
+        <item name="colorPopupBackground">@color/boneWhite</item>
+        <item name="colorBackgroundFilterButton">@color/white</item>
+        <item name="colorSearchBarBackground">@color/white</item>
+        <item name="colorBackgroundButton">@color/purpleButton</item>
+        <item name="colorTextButton">@color/white</item>
+        <item name="tabBackgroundColor">@color/tab_color</item>
+
     </style>
 </resources>

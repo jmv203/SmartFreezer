@@ -1,6 +1,7 @@
 package com.example.smartfreezer.navigation
 
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -12,7 +13,9 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.smartfreezer.ProfileActivity
 import com.example.smartfreezer.R
+import com.example.smartfreezer.SettingsActivity
 import com.google.android.material.tabs.TabLayout
 import com.example.smartfreezer.adapters.RecipesAdapter
 import com.example.smartfreezer.adapters.UserIngredientsAdapter
@@ -24,7 +27,6 @@ import com.example.smartfreezer.util.NetworkResult
 import com.example.smartfreezer.util.OnRecipeTabSelectedListener
 import com.example.smartfreezer.viewmodels.RecipesViewModel
 import com.google.android.material.bottomsheet.BottomSheetDialog
-import com.google.android.material.chip.Chip
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.toObject
@@ -39,7 +41,6 @@ class RecipesFragment : Fragment(R.layout.fragment_recipes) {
     private val recipesAdapter by lazy { RecipesAdapter() }
     private val recipesViewModel: RecipesViewModel by viewModels()
     private val firestore = FirebaseFirestore.getInstance()
-    private val user = FirebaseAuth.getInstance().currentUser
 
     private var recipesList = mutableListOf<Result>()
 
@@ -67,6 +68,17 @@ class RecipesFragment : Fragment(R.layout.fragment_recipes) {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        binding.btnAccountRecipe.setOnClickListener {
+            val intent = Intent(requireContext(), ProfileActivity::class.java)
+            startActivity(intent)
+        }
+
+        binding.btnSettingsRecipe.setOnClickListener {
+            val intent = Intent(requireContext(), SettingsActivity::class.java)
+            startActivity(intent)
+        }
+
 
         setupTabLayout()
         setupGreeting()
@@ -209,7 +221,7 @@ class RecipesFragment : Fragment(R.layout.fragment_recipes) {
         firestore.collection("users").document(currentUser.uid).get()
             .addOnSuccessListener { document ->
                 document.getString("name")?.let { name ->
-                    binding.tvGreetingRecipe.text = "Hola, $name"
+                    _binding?.tvGreetingRecipe?.text = getString(R.string.hola, name)
                 }
             }
     }
@@ -309,6 +321,7 @@ class RecipesFragment : Fragment(R.layout.fragment_recipes) {
             "vegan" -> filterBinding.chipVegan.isChecked = true
             "vegetarian" -> filterBinding.chipVegetarian.isChecked = true
             "gluten free" -> filterBinding.chipGlutenFree.isChecked = true
+                "dairy free" -> filterBinding.chipDairyFree.isChecked = true
         }
 
         // Listener del ChipGroup de tipo de dieta
@@ -317,6 +330,7 @@ class RecipesFragment : Fragment(R.layout.fragment_recipes) {
                 R.id.chipVegan -> "vegan"
                 R.id.chipVegetarian -> "vegetarian"
                 R.id.chipGlutenFree -> "gluten free"
+                R.id.chipDairyFree -> "dairy free"
                 else -> ""
             }
         }

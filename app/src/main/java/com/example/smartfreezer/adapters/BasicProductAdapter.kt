@@ -1,6 +1,6 @@
 package com.example.smartfreezer.adapters
 
-import android.util.Log
+
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -35,7 +35,9 @@ class BasicProductAdapter(
 
         holder.icon.setImageResource(iconResId)
 
-        holder.name.text = item.name
+        holder.name.text = item.name.replaceFirstChar {
+            if (it.isLowerCase()) it.titlecase() else it.toString()
+        }
 
         // Configurar el clic en el elemento
         holder.itemView.setOnClickListener {

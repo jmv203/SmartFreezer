@@ -12,7 +12,7 @@ import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
 import com.google.firebase.auth.FirebaseAuth
 
-class LoginActivity : AppCompatActivity() {
+class LoginActivity : BaseActivity() {
 
     private lateinit var auth: FirebaseAuth
 
@@ -22,6 +22,12 @@ class LoginActivity : AppCompatActivity() {
 
         // Inicializar Firebase Auth
         auth = FirebaseAuth.getInstance()
+
+        // Mostrar aviso si viene de registro sin verificar correo
+        val emailPending = intent.getBooleanExtra("emailPendingVerification", false)
+        if (emailPending) {
+            Toast.makeText(this, "Verifica tu correo antes de iniciar sesión", Toast.LENGTH_LONG).show()
+        }
 
         // Referencias a los elementos del layout
         val emailInputLayout = findViewById<TextInputLayout>(R.id.emailInputLayout)
@@ -41,7 +47,7 @@ class LoginActivity : AppCompatActivity() {
 
             var isValid = true
 
-            // Validar email (máx. 40 caracteres y formato correcto)
+            // Validar email
             if (email.isEmpty()) {
                 emailInputLayout.error = "El correo no puede estar vacío"
                 isValid = false
@@ -55,7 +61,7 @@ class LoginActivity : AppCompatActivity() {
                 emailInputLayout.error = null
             }
 
-            // Validar contraseña (mín. 8 caracteres, 1 mayúscula y 1 número)
+            // Validar contraseña
             if (password.isEmpty()) {
                 passwordInputLayout.error = "La contraseña no puede estar vacía"
                 isValid = false
@@ -69,37 +75,39 @@ class LoginActivity : AppCompatActivity() {
                 passwordInputLayout.error = null
             }
 
-            // Si todo está correcto, proceder con el inicio de sesión
             if (isValid) {
-                // Iniciar sesión con Firebase Authentication
+                // Iniciar sesión con Firebase
                 auth.signInWithEmailAndPassword(email, password)
                     .addOnCompleteListener(this) { task ->
                         if (task.isSuccessful) {
-                            // Inicio de sesión exitoso
-                            Toast.makeText(this, "Inicio de sesión exitoso", Toast.LENGTH_SHORT).show()
-                            // Redirigir a la pantalla principal
-                            val intent = Intent(this, HomeActivity::class.java)
-                            startActivity(intent)
-                            finish() // Cerrar la actividad de inicio de sesión
+                            val user = auth.currentUser
+                            if (user != null && user.isEmailVerified) {
+                                Toast.makeText(this, "Inicio de sesión exitoso", Toast.LENGTH_SHORT).show()
+                                val intent = Intent(this, HomeActivity::class.java)
+                                startActivity(intent)
+                                finish()
+                            } else {
+                                auth.signOut()
+                                Toast.makeText(this, "Debes verificar tu correo antes de iniciar sesión", Toast.LENGTH_LONG).show()
+                            }
                         } else {
-                            // Error al iniciar sesión
                             Toast.makeText(this, "Error: ${task.exception?.message}", Toast.LENGTH_LONG).show()
                         }
                     }
             }
         }
 
-        // Manejar la redirección al registro
+        // Redirección al registro
         registerRedirect.setOnClickListener {
             val intent = Intent(this, RegisterActivity::class.java)
             startActivity(intent)
-            finish() // Cierra esta actividad para evitar volver atrás
+            finish()
         }
 
-        // Manejar el clic en "Olvidé mi contraseña"
+        // Redirección para recuperar contraseña
         forgotPasswordLink.setOnClickListener {
             Toast.makeText(this, "Recuperar contraseña", Toast.LENGTH_SHORT).show()
-            // Aquí podrías agregar la lógica para redirigir a una pantalla de recuperación de contraseña
+            // Aquí podrías redirigir a una pantalla de recuperación
         }
     }
 }

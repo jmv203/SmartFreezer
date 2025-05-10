@@ -1,6 +1,7 @@
 package com.example.smartfreezer.models
 
 data class Category(
-    val name: String,
+    val displayName: String,
+    val firestoreName: String,
     val iconCat: Int
 )

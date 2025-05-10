@@ -1,11 +1,14 @@
 <androidx.cardview.widget.CardView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:card_view="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:clickable="true"
+    android:focusable="true"
     card_view:cardCornerRadius="12dp"
     card_view:cardElevation="4dp"
-    card_view:cardBackgroundColor="@color/colorNavBar"
+    card_view:cardBackgroundColor="?attr/colorCardBackground"
     android:layout_margin="8dp">
 
     <LinearLayout
@@ -13,21 +16,22 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="16dp"
-        android:gravity="center">
+        android:gravity="center"
+        tools:ignore="UseCompoundDrawables">
 
         <ImageView
             android:id="@+id/categoryIcon"
             android:layout_width="64dp"
             android:layout_height="64dp"
             android:src="@drawable/ic_fruit"
-            android:contentDescription="Icono categoría"/>
+            android:contentDescription="@string/icono_categor_a"/>
 
         <TextView
             android:id="@+id/categoryName"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Fruta"
-            android:textColor="@color/white"
+            android:text="@string/fruta"
+            android:textColor="?attr/colorTextPrimary"
             android:textStyle="bold"
             android:layout_marginTop="8dp"/>
     </LinearLayout>

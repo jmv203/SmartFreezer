@@ -2,9 +2,7 @@ package com.example.smartfreezer.navigation
 
 import android.os.Bundle
 import androidx.fragment.app.Fragment
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -23,14 +21,23 @@ class SelectCategoryFragment : Fragment(R.layout.fragment_select_category) {
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
         btnBack = view.findViewById(R.id.btnBackSelectCategory) // Inicializa el botón de retroceso
 
+
         val categories = listOf(
-            Category("Fruta", R.drawable.ic_fruit),
-            Category("Verdura", R.drawable.ic_vegetable)
+            Category(
+                displayName = getString(R.string.fruta), // Nombre visual según idioma
+                firestoreName = "fruta", // Nombre para Firestore
+                iconCat = R.drawable.ic_fruit
+            ),
+            Category(
+                displayName = getString(R.string.verdura),
+                firestoreName = "verdura",
+                iconCat = R.drawable.ic_vegetable
+            )
         )
 
         recyclerView.adapter = CategoryAdapter(categories) { selected ->
             val action = SelectCategoryFragmentDirections
-                .actionSelectCategoryFragmentToSelectProductFragment(selected.name)
+                .actionSelectCategoryFragmentToSelectProductFragment(selected.firestoreName)
             findNavController().navigate(action)
         }
 

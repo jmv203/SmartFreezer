@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_margin="8dp"
-    app:cardBackgroundColor="@color/white"
+    app:cardBackgroundColor="?attr/colorCardBackground"
     app:cardCornerRadius="8dp"
     app:cardElevation="4dp">
 
@@ -20,6 +21,7 @@
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:layout_marginEnd="16dp"
+            android:contentDescription="@string/icono_del_producto"
             android:src="@drawable/apple" />
 
         <TextView
@@ -27,10 +29,11 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Manzana"
+            android:text="@string/manzana"
             android:textAlignment="center"
             android:textSize="16sp"
-            android:textStyle="bold" />
+            android:textColor="?attr/colorTextPrimary"
+            android:fontFamily="@font/roboto" />
 
         <LinearLayout
             android:layout_width="wrap_content"
@@ -43,8 +46,9 @@
                 android:layout_width="24dp"
                 android:layout_height="24dp"
                 android:layout_marginEnd="8dp"
+                android:contentDescription="@string/boton_de_decrementar"
                 android:src="@drawable/delete"
-                app:tint="@color/purpleButton" />
+                app:tint="?attr/colorTextPrimary" />
 
             <TextView
                 android:id="@+id/tvQuantity"
@@ -53,14 +57,17 @@
                 android:layout_marginEnd="8dp"
                 android:text="1"
                 android:textSize="16sp"
-                android:textStyle="bold" />
+                android:textColor="?attr/colorTextPrimary"
+                android:fontFamily="@font/roboto"
+                tools:ignore="HardcodedText" />
 
             <ImageView
                 android:id="@+id/btnIncrease"
                 android:layout_width="24dp"
                 android:layout_height="24dp"
                 android:src="@drawable/add"
-                app:tint="@color/purpleButton" />
+                android:contentDescription="@string/boton_de_incrementar"
+                app:tint="?attr/colorTextPrimary" />
 
         </LinearLayout>
 

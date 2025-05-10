@@ -11,7 +11,8 @@ import com.example.smartfreezer.models.UserProduct
 
 class UserProductAdapter(
     private var productList: List<UserProduct>,
-    private val onItemClick: (UserProduct) -> Unit
+    private val onItemClick: (UserProduct) -> Unit,
+    private val onItemLongClick: (UserProduct) -> Unit
 ) : RecyclerView.Adapter<UserProductAdapter.ViewHolder>() {
 
     inner class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
@@ -19,11 +20,18 @@ class UserProductAdapter(
         val nameTextView: TextView = view.findViewById(R.id.tvProductNameInventory)
 
         fun bind(product: UserProduct) {
-            nameTextView.text = product.name
+            nameTextView.text = product.name.replaceFirstChar { it.uppercase() }
             iconImageView.setImageResource(product.iconDrawableRes)
 
+            // Click normal - abrir detalles
             itemView.setOnClickListener {
                 onItemClick(product)
+            }
+
+            // Long click - mostrar diálogo de eliminación
+            itemView.setOnLongClickListener {
+                onItemLongClick(product)
+                true
             }
         }
     }

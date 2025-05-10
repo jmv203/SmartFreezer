@@ -6,11 +6,11 @@
             <menu>
                 <item
                     android:id="@+id/filter_fruit"
-                    android:title="Fruta"
+                    android:title="@string/filter_category_fruit"
                     android:checkable="true" />
                 <item
                     android:id="@+id/filter_vegetable"
-                    android:title="Verdura"
+                    android:title="@string/filter_category_vegetable"
                     android:checkable="true" />
             </menu>
         </item>
@@ -20,17 +20,17 @@
             <menu>
                 <item
                     android:id="@+id/filter_fresh"
-                    android:title="Fresco"
+                    android:title="@string/filter_condition_fresh"
                     android:checkable="true" />
                 <item
                     android:id="@+id/filter_rotten"
-                    android:title="Podrido"
+                    android:title="@string/filter_condition_rotten"
                     android:checkable="true" />
             </menu>
         </item>
 
         <item
             android:id="@+id/filter_clear"
-            android:title="Limpiar filtros" />
+            android:title="@string/limpiar_filtros" />
     </group>
 </menu>

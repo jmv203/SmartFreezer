@@ -1,7 +1,28 @@
-<resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- Base application theme. -->
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
     <style name="Base.Theme.SmartFreezer" parent="Theme.Material3.DayNight.NoActionBar">
-        <!-- Customize your dark theme here. -->
-        <!-- <item name="colorPrimary">@color/my_dark_primary</item> -->
+        <!-- Personalización del tema oscuro -->
+        <item name="colorBackground">@color/background</item>
+        <item name="colorHeaderBackground">@color/colorHeader</item>
+        <item name="colorHeaderText">@color/white</item>
+        <item name="colorCardBackground">@color/boneWhite</item>
+        <item name="colorTextPrimary">@color/white</item> <!-- Texto principal blanco -->
+        <item name="colorTextSecondary">@color/darker_gray</item> <!-- Texto secundario gris -->
+        <item name="colorTextTertiary">@color/purple_200</item> <!-- Elementos terciarios morado claro -->
+        <item name="colorPopupBackground">@color/boneWhite</item>
+        <item name="colorBackgroundFilterButton">@color/boneWhite</item>
+        <item name="colorSearchBarBackground">@color/boneWhite</item>
+        <item name="colorBackgroundButton">@color/purpleButton</item>
+        <item name="colorTextButton">@color/white</item>
+        <item name="tabBackgroundColor">@color/tab_color</item>
+
+
+
+        <!-- Colores de Material Design 3 para modo oscuro -->
+        <item name="android:statusBarColor">@color/colorHeader</item>
+        <item name="android:navigationBarColor">@color/colorNavBar</item>
+        <item name="colorSurface">@color/boneWhite</item>
+        <item name="colorOnSurface">@color/white</item>
+        <item name="colorOnPrimary">@color/black</item> <!-- Texto sobre botones morados -->
     </style>
 </resources>

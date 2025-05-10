@@ -1,7 +1,6 @@
 package com.example.smartfreezer.navigation
 
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import android.widget.ImageView
 import androidx.fragment.app.Fragment
@@ -25,7 +24,7 @@ class SelectProductFragment : Fragment(R.layout.fragment_select_product) {
         btnBack = view.findViewById(R.id.btnBackSelectProduct) // Inicializa el botón de retroceso
 
         val category = arguments?.getString("category")?.lowercase() ?: return
-        Log.d("SelectProductFragment", "Categoría recibida: $category")
+
 
         firestore.collection("basic_products")
             .whereEqualTo("category", category)

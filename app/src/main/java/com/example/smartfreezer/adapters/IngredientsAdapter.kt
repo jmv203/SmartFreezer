@@ -15,7 +15,7 @@ class IngredientsAdapter : RecyclerView.Adapter<IngredientsAdapter.MyViewHolder>
 
         fun bind(ingredient: ExtendedIngredient) {
             binding.ingredient = ingredient
-            binding.name.text = ingredient.nameClean  // Asegurar que el texto se establece aquí
+            binding.name.text = ingredient.nameClean.replaceFirstChar { it.uppercase() }  // Asegurar que el texto se establece aquí
             binding.name.isSelected = true          // Activar el marquee
             binding.name.requestFocus()            // Solicitar el foco
             binding.executePendingBindings()

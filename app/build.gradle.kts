@@ -53,6 +53,10 @@ dependencies {
     // Servicios de Firebase (autenticación y Firestore)
     implementation("com.google.firebase:firebase-auth")
     implementation("com.google.firebase:firebase-firestore")
+    // Also add the dependencies for the Credential Manager libraries and specify their versions
+    implementation("androidx.credentials:credentials:1.3.0")
+    implementation("androidx.credentials:credentials-play-services-auth:1.3.0")
+    implementation("com.google.android.libraries.identity.googleid:googleid:1.1.1")
     //Menu SmoothBottomBar
     implementation("com.github.ibrahimsn98:SmoothBottomBar:1.7.9")
     //Menu desplegable PowerSpinner
@@ -68,6 +72,9 @@ dependencies {
     implementation ("androidx.lifecycle:lifecycle-extensions:2.2.0")
     implementation ("androidx.hilt:hilt-common:1.1.0")
     implementation ("androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.2")
+
+    //Grafico
+    implementation ("com.github.PhilJay:MPAndroidChart:v3.1.0")
 
     // Glide para imágenes
     implementation ("com.github.bumptech.glide:glide:4.12.0")

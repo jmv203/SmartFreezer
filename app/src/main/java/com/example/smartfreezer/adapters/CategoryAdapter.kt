@@ -20,7 +20,7 @@ class CategoryAdapter(
 
         fun bind(category: Category) {
             icon.setImageResource(category.iconCat)
-            name.text = category.name
+            name.text = category.displayName
             itemView.setOnClickListener { onClick(category) }
         }
     }
@@ -37,4 +37,3 @@ class CategoryAdapter(
     override fun getItemCount() = categories.size
 }
 
-private fun ImageView.setImageResource(string: kotlin.String) {}

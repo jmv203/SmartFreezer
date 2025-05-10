@@ -1,14 +1,19 @@
 package com.example.smartfreezer.navigation
 
+import android.annotation.SuppressLint
+import android.content.Intent
 import android.os.Bundle
 import android.view.View
+import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.smartfreezer.ProfileActivity
 import com.example.smartfreezer.R
+import com.example.smartfreezer.SettingsActivity
 import com.example.smartfreezer.adapters.ShoppingListAdapter
 import com.example.smartfreezer.models.ShoppingItem
 import com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -21,6 +26,8 @@ class ShoppingListFragment : Fragment(R.layout.fragment_shopping_list) {
     private lateinit var adapter: ShoppingListAdapter
     private lateinit var tvProductCount: TextView
     private lateinit var fabAddProduct: FloatingActionButton
+    private lateinit var btnAccountShoppingList: ImageView
+    private lateinit var btnSettingsShoppingList : ImageView
 
     private val shoppingList = mutableListOf<ShoppingItem>()
     private val firestore = FirebaseFirestore.getInstance()
@@ -28,6 +35,19 @@ class ShoppingListFragment : Fragment(R.layout.fragment_shopping_list) {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        btnAccountShoppingList = view.findViewById(R.id.btnAccountShoppingList)
+        btnSettingsShoppingList = view.findViewById(R.id.btnSettingsShoppingList)
+
+        btnAccountShoppingList.setOnClickListener {
+            val intent = Intent(requireContext(), ProfileActivity::class.java)
+            startActivity(intent)
+        }
+
+        btnSettingsShoppingList.setOnClickListener {
+            val intent = Intent(requireContext(), SettingsActivity::class.java)
+            startActivity(intent)
+        }
 
         recyclerView = view.findViewById(R.id.rvShoppingList)
         tvProductCount = view.findViewById(R.id.tvProductCountShoppingList)
@@ -63,7 +83,7 @@ class ShoppingListFragment : Fragment(R.layout.fragment_shopping_list) {
         firestore.collection("users").document(currentUser.uid).get()
             .addOnSuccessListener { document ->
                 document.getString("name")?.let { name ->
-                    view.findViewById<TextView>(R.id.tvGreetingShoppingList).text = "Hola, $name"
+                    view.findViewById<TextView>(R.id.tvGreetingShoppingList).text = getString(R.string.hola, name)
                 }
             }
     }
@@ -87,7 +107,8 @@ class ShoppingListFragment : Fragment(R.layout.fragment_shopping_list) {
                 updateProductCount()
             }
             .addOnFailureListener {
-                Toast.makeText(requireContext(), "Error al cargar la lista", Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireContext(),
+                    getString(R.string.error_al_cargar_la_lista), Toast.LENGTH_SHORT).show()
             }
     }
 
@@ -120,8 +141,9 @@ class ShoppingListFragment : Fragment(R.layout.fragment_shopping_list) {
             }
     }
 
+    @SuppressLint("StringFormatMatches")
     private fun updateProductCount() {
         val total = shoppingList.sumOf { it.quantity }
-        tvProductCount.text = "$total productos"
+        tvProductCount.text = getString(R.string.productos, total)
     }
 }

@@ -1,0 +1,18 @@
+<resources>
+    <attr name="colorBackground" format="reference|color"/>
+    <attr name="colorHeaderBackground" format="reference|color"/>
+    <attr name="colorHeaderText" format="reference|color"/>
+    <attr name="colorCardBackground" format="reference|color"/>
+    <attr name="colorTextPrimary" format="reference|color"/>
+    <attr name="colorTextSecondary" format="reference|color"/>
+    <attr name="colorTextTertiary" format="reference|color"/>
+    <attr name="colorPopupBackground" format="reference|color"/>
+    <attr name="colorBackgroundFilterButton" format="reference|color"/>
+    <attr name="colorBackgroundButton" format="reference|color"/>
+    <attr name="colorTextButton" format="reference|color"/>
+    <attr name="colorSearchBarBackground" format="reference|color"/>
+    <attr name="tabBackgroundColor" format="reference|color"/>
+
+
+
+</resources>

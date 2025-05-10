@@ -6,10 +6,23 @@
     <color name="teal_200">#FF03DAC5</color>
     <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>
-    <color name="white">#FFFFFFFF</color>
+    <color name="white">#FFFFFFFF</color>#
+    <color name="background">#F8FAFF</color>
     <color name="purpleButton">#052353</color>
     <color name="colorNavBar">#48606C</color>
     <color name="colorHeader">#25414F</color>
     <color name="boneWhite">#FAF6F4</color>
+    <color name="light_red">#FFF5F5</color>
+    <color name="light_green">#F0FFF0</color>
+    <color name="red">#FF0000</color>
+    <color name="green">#008000</color>
+    <color name="darker_gray">#AAAAAA</color>
+    <color name="switch_track">#BDBDBD</color> <!-- Gris claro por defecto -->
+    <color name="switch_track_night">#E1D8F0</color> <!-- Un morado muy claro -->
+    <color name="tab_color">#FDFDFD</color>
+    <color name="colorPrimary">#6200EE</color> <!-- Color principal claro -->
+    <color name="colorPrimaryDark">#3700B3</color> <!-- Color oscuro claro -->
+    <color name="barChartColor">#FF5722</color> <!-- Color para gráfico -->
+    <color name="barChartTextColor">#000000</color> <!-- Color para texto en el gráfico -->
 
 </resources>

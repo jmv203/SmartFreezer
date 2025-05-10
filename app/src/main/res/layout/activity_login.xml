@@ -15,7 +15,7 @@
         android:layout_height="275dp"
         android:layout_marginTop="-80dp"
         android:layout_marginBottom="-10dp"
-        android:contentDescription="Logo de la aplicación"
+        android:contentDescription="@string/logo_de_la_app"
         android:src="@drawable/smartfreezer__3_" />
 
     <!-- Título de la pantalla -->
@@ -44,7 +44,8 @@
             android:id="@+id/emailInput"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:drawableStart="@drawable/ic_mail"
+            android:drawableStart="@drawable/ic_email"
+            app:tint="@color/purpleButton"
             android:drawablePadding="10dp"
             android:textColor="@android:color/black" />
     </com.google.android.material.textfield.TextInputLayout>
@@ -69,6 +70,7 @@
             android:layout_height="wrap_content"
             android:inputType="textPassword"
             android:drawableStart="@drawable/ic_lock"
+            app:tint="@color/purpleButton"
             android:drawablePadding="10dp"
             android:textColor="@android:color/black" />
     </com.google.android.material.textfield.TextInputLayout>
@@ -102,7 +104,7 @@
         android:id="@+id/loginButton"
         style="@style/Widget.MaterialComponents.Button"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="60dp"
         android:layout_marginTop="15dp"
         android:backgroundTint="@color/purpleButton"
         android:text="@string/login"

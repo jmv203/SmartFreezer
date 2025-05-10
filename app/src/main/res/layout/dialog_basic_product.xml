@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/basicProductDialog"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -17,16 +18,16 @@
             android:layout_width="80dp"
             android:layout_height="80dp"
             android:layout_marginBottom="8dp"
-            android:contentDescription="Icono del producto" />
+            android:contentDescription="@string/icono_del_producto" />
 
         <TextView
             android:id="@+id/nameTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Nombre del Producto"
+            android:text="@string/nombre_del_producto"
             android:textStyle="bold"
             android:textSize="20sp"
-            android:textColor="@android:color/black"
+            android:textColor="?attr/colorTextPrimary"
             android:layout_marginBottom="16dp" />
 
         <!-- Contenedor de dos columnas -->
@@ -47,18 +48,18 @@
                     android:layout_width="0dp"
                     android:layout_weight="1"
                     android:layout_height="wrap_content"
-                    android:text="Categoría:"
+                    android:text="@string/categor_a"
                     android:textSize="16sp"
-                    android:textColor="@android:color/black" />
+                    android:textColor="?attr/colorTextPrimary" />
 
                 <TextView
                     android:id="@+id/categoryTextView"
                     android:layout_width="0dp"
                     android:layout_weight="1"
                     android:layout_height="wrap_content"
-                    android:text="verdura"
+                    android:text="@string/verdura"
                     android:textSize="16sp"
-                    android:textColor="@android:color/darker_gray" />
+                    android:textColor="?attr/colorTextSecondary" />
             </LinearLayout>
 
             <!-- Fila: Condición -->
@@ -72,18 +73,18 @@
                     android:layout_width="0dp"
                     android:layout_weight="1"
                     android:layout_height="wrap_content"
-                    android:text="Condición:"
+                    android:text="@string/condici_n"
                     android:textSize="16sp"
-                    android:textColor="@android:color/black" />
+                    android:textColor="?attr/colorTextPrimary" />
 
                 <TextView
                     android:id="@+id/conditionTextView"
                     android:layout_width="0dp"
                     android:layout_weight="1"
                     android:layout_height="wrap_content"
-                    android:text="fresco"
+                    android:text="@string/fresco"
                     android:textSize="16sp"
-                    android:textColor="@android:color/darker_gray" />
+                    android:textColor="?attr/colorTextSecondary" />
             </LinearLayout>
 
             <!-- Fila: Ubicación -->
@@ -97,18 +98,18 @@
                     android:layout_width="0dp"
                     android:layout_weight="1"
                     android:layout_height="wrap_content"
-                    android:text="Ubicación:"
+                    android:text="@string/ubicaci_n"
                     android:textSize="16sp"
-                    android:textColor="@android:color/black" />
+                    android:textColor="?attr/colorTextPrimary" />
 
                 <TextView
                     android:id="@+id/locationTextView"
                     android:layout_width="0dp"
                     android:layout_weight="1"
                     android:layout_height="wrap_content"
-                    android:text="nevera"
+                    android:text="@string/nevera"
                     android:textSize="16sp"
-                    android:textColor="@android:color/darker_gray" />
+                    android:textColor="?attr/colorTextSecondary" />
             </LinearLayout>
 
             <!-- Fila: Cantidad -->
@@ -122,9 +123,9 @@
                     android:layout_width="0dp"
                     android:layout_weight="1"
                     android:layout_height="wrap_content"
-                    android:text="Cantidad:"
+                    android:text="@string/cantidad"
                     android:textSize="16sp"
-                    android:textColor="@android:color/black" />
+                    android:textColor="?attr/colorTextPrimary" />
 
                 <TextView
                     android:id="@+id/quantityTextView"
@@ -133,9 +134,32 @@
                     android:layout_height="wrap_content"
                     android:text="3"
                     android:textSize="16sp"
-                    android:textColor="@android:color/darker_gray" />
+                    android:textColor="?attr/colorTextSecondary"
+                    tools:ignore="HardcodedText" />
             </LinearLayout>
 
         </LinearLayout>
+
+        <!-- Botón de Eliminar -->
+        <Button
+            android:id="@+id/tvDeleteProduct"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:text="@string/eliminar"
+            android:textColor="?attr/colorTextButton"
+            android:backgroundTint="@color/red"
+            android:textAllCaps="false"
+            android:paddingVertical="12dp"/>
+
+        <Button
+            android:id="@+id/btnMarkAsRotten"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/mark_as_rotten"
+            android:backgroundTint="@color/red"
+            android:textColor="@android:color/white"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp"/>
     </LinearLayout>
 </ScrollView>

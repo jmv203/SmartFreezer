@@ -21,8 +21,8 @@
 
     <!--Style para PopUpMenu -->
     <style name="PopupMenuInventory" parent="Widget.AppCompat.PopupMenu">
-        <item name="android:textColor">@color/purpleButton</item>
-        <item name="android:backgroundTint">@color/boneWhite</item>
+        <item name="android:textColor">?attr/colorTextPrimary</item>
+        <item name="android:backgroundTint">?attr/colorPopupBackground</item>
         <item name="android:itemBackground">@drawable/popup_menu_inventory_background</item>
         <item name="android:fontFamily">@font/roboto_light</item>
     </style>
@@ -32,7 +32,7 @@
     </style>
 
     <style name="CustomBottomSheetStyle" parent="Widget.Design.BottomSheet.Modal">
-        <item name="android:background">@android:color/transparent</item>
+        <item name="android:background">?attr/colorCardBackground</item>
     </style>
 
     <style name="RecipeIndicator">

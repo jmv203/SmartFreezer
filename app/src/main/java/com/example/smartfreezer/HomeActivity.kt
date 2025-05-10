@@ -2,22 +2,28 @@ package com.example.smartfreezer
 
 import android.content.Intent
 import android.os.Bundle
-import androidx.activity.OnBackPressedCallback
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import com.example.smartfreezer.databinding.ActivityHomeBinding
+import com.example.smartfreezer.util.OnInventoryTabSelectedListener
 import com.example.smartfreezer.util.OnRecipeTabSelectedListener
+import com.example.smartfreezer.util.SharedPrefManager
+import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.auth
 import dagger.hilt.android.AndroidEntryPoint
-import me.ibrahimsn.lib.SmoothBottomBar
+import java.util.Locale
+
 @AndroidEntryPoint
-class HomeActivity : AppCompatActivity(), OnRecipeTabSelectedListener {
+class HomeActivity : BaseActivity(), OnRecipeTabSelectedListener, OnInventoryTabSelectedListener  {
 
     private lateinit var binding: ActivityHomeBinding
     private lateinit var navController: NavController
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        applyLocale()
         super.onCreate(savedInstanceState)
 
         binding = ActivityHomeBinding.inflate(layoutInflater)
@@ -29,6 +35,19 @@ class HomeActivity : AppCompatActivity(), OnRecipeTabSelectedListener {
             startActivity(Intent(this, LoginActivity::class.java))
             finish()
             return
+        }
+        // Manejar enlace de verificación de email
+        val intent = intent
+        val emailLink = intent.data?.toString()
+
+        if (emailLink != null) {
+            if (Firebase.auth.isSignInWithEmailLink(emailLink)) {
+                // El enlace es válido, puedes marcar el email como verificado
+                // Aquí podrías guardar en SharedPreferences que el email está verificado
+                // o mostrar un diálogo confirmando la verificación
+                Toast.makeText(this,
+                    getString(R.string.correo_electr_nico_verificado_correctamente), Toast.LENGTH_SHORT).show()
+            }
         }
 
         // Setup NavController
@@ -67,7 +86,26 @@ class HomeActivity : AppCompatActivity(), OnRecipeTabSelectedListener {
             }
         }
 
+        // Si venimos del cambio de idioma, ir directamente a InventoryFragment
+        intent.getStringExtra("navigateTo")?.let {
+            if (it == "inventory") {
+                navController.navigate(R.id.inventoryFragment)
+                binding.bottomBar.itemActiveIndex = 2
+            }
+        }
+
+
     }
+    private fun applyLocale() {
+        val sharedPrefManager = SharedPrefManager(this)
+        val languageCode = sharedPrefManager.getAppLanguage()
+        val locale = Locale(languageCode)
+        Locale.setDefault(locale)
+        val config = resources.configuration
+        config.setLocale(locale)
+        createConfigurationContext(config)
+    }
+
 
     override fun onRecipeTabSelected(tabIndex: Int) {
         binding.bottomBar.itemActiveIndex = 3
@@ -80,6 +118,22 @@ class HomeActivity : AppCompatActivity(), OnRecipeTabSelectedListener {
             1 -> {
                 if (navController.currentDestination?.id != R.id.savedRecipesFragment) {
                     navController.navigate(R.id.savedRecipesFragment)
+                }
+            }
+        }
+    }
+
+    override fun onInventoryTabSelected(tabIndex: Int) {
+        binding.bottomBar.itemActiveIndex = 2
+        when (tabIndex) {
+            0 -> {
+                if (navController.currentDestination?.id != R.id.inventoryFragment) {
+                    navController.navigate(R.id.inventoryFragment)
+                }
+            }
+            1 -> {
+                if (navController.currentDestination?.id != R.id.wastedProductsFragment) {
+                    navController.navigate(R.id.wastedProductsFragment)
                 }
             }
         }

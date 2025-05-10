@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Colores principales adaptados para modo oscuro -->
+    <color name="purple_200">#BB86FC</color> <!-- Más claro en oscuro -->
+    <color name="purple_500">#7F4BFF</color> <!-- Versión más suave del morado -->
+    <color name="purple_700">#3700B3</color> <!-- Mantenido para consistencia -->
+
+    <color name="teal_200">#03DAC5</color> <!-- Puede mantenerse igual -->
+    <color name="teal_700">#018786</color> <!-- Puede mantenerse igual -->
+
+    <!-- Colores específicos de la app -->
+    <color name="background">#121212</color> <!-- Fondo oscuro estándar -->
+    <color name="purpleButton">#7F4BFF</color> <!-- Versión más clara para contraste -->
+    <color name="colorNavBar">#1E1E1E</color> <!-- Barra de navegación oscura -->
+    <color name="colorHeader">#212121</color> <!-- Versión oscura del encabezado -->
+    <color name="boneWhite">#2D2D2D</color> <!-- Fondo de popups en oscuro -->
+    <color name="light_red">#2D1C1C</color> <!-- Rojo claro adaptado -->
+    <color name="light_green">#1C2D1C</color> <!-- Verde claro adaptado -->
+    <color name="red">#FF5252</color> <!-- Rojo más visible en oscuro -->
+    <color name="green">#08A450</color> <!-- Verde más visible en oscuro -->
+    <color name="darker_gray">#9E9E9E</color> <!-- Gris más claro para texto secundario -->
+    <color name="switch_track">#424242</color> <!-- Gris oscuro para switch -->
+    <color name="switch_track_night">#7F4BFF</color> <!-- Morado claro para estado activo -->
+    <color name="tab_color">#212121</color>
+    <color name="colorPrimary">#BB86FC</color> <!-- Color principal oscuro -->
+    <color name="colorPrimaryDark">#3700B3</color> <!-- Color oscuro oscuro -->
+    <color name="barChartColor">#FF5722</color> <!-- Color para gráfico -->
+    <color name="barChartTextColor">#FFFFFF</color> <!-- Color para texto en el gráfico -->
+
+</resources>

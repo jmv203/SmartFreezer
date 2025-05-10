@@ -2,11 +2,14 @@
 <androidx.cardview.widget.CardView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_margin="8dp"
+    android:clickable="true"
+    android:focusable="true"
     app:cardCornerRadius="12dp"
-    app:cardBackgroundColor="@color/white"
+    app:cardBackgroundColor="?attr/colorCardBackground"
     app:cardElevation="4dp">
 
     <LinearLayout
@@ -14,7 +17,8 @@
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:padding="16dp"
-        android:gravity="center">
+        android:gravity="center"
+        tools:ignore="UseCompoundDrawables">
 
         <ImageView
             android:id="@+id/productIconAdd"
@@ -22,16 +26,16 @@
             android:layout_height="64dp"
             android:layout_gravity="center_horizontal"
             android:src="@drawable/apple"
-            android:contentDescription="Icono producto" />
+            android:contentDescription="@string/icono_producto" />
 
         <TextView
             android:id="@+id/productNameAdd"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Manzana"
-            android:textColor="@color/purpleButton"
+            android:text="@string/manzana"
+            android:textColor="?attr/colorTextPrimary"
             android:textSize="16sp"
-            android:textStyle="bold"
+            android:fontFamily="@font/roboto"
             android:layout_marginTop="8dp"
             android:gravity="center_horizontal"
             android:layout_gravity="center_horizontal"/>

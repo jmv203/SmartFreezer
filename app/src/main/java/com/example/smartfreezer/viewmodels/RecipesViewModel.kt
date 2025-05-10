@@ -5,6 +5,7 @@ import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.util.Log
 import androidx.lifecycle.*
+import com.example.smartfreezer.R
 import com.example.smartfreezer.api.FoodRecipesApi
 import com.example.smartfreezer.models.*
 import com.example.smartfreezer.util.Constants.Companion.API_KEY
@@ -37,11 +38,6 @@ class RecipesViewModel @Inject constructor(
     private val _recipeDetailsResponse = MutableLiveData<NetworkResult<RecipeDetails>>()
     val recipeDetailsResponse: LiveData<NetworkResult<RecipeDetails>> get() = _recipeDetailsResponse
 
-    private val _recipeInstructionsResponse = MutableLiveData<NetworkResult<List<RecipeDetails>>>()
-    val recipeInstructionsResponse: LiveData<NetworkResult<List<RecipeDetails>>> get() = _recipeInstructionsResponse
-
-    private val _savedRecipesResponse = MutableLiveData<NetworkResult<List<Result>>>()
-    val savedRecipesResponse: LiveData<NetworkResult<List<Result>>> = _savedRecipesResponse
 
     var selectedType: String = ""
     var selectedDiet: String = ""
@@ -103,75 +99,13 @@ class RecipesViewModel @Inject constructor(
         return if (response.isSuccessful) {
             response.body()?.let {
                 NetworkResult.Success(it)
-            } ?: NetworkResult.Error("No se encontraron detalles de la receta")
+            } ?: NetworkResult.Error(context.getString(R.string.no_se_encontraron_detalles_de_la_receta))
         } else {
             NetworkResult.Error("Error: ${response.message()}")
         }
     }
 
-    fun getRecipeInstructions(recipeId: Int, stepBreakdown: Boolean = false) {
-        _recipeInstructionsResponse.value = NetworkResult.Loading()
-        viewModelScope.launch {
-            if (hasInternetConnection()) {
-                try {
-                    val response = foodRecipesApi.getAnalyzedRecipeInstructions(recipeId, API_KEY, stepBreakdown)
-                    _recipeInstructionsResponse.value = handleRecipeInstructionsResponse(response)
-                } catch (e: Exception) {
-                    _recipeInstructionsResponse.value = NetworkResult.Error("Error: ${e.message}")
-                }
-            } else {
-                _recipeInstructionsResponse.value = NetworkResult.Error("No Internet Connection")
-            }
-        }
-    }
 
-    private fun handleRecipeInstructionsResponse(response: Response<List<RecipeDetails>>): NetworkResult<List<RecipeDetails>> {
-        return if (response.isSuccessful) {
-            response.body()?.let {
-                NetworkResult.Success(it)
-            } ?: NetworkResult.Error("No se encontraron instrucciones")
-        } else {
-            NetworkResult.Error("Error: ${response.message()}")
-        }
-    }
-
-    fun getBulkRecipes(ids: String) {
-        viewModelScope.launch {
-            _savedRecipesResponse.value = NetworkResult.Loading()
-            Log.d("RecipesViewModel", "getBulkRecipes called with IDs: $ids") // Log
-            try {
-                val response = foodRecipesApi.getBulkRecipes(
-                    ids = ids,
-                    apiKey = API_KEY
-                )
-                Log.d("RecipesViewModel", "getBulkRecipes - Response: ${response.raw()}") // Log raw response
-                _savedRecipesResponse.value = handleBulkRecipesResponse(response)
-                Log.d("RecipesViewModel", "getBulkRecipes - Result: ${_savedRecipesResponse.value}") // Log the result
-            } catch (e: Exception) {
-                Log.e("RecipesViewModel", "getBulkRecipes - Error: ${e.message}", e) // Log error
-                _savedRecipesResponse.value = NetworkResult.Error("Error fetching bulk recipes: ${e.message}")
-            }
-        }
-    }
-
-    private fun handleBulkRecipesResponse(response: Response<List<Result>>): NetworkResult<List<Result>> {
-
-        return when {
-            response.message().toString().contains("timeout") -> {
-                NetworkResult.Error("Timeout")
-            }
-            response.code() == 402 -> {
-                NetworkResult.Error("API Key Limited")
-            }
-            response.isSuccessful -> {
-                val recipes = response.body()
-                NetworkResult.Success(recipes ?: emptyList())
-            }
-            else -> {
-                NetworkResult.Error(response.message())
-            }
-        }
-    }
     private fun hasInternetConnection(): Boolean {
         val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
         val activeNetwork = connectivityManager.activeNetwork ?: return false
@@ -240,10 +174,4 @@ class RecipesViewModel @Inject constructor(
         offset += 20
     }
 
-    fun resetFilters() {
-        selectedType = ""
-        selectedDiet = ""
-        selectedRating = 0
-        selectedIngredients = emptyList()
-    }
 }

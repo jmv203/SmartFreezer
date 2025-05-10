@@ -2,6 +2,7 @@ package com.example.smartfreezer.navigation
 
 import android.app.AlertDialog
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -14,7 +15,9 @@ import androidx.navigation.fragment.findNavController
 import com.google.android.material.tabs.TabLayout
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.smartfreezer.ProfileActivity
 import com.example.smartfreezer.R
+import com.example.smartfreezer.SettingsActivity
 import com.example.smartfreezer.adapters.RecipesAdapter
 import com.example.smartfreezer.adapters.UserIngredientsAdapter
 import com.example.smartfreezer.databinding.DialogRecipesFilterBinding
@@ -66,6 +69,16 @@ class SavedRecipesFragment : Fragment(R.layout.fragment_saved_recipes) {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        binding.btnAccountSavedRecipe.setOnClickListener {
+            val intent = Intent(requireContext(), ProfileActivity::class.java)
+            startActivity(intent)
+        }
+
+        binding.btnSettingsSavedRecipe.setOnClickListener {
+            val intent = Intent(requireContext(), SettingsActivity::class.java)
+            startActivity(intent)
+        }
 
         setupTabLayout()
         setupGreeting()
@@ -128,7 +141,6 @@ class SavedRecipesFragment : Fragment(R.layout.fragment_saved_recipes) {
                 callback(ids)
             }
             .addOnFailureListener {
-                Log.e("SavedRecipesFragment", "Error getting saved recipe IDs", it)
                 callback(emptySet())
             }
     }
@@ -158,11 +170,11 @@ class SavedRecipesFragment : Fragment(R.layout.fragment_saved_recipes) {
 
         savedRecipeRef.set(data)
             .addOnSuccessListener {
-                Toast.makeText(requireContext(), "Receta guardada", Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireContext(), getString(R.string.receta_guardada), Toast.LENGTH_SHORT).show()
                 updateAdapterSavedRecipeIds() // Update saved IDs in adapter
             }
             .addOnFailureListener {
-                Toast.makeText(requireContext(), "Error al guardar", Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireContext(), getString(R.string.error_al_guardar), Toast.LENGTH_SHORT).show()
             }
     }
 
@@ -176,13 +188,13 @@ class SavedRecipesFragment : Fragment(R.layout.fragment_saved_recipes) {
 
         savedRecipeRef.delete()
             .addOnSuccessListener {
-                Toast.makeText(requireContext(), "Receta eliminada", Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireContext(), getString(R.string.receta_eliminada), Toast.LENGTH_SHORT).show()
                 updateAdapterSavedRecipeIds() // Update saved IDs in adapter
                 recipesList.removeIf { it.id == result.id } // Remove deleted item from list
                 savedRecipeAdapter.setData(recipesList) // Update adapter data
             }
             .addOnFailureListener {
-                Toast.makeText(requireContext(), "Error al eliminar", Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireContext(), getString(R.string.error_al_eliminar), Toast.LENGTH_SHORT).show()
             }
     }
 
@@ -199,7 +211,6 @@ class SavedRecipesFragment : Fragment(R.layout.fragment_saved_recipes) {
                 callback(document.exists())
             }
             .addOnFailureListener {
-                Log.e("RecipesFragment", "Error checking saved status", it)
                 callback(false) // Assume not saved on error
             }
     }
@@ -209,7 +220,7 @@ class SavedRecipesFragment : Fragment(R.layout.fragment_saved_recipes) {
         FirebaseFirestore.getInstance().collection("users").document(currentUser.uid).get()
             .addOnSuccessListener { document ->
                 document.getString("name")?.let { name ->
-                    binding.tvGreetingSavedRecipe.text = "Hola, $name"
+                    _binding?.tvGreetingSavedRecipe?.text = getString(R.string.hola, name)
                 }
             }
     }
@@ -218,7 +229,6 @@ class SavedRecipesFragment : Fragment(R.layout.fragment_saved_recipes) {
         showLoading()
 
         val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return
-        Log.d("SavedRecipes", "Fetching saved recipes for user: $userId")
 
         FirebaseFirestore.getInstance()
             .collection("users")
@@ -226,6 +236,8 @@ class SavedRecipesFragment : Fragment(R.layout.fragment_saved_recipes) {
             .collection("savedRecipes")
             .get()
             .addOnSuccessListener { snapshot ->
+                if (_binding == null) return@addOnSuccessListener
+
                 val recipesData = snapshot.documents.mapNotNull { document ->
                     val recipeId = document.getLong("recipeId")?.toInt()
                     val recipeTitle = document.getString("title")
@@ -236,15 +248,13 @@ class SavedRecipesFragment : Fragment(R.layout.fragment_saved_recipes) {
                     }
                 }
 
-                Log.d("SavedRecipes", "Retrieved recipes data: $recipesData")
                 if (recipesData.isEmpty()) {
-                    Log.d("SavedRecipes", "No saved recipes found in Firestore")
                     hideLoading()
                     savedRecipeAdapter.setData(emptyList())
-                    binding.tvEmpty.visibility = View.VISIBLE
+                    _binding?.tvEmpty?.visibility = View.VISIBLE
                     return@addOnSuccessListener
                 }
-                binding.tvEmpty.visibility = View.GONE
+                _binding?.tvEmpty?.visibility = View.GONE
 
                 recipesList.clear()
                 val searchResults = mutableListOf<Result>()
@@ -258,23 +268,22 @@ class SavedRecipesFragment : Fragment(R.layout.fragment_saved_recipes) {
                 }
 
                 recipesData.forEach { (recipeId, recipeTitle) ->
-
                     recipesViewModel.searchRecipesByTitle(recipeTitle) { result ->
+                        if (_binding == null) return@searchRecipesByTitle
+
                         when (result) {
                             is NetworkResult.Success -> {
                                 result.data?.let { recipes ->
                                     if (recipes.isNotEmpty()) {
-                                        searchResults.add(recipes.first()) // Add the first result
-                                        Log.d("SavedRecipes", "Recipe found for $recipeTitle: ${recipes.first()}")
+                                        searchResults.add(recipes.first())
                                     } else {
                                         Log.w("SavedRecipes", "No recipe found for $recipeTitle")
                                     }
-
                                 }
                             }
                             is NetworkResult.Error -> {
-                                Log.e("SavedRecipes", "Error searching for $recipeTitle: ${result.message}")
-                                Toast.makeText(requireContext(), "Error searching for $recipeTitle: ${result.message}", Toast.LENGTH_SHORT).show()
+                                Toast.makeText(requireContext(),
+                                    getString(R.string.error_en_buscar, recipeTitle, result.message), Toast.LENGTH_SHORT).show()
                             }
                             is NetworkResult.Loading -> {
                                 showLoading()
@@ -286,17 +295,17 @@ class SavedRecipesFragment : Fragment(R.layout.fragment_saved_recipes) {
                             hideLoading()
                             val distinctRecipes = searchResults.distinctBy { it.id }
                             savedRecipeAdapter.setData(distinctRecipes)
-                            Log.d("SavedRecipes", "All searches completed. Updating adapter with ${distinctRecipes.size} recipes")
                         }
                     }
                 }
             }
-            .addOnFailureListener { exception ->
-                Log.e("SavedRecipes", "Error fetching from Firestore", exception)
+            .addOnFailureListener {
                 hideLoading()
-                Toast.makeText(requireContext(), "Error loading saved recipes", Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireContext(),
+                    getString(R.string.error_en_cargar_las_recetas_guardadas), Toast.LENGTH_SHORT).show()
             }
     }
+
 
     private fun showLoading() {
         binding.shimmerLayoutSavedRecipe.startShimmer()
@@ -326,7 +335,6 @@ class SavedRecipesFragment : Fragment(R.layout.fragment_saved_recipes) {
         var selectedType = recipesViewModel.selectedType
         var selectedDiet = recipesViewModel.selectedDiet
         var selectedRating = recipesViewModel.selectedRating
-        val selectedIngredientIcons = recipesViewModel.selectedIngredients.toMutableList()
 
         // Configuración inicial del tipo de plato
         when (selectedType) {
@@ -354,6 +362,7 @@ class SavedRecipesFragment : Fragment(R.layout.fragment_saved_recipes) {
             "vegan" -> filterBinding.chipVegan.isChecked = true
             "vegetarian" -> filterBinding.chipVegetarian.isChecked = true
             "gluten free" -> filterBinding.chipGlutenFree.isChecked = true
+            "dairy free" -> filterBinding.chipDairyFree.isChecked = true
         }
 
         // Listener del ChipGroup de tipo de dieta
@@ -362,6 +371,7 @@ class SavedRecipesFragment : Fragment(R.layout.fragment_saved_recipes) {
                 R.id.chipVegan -> "vegan"
                 R.id.chipVegetarian -> "vegetarian"
                 R.id.chipGlutenFree -> "gluten free"
+                R.id.chipDairyFree -> "dairy free"
                 else -> ""
             }
         }
@@ -441,10 +451,10 @@ class SavedRecipesFragment : Fragment(R.layout.fragment_saved_recipes) {
     private fun setupClearSavedRecipesButton() {
         binding.btnClearSavedRecipes.setOnClickListener {
             AlertDialog.Builder(requireContext())
-                .setTitle("Eliminar todas las recetas")
-                .setMessage("¿Estás seguro de que quieres eliminar todas las recetas guardadas?")
-                .setPositiveButton("Sí") { _, _ -> clearAllSavedRecipes() }
-                .setNegativeButton("Cancelar", null)
+                .setTitle(getString(R.string.eliminar_todas_las_recetas))
+                .setMessage(getString(R.string.est_s_seguro_de_que_quieres_eliminar_todas_las_recetas_guardadas))
+                .setPositiveButton(getString(R.string.s)) { _, _ -> clearAllSavedRecipes() }
+                .setNegativeButton(getString(R.string.cancelar), null)
                 .show()
         }
     }

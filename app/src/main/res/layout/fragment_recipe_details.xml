@@ -29,6 +29,7 @@
                     android:layout_width="0dp"
                     android:layout_height="350dp"
                     android:scaleType="centerCrop"
+                    android:contentDescription="@string/imagen_receta"
                     app:layout_constraintTop_toTopOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
@@ -41,12 +42,13 @@
                     android:layout_height="wrap_content"
                     android:layout_margin="16dp"
                     android:src="@drawable/baseline_arrow_back_24"
-                    app:tint="@color/white"
+                    app:tint="?attr/colorTextTertiary"
                     app:fabSize="normal"
+                    android:contentDescription="@string/icono"
                     android:layout_gravity="top|start"
                     app:layout_constraintTop_toTopOf="@id/recipeDetailImage"
                     app:layout_constraintStart_toStartOf="@id/recipeDetailImage"
-                    android:backgroundTint="@color/purpleButton"
+                    android:backgroundTint="?attr/colorTextPrimary"
                     android:alpha="0.7"/>
 
                 <com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -55,11 +57,13 @@
                     android:layout_height="wrap_content"
                     android:layout_margin="16dp"
                     android:src="@drawable/ic_save"
+                    app:tint="?attr/colorTextTertiary"
                     app:fabSize="normal"
+                    android:contentDescription="@string/icono"
                     android:layout_gravity="top|end"
                     app:layout_constraintTop_toTopOf="@id/recipeDetailImage"
                     app:layout_constraintEnd_toEndOf="@id/recipeDetailImage"
-                    android:backgroundTint="@color/purpleButton"
+                    android:backgroundTint="?attr/colorTextPrimary"
                     android:alpha="0.7"/>
 
 
@@ -67,7 +71,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="300dp"
-                    app:cardBackgroundColor="@android:color/white"
+                    app:cardBackgroundColor="?attr/colorCardBackground"
                     app:cardCornerRadius="16dp"
                     app:cardElevation="4dp"
                     app:layout_constraintTop_toTopOf="parent"
@@ -95,7 +99,7 @@
                                 android:layout_height="wrap_content"
                                 android:layout_weight="1"
                                 android:text="@{details.title}"
-                                android:textColor="@color/purpleButton"
+                                android:textColor="?attr/colorTextPrimary"
                                 android:textSize="24sp"
                                 android:fontFamily="@font/roboto_light"
                                 tools:text="Recipe Title" />
@@ -105,7 +109,8 @@
                                 android:layout_height="wrap_content"
                                 android:orientation="horizontal"
                                 android:gravity="center_vertical"
-                                android:layout_marginEnd="16dp">
+                                android:layout_marginEnd="16dp"
+                                tools:ignore="UseCompoundDrawables">
 
                                 <ImageView
                                     android:id="@+id/recipeDetailStarIcon"
@@ -113,6 +118,7 @@
                                     android:layout_height="24dp"
                                     android:layout_marginStart="8dp"
                                     android:src="@drawable/ic_star"
+                                    android:contentDescription="@string/icono"
                                     app:tint="#FFEB3B" />
 
                                 <TextView
@@ -121,7 +127,7 @@
                                     android:layout_height="wrap_content"
                                     android:layout_marginStart="4dp"
                                     app:loadScoreValue="@{details.spoonacularScore}"
-                                    android:textColor="@color/purpleButton"
+                                    android:textColor="?attr/colorTextPrimary"
                                     android:textSize="20sp"
                                     tools:text="4.5" />
 
@@ -135,7 +141,7 @@
                             android:layout_marginTop="16dp"
                             android:orientation="horizontal"
                             android:gravity="center"
-                            android:weightSum="5"
+                            android:weightSum="6"
                             app:layout_constraintTop_toBottomOf="@id/recipeDetailTitleContainer"
                             app:layout_constraintStart_toStartOf="parent"
                             app:layout_constraintEnd_toEndOf="parent">
@@ -148,7 +154,7 @@
                                 android:orientation="horizontal"
                                 android:gravity="center"
                                 android:layoutDirection="ltr"
-                                android:weightSum="5"
+                                android:weightSum="6"
                                 app:layout_constraintTop_toBottomOf="@id/recipeDetailTitleContainer"
                                 app:layout_constraintStart_toStartOf="parent"
                                 app:layout_constraintEnd_toEndOf="parent" >
@@ -163,7 +169,7 @@
                             android:layout_marginTop="16dp"
                             android:text="@string/summary_label"
                             android:textSize="18sp"
-                            android:textColor="@color/purpleButton"
+                            android:textColor="?attr/colorTextPrimary"
                             android:fontFamily="@font/roboto_medium"
                             app:layout_constraintTop_toBottomOf="@id/indicatorsLayout"
                             app:layout_constraintStart_toStartOf="parent"
@@ -177,7 +183,7 @@
                             android:ellipsize="end"
                             app:parseHtml="@{details.summary}"
                             android:textSize="16sp"
-                            android:textColor="@color/purpleButton"
+                            android:textColor="?attr/colorTextPrimary"
                             app:layout_constraintTop_toBottomOf="@id/recipeDetailSummaryLabel"
                             app:layout_constraintStart_toStartOf="parent"
                             app:layout_constraintEnd_toEndOf="parent"
@@ -190,7 +196,7 @@
                             android:layout_marginTop="16dp"
                             android:text="@string/ingredients_label_title"
                             android:textSize="18sp"
-                            android:textColor="@color/purpleButton"
+                            android:textColor="?attr/colorTextPrimary"
                             android:fontFamily="@font/roboto_medium"
                             app:layout_constraintTop_toBottomOf="@id/recipeDetailSummary"
                             app:layout_constraintStart_toStartOf="parent"
@@ -215,7 +221,7 @@
                             android:text="@string/instructions_label_title"
                             android:textSize="18sp"
                             android:fontFamily="@font/roboto_medium"
-                            android:textColor="@color/purpleButton"
+                            android:textColor="?attr/colorTextPrimary"
                             app:layout_constraintTop_toBottomOf="@id/recipeDetailIngredientsRecyclerView"
                             app:layout_constraintStart_toStartOf="parent"
                             app:layout_constraintEnd_toEndOf="parent" />
@@ -239,7 +245,7 @@
                             android:text="@string/nutrition_info_label_title"
                             android:textSize="18sp"
                             android:fontFamily="@font/roboto_medium"
-                            android:textColor="@color/purpleButton"
+                            android:textColor="?attr/colorTextPrimary"
                             app:layout_constraintTop_toBottomOf="@id/recipeDetailStepsRecyclerView"
                             app:layout_constraintStart_toStartOf="parent"
                             app:layout_constraintEnd_toEndOf="parent" />

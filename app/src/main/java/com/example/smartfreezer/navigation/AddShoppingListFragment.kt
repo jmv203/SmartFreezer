@@ -8,6 +8,7 @@ import android.widget.EditText
 import android.widget.ImageView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.smartfreezer.R
@@ -65,7 +66,8 @@ class AddShoppingListFragment : Fragment(R.layout.fragment_add_shopping_list) {
                 adapter.updateData(productList)
             }
             .addOnFailureListener {
-                Toast.makeText(requireContext(), "Error al cargar productos", Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireContext(),
+                    getString(R.string.error_al_cargar_productos), Toast.LENGTH_SHORT).show()
             }
     }
 
@@ -96,9 +98,13 @@ class AddShoppingListFragment : Fragment(R.layout.fragment_add_shopping_list) {
             )
             transaction.set(shoppingListRef, data)
         }.addOnSuccessListener {
-            Toast.makeText(requireContext(), "${product.name} añadido a la lista", Toast.LENGTH_SHORT).show()
+            context?.let {
+                Toast.makeText(it,
+                    getString(R.string.a_adido_a_la_lista, product.name), Toast.LENGTH_SHORT).show()
+                findNavController().popBackStack()}
         }.addOnFailureListener {
-            Toast.makeText(requireContext(), "Error al añadir producto", Toast.LENGTH_SHORT).show()
+            Toast.makeText(requireContext(),
+                getString(R.string.error_al_a_adir_producto), Toast.LENGTH_SHORT).show()
         }
     }
 }
