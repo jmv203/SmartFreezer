@@ -295,27 +295,30 @@
 
     <string name="weekly">Semanal</string>
     <string name="monthly">Mensual</string>
-    <string name="no_wasted_products">¡No hay productos desperdiciados en este período!</string>
+
 
     <string name="mark_as_rotten">Marcar como podrido</string>
     <string name="product_marked_rotten">Producto marcado como podrido</string>
     <string name="error_marking_rotten">Error al marcar el producto</string>
-    <string name="productos_desperdiciados">Productos desperdiciados</string>
 
-    <string name="weekly_short">Semana</string>
-    <string name="monthly_short">Mes</string>
-    <string name="yearly_short">Año</string>
-    <string name="select_date">Seleccionar fecha</string>
-    <string name="weekly_summary">Esta semana: %d productos desperdiciados</string>
-    <string name="monthly_summary">Este mes: %d productos desperdiciados</string>
-    <string name="yearly_summary">Este año: %d productos desperdiciados</string>
-    <string name="most_wasted_day">Día con más desperdicio: %s (%d productos)</string>
-    <string name="most_wasted_month">Mes con más desperdicio: %s (%d productos)</string>
-    <string name="most_wasted_year">Año con más desperdicio: %s (%d productos)</string>
+
     <string name="previous">Anterior</string>
     <string name="next">Siguiente</string>
 
-    <string name="week_title">Semana %1$d - %2$s</string>
-    <string name="months_title">%d (Últimos 6 meses)</string>
-    <string name="total_wasted">Total: %d productos</string>
+    <string name="total_wasted">Total: %d productos han sido desperdiciados</string>
+
+    <!-- Días de la semana abreviados -->
+    <string name="monday">L</string>
+    <string name="tuesday">M</string>
+    <string name="wednesday">X</string>
+    <string name="thursday">J</string>
+    <string name="friday">V</string>
+    <string name="saturday">S</string>
+    <string name="sunday">D</string>
+
+
+    <!-- Formatos de fecha -->
+    <string name="week_range_format">%1$s - %2$s %3$s</string>
+    <string name="month_range_format">%1$s - %2$s %3$s</string>
+    <string name="productos_desperdiciados">Desperdicios</string>
 </resources>

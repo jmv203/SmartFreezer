@@ -560,7 +560,7 @@ class ProfileActivity : BaseActivity() {
                 if (reauthTask.isSuccessful) {
 
                     // Paso 1: Eliminar subcolecciones manualmente
-                    val collectionsToDelete = listOf("products", "savedRecipes", "shopping_list")
+                    val collectionsToDelete = listOf("products", "savedRecipes", "shopping_list", "wasted_products")
 
                     val deletionTasks = collectionsToDelete.map { collection ->
                         userDocRef.collection(collection).get()

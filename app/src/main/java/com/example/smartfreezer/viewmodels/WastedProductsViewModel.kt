@@ -1,5 +1,6 @@
 package com.example.smartfreezer.viewmodels
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -21,6 +22,17 @@ class WastedProductsViewModel : ViewModel() {
     private val _selectedPeriod = MutableLiveData<String>().apply { value = "weekly" }
     val selectedPeriod: LiveData<String> = _selectedPeriod
 
+    private var daysOfWeek: List<String> = emptyList()
+
+
+    fun setStringResources(
+        days: List<String>,
+
+    ) {
+        daysOfWeek = days
+
+    }
+
     fun loadWeeklyData(referenceDate: Date = Calendar.getInstance().time) {
         val calendar = Calendar.getInstance().apply { time = referenceDate }
         calendar.add(Calendar.DAY_OF_YEAR, -7)
@@ -30,11 +42,22 @@ class WastedProductsViewModel : ViewModel() {
     }
 
     fun loadMonthlyData(referenceDate: Date = Calendar.getInstance().time) {
-        val calendar = Calendar.getInstance().apply { time = referenceDate }
-        calendar.add(Calendar.MONTH, -1)
-        val startDate = calendar.time
+        val dateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
 
-        loadDataBetweenDates(startDate, referenceDate, "monthly")
+        val endCal = Calendar.getInstance().apply {
+            time = referenceDate
+            set(Calendar.DAY_OF_MONTH, getActualMaximum(Calendar.DAY_OF_MONTH))
+        }
+
+        val startCal = Calendar.getInstance().apply {
+            time = endCal.time
+            add(Calendar.MONTH, -5)
+            set(Calendar.DAY_OF_MONTH, 1)
+        }
+
+        Log.d("DateRange", "Rango consultado: ${dateFormat.format(startCal.time)} - ${dateFormat.format(endCal.time)}")
+
+        loadDataBetweenDates(startCal.time, endCal.time, "monthly")
     }
 
     fun setPeriod(period: String) {
@@ -54,10 +77,11 @@ class WastedProductsViewModel : ViewModel() {
     }
 
     fun loadData(periodOffset: Int = 0) {
-        val calendar = Calendar.getInstance()
+        val calendar = Calendar.getInstance().apply { time = _currentPeriod.value ?: Date() }
+
         when(selectedPeriod.value) {
-            "monthly" -> calendar.add(Calendar.MONTH, periodOffset * 6) // Medio año
-            else -> calendar.add(Calendar.WEEK_OF_YEAR, periodOffset) // Semanas
+            "monthly" -> calendar.add(Calendar.MONTH, periodOffset * 6) // 6 meses
+            else -> calendar.add(Calendar.WEEK_OF_YEAR, periodOffset) // 1 semana
         }
         _currentPeriod.value = calendar.time
 
@@ -68,7 +92,9 @@ class WastedProductsViewModel : ViewModel() {
     }
 
     private fun loadDataBetweenDates(startDate: Date, endDate: Date, period: String) {
+
         val currentUser = auth.currentUser
+        Log.d("FirestoreQuery", "Consultando desde ${SimpleDateFormat("dd/MM/yyyy").format(startDate)} hasta ${SimpleDateFormat("dd/MM/yyyy").format(endDate)}")
         if (currentUser == null) {
             _wastedProductsData.value = emptyList()
             return
@@ -76,7 +102,7 @@ class WastedProductsViewModel : ViewModel() {
 
         db.collection("users")
             .document(currentUser.uid)
-            .collection("wastedProducts")
+            .collection("wasted_products")
             .whereGreaterThanOrEqualTo("date", startDate)
             .whereLessThanOrEqualTo("date", endDate)
             .orderBy("date", Query.Direction.DESCENDING)
@@ -101,26 +127,37 @@ class WastedProductsViewModel : ViewModel() {
     private fun processData(products: List<WastedProduct>, period: String): List<Pair<String, Int>> {
         return when (period) {
             "weekly" -> {
-                val days = listOf("L", "M", "X", "J", "V", "S", "D")
-                days.map { day ->
-                    day to products.count {
-                        SimpleDateFormat("E", Locale.getDefault()).format(it.date.toDate()).startsWith(day)
+                val dayFormat = SimpleDateFormat("u", Locale.getDefault())
+                daysOfWeek.mapIndexed { index, day ->
+                    val dayNumber = index + 1
+                    day to products.count { product ->
+                        dayFormat.format(product.date.toDate()).toInt() == dayNumber
                     }
                 }
             }
             "monthly" -> {
-                val months = (0..5).map { i ->
-                    val cal = Calendar.getInstance().apply {
+                val currentCal = Calendar.getInstance().apply {
+                    time = _currentPeriod.value ?: Date()
+                    set(Calendar.DAY_OF_MONTH, getActualMaximum(Calendar.DAY_OF_MONTH))
+                }
+
+                (0..5).map { i ->
+                    val targetCal = Calendar.getInstance().apply {
+                        time = currentCal.time
                         add(Calendar.MONTH, -i)
                     }
-                    SimpleDateFormat("MMM", Locale.getDefault()).format(cal.time)
-                }.reversed()
 
-                months.map { month ->
-                    month to products.count {
-                        SimpleDateFormat("MMM", Locale.getDefault()).format(it.date.toDate()) == month
+                    val monthName = SimpleDateFormat("MMM", Locale.getDefault())
+                        .format(targetCal.time)
+                        .replace(".", "")
+
+                    monthName to products.count { product ->
+                        val productDate = product.date.toDate()
+                        val productCal = Calendar.getInstance().apply { time = productDate }
+                        productCal.get(Calendar.MONTH) == targetCal.get(Calendar.MONTH) &&
+                                productCal.get(Calendar.YEAR) == targetCal.get(Calendar.YEAR)
                     }
-                }
+                }.reversed()
             }
             else -> emptyList()
         }

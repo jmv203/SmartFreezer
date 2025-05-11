@@ -295,28 +295,34 @@
 
     <string name="weekly">Weekly</string>
     <string name="monthly">Monthly</string>
-    <string name="no_wasted_products">¡No wasted products in this period!</string>
+
 
     <string name="mark_as_rotten">Mark as rotten</string>
     <string name="product_marked_rotten">Product marked as rotten</string>
     <string name="error_marking_rotten">Error marking product as rotten</string>
-    <string name="productos_desperdiciados">Wasted products</string>
 
-    <string name="weekly_short">Week</string>
-    <string name="monthly_short">Month</string>
-    <string name="yearly_short">Year</string>
-    <string name="select_date">Select date</string>
-    <string name="weekly_summary">This week: %d wasted products</string>
-    <string name="monthly_summary">This month: %d wasted products</string>
-    <string name="yearly_summary">This year: %d wasted products</string>
-    <string name="most_wasted_day">Most wasted day: %s (%d products)</string>
-    <string name="most_wasted_month">Most wasted month: %s (%d products)</string>
-    <string name="most_wasted_year">Most wasted year: %s (%d products)</string>
+
+
     <string name="previous">Previous</string>
     <string name="next">Next</string>
 
 
-    <string name="week_title">Week %1$d - %2$s</string>
-    <string name="months_title">%d (Last 6 months)</string>
-    <string name="total_wasted">Total: %d products</string>
+    <string name="total_wasted">Total: %d products has been wasted</string>
+
+    <!-- Días de la semana abreviados -->
+    <string name="monday">M</string>
+    <string name="tuesday">T</string>
+    <string name="wednesday">W</string>
+    <string name="thursday">T</string>
+    <string name="friday">F</string>
+    <string name="saturday">S</string>
+    <string name="sunday">S</string>
+
+
+    <!-- Formatos de fecha -->
+    <string name="week_range_format">%1$s - %2$s %3$s</string>
+    <string name="month_range_format">%1$s - %2$s %3$s</string>
+
+    <string name="productos_desperdiciados">Waste</string>
+
 </resources>

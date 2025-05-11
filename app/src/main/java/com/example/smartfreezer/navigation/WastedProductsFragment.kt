@@ -55,9 +55,23 @@ class WastedProductsFragment : Fragment(R.layout.fragment_wasted_products) {
 
         setupUI()
         setupTabLayout()
+        setupChart()
         setupObservers()
 
+
         viewModel.setPeriod("weekly")
+
+        viewModel.setStringResources(
+            days = listOf(
+                getString(R.string.monday),
+                getString(R.string.tuesday),
+                getString(R.string.wednesday),
+                getString(R.string.thursday),
+                getString(R.string.friday),
+                getString(R.string.saturday),
+                getString(R.string.sunday)
+            ),
+        )
     }
 
     private fun setupTabLayout() {
@@ -112,12 +126,14 @@ class WastedProductsFragment : Fragment(R.layout.fragment_wasted_products) {
                 setDrawGridLines(false)
                 granularity = 1f
                 axisMinimum = -0.5f
+                labelCount = if (viewModel.selectedPeriod.value == "weekly") 7 else 6
             }
 
             axisLeft.apply {
                 axisMinimum = 0f
                 granularity = 1f
                 setDrawZeroLine(true)
+                setDrawGridLines(false)
             }
 
             axisRight.isEnabled = false
@@ -134,7 +150,6 @@ class WastedProductsFragment : Fragment(R.layout.fragment_wasted_products) {
         }
 
         viewModel.selectedPeriod.observe(viewLifecycleOwner) { period ->
-            binding.scrollView.scrollTo(0, 0)
             viewModel.loadData()
         }
     }
@@ -152,12 +167,33 @@ class WastedProductsFragment : Fragment(R.layout.fragment_wasted_products) {
         }
 
         binding.barChart.apply {
-            this.data = BarData(dataSet).apply { barWidth = 0.5f }
-            xAxis.valueFormatter = object : ValueFormatter() {
-                override fun getAxisLabel(value: Float, axis: AxisBase?): String {
-                    return data.getOrNull(value.toInt())?.first ?: ""
-                }
+            this.data = BarData(dataSet).apply {
+                barWidth = 0.5f
+                setValueFormatter(object : ValueFormatter() {
+                    override fun getFormattedValue(value: Float): String {
+                        return if (value == 0f) "" else value.toInt().toString()
+                    }
+                })
             }
+
+            xAxis.apply {
+                valueFormatter = object : ValueFormatter() {
+                    override fun getAxisLabel(value: Float, axis: AxisBase?): String {
+                        return data.getOrNull(value.toInt())?.first ?: ""
+                    }
+                }
+                labelCount = data.size
+                granularity = 1f
+                axisMinimum = -0.5f
+                axisMaximum = data.size.toFloat() - 0.5f
+            }
+
+            axisLeft.apply {
+                granularity = 1f
+                axisMinimum = 0f
+                setDrawGridLines(false)
+            }
+
             invalidate()
         }
 
@@ -171,13 +207,29 @@ class WastedProductsFragment : Fragment(R.layout.fragment_wasted_products) {
         val title = when(period) {
             "weekly" -> {
                 val cal = Calendar.getInstance().apply { time = date }
-                val weekNum = cal.get(Calendar.WEEK_OF_YEAR)
-                getString(R.string.week_title, weekNum, SimpleDateFormat("MMMM yyyy", Locale.getDefault()).format(date))
+                val startCal = Calendar.getInstance().apply {
+                    time = date
+                    add(Calendar.DAY_OF_WEEK, -6)
+                }
+
+                val startDate = SimpleDateFormat("d", Locale.getDefault()).format(startCal.time)
+                val endDate = SimpleDateFormat("d", Locale.getDefault()).format(cal.time)
+                val monthYear = SimpleDateFormat("MMMM yyyy", Locale.getDefault()).format(cal.time)
+
+                getString(R.string.week_range_format, startDate, endDate, monthYear)
             }
             "monthly" -> {
                 val cal = Calendar.getInstance().apply { time = date }
-                val year = cal.get(Calendar.YEAR)
-                getString(R.string.months_title, year)
+                val startCal = Calendar.getInstance().apply {
+                    time = date
+                    add(Calendar.MONTH, -5)
+                }
+
+                val startMonth = SimpleDateFormat("MMM", Locale.getDefault()).format(startCal.time)
+                val endMonth = SimpleDateFormat("MMM", Locale.getDefault()).format(cal.time)
+                val year = SimpleDateFormat("yyyy", Locale.getDefault()).format(cal.time)
+
+                getString(R.string.month_range_format, startMonth, endMonth, year)
             }
             else -> ""
         }
