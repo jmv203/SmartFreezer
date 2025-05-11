@@ -1,24 +1,24 @@
 package com.example.smartfreezer.navigation
 
-import android.app.DatePickerDialog
 import android.content.Context
 import android.os.Bundle
 import android.view.View
 import androidx.core.content.ContextCompat
+import androidx.core.content.res.ResourcesCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import com.example.smartfreezer.R
 import com.example.smartfreezer.databinding.FragmentWastedProductsBinding
+import com.example.smartfreezer.util.CustomMarkerView
 import com.example.smartfreezer.util.OnInventoryTabSelectedListener
 import com.example.smartfreezer.viewmodels.WastedProductsViewModel
-import com.github.mikephil.charting.charts.BarChart
+import com.github.mikephil.charting.animation.Easing
 import com.github.mikephil.charting.components.AxisBase
 import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.data.BarData
 import com.github.mikephil.charting.data.BarDataSet
 import com.github.mikephil.charting.data.BarEntry
-import com.github.mikephil.charting.formatter.IndexAxisValueFormatter
 import com.github.mikephil.charting.formatter.ValueFormatter
 import com.google.android.material.tabs.TabLayout
 import java.text.SimpleDateFormat
@@ -114,29 +114,57 @@ class WastedProductsFragment : Fragment(R.layout.fragment_wasted_products) {
 
     private fun setupChart() {
         with(binding.barChart) {
+            // Configuración básica
             setDrawBarShadow(false)
             setDrawValueAboveBar(true)
             description.isEnabled = false
             legend.isEnabled = false
             setPinchZoom(false)
             setDrawGridBackground(false)
+            setTouchEnabled(true)
+            isDragEnabled = true
+            setScaleEnabled(true)
 
+            // Fondo transparente
+            setBackgroundColor(ContextCompat.getColor(requireContext(), android.R.color.transparent))
+
+            // Estilo del eje X
             xAxis.apply {
                 position = XAxis.XAxisPosition.BOTTOM
                 setDrawGridLines(false)
                 granularity = 1f
                 axisMinimum = -0.5f
-                labelCount = if (viewModel.selectedPeriod.value == "weekly") 7 else 6
+                axisLineColor = ContextCompat.getColor(requireContext(), R.color.colorPrimaryDark)
+                axisLineWidth = 1.5f
+                textColor = ContextCompat.getColor(requireContext(), R.color.colorPrimary)
+                textSize = 12f
+                typeface = ResourcesCompat.getFont(requireContext(), R.font.roboto_medium)
             }
 
+            // Estilo del eje Y izquierdo
             axisLeft.apply {
                 axisMinimum = 0f
                 granularity = 1f
                 setDrawZeroLine(true)
                 setDrawGridLines(false)
+                axisLineColor = ContextCompat.getColor(requireContext(), R.color.colorPrimaryDark)
+                axisLineWidth = 1.5f
+                textColor = ContextCompat.getColor(requireContext(), R.color.colorPrimary)
+                textSize = 12f
+                typeface = ResourcesCompat.getFont(requireContext(), R.font.roboto_medium)
             }
 
+            // Deshabilitar eje derecho
             axisRight.isEnabled = false
+
+            // Animaciones
+            animateY(1000, Easing.EaseInOutQuad)
+
+            // Estilo general
+            setExtraOffsets(10f, 10f, 10f, 10f)
+            setDrawBorders(false)
+            setBorderWidth(1f)
+            setBorderColor(ContextCompat.getColor(requireContext(), R.color.colorPrimary))
         }
     }
 
@@ -160,20 +188,28 @@ class WastedProductsFragment : Fragment(R.layout.fragment_wasted_products) {
         }
 
         val dataSet = BarDataSet(entries, "").apply {
+            // Estilo de las barras
             color = ContextCompat.getColor(requireContext(), R.color.colorPrimary)
             valueTextColor = ContextCompat.getColor(requireContext(), R.color.colorPrimaryDark)
-            valueTextSize = 10f
+            valueTextSize = 12f
             setDrawValues(true)
+            highLightColor = ContextCompat.getColor(requireContext(), R.color.colorPrimary)
+            setGradientColor(
+                ContextCompat.getColor(requireContext(), R.color.colorPrimary),
+                ContextCompat.getColor(requireContext(), R.color.colorPrimaryDark)
+            )
+            barShadowColor = ContextCompat.getColor(requireContext(), R.color.colorPrimary)
+            valueFormatter = object : ValueFormatter() {
+                override fun getFormattedValue(value: Float): String {
+                    return if (value == 0f) "" else value.toInt().toString()
+                }
+            }
         }
 
         binding.barChart.apply {
             this.data = BarData(dataSet).apply {
-                barWidth = 0.5f
-                setValueFormatter(object : ValueFormatter() {
-                    override fun getFormattedValue(value: Float): String {
-                        return if (value == 0f) "" else value.toInt().toString()
-                    }
-                })
+                barWidth = 0.6f
+                setValueTextSize(12f)
             }
 
             xAxis.apply {
@@ -188,11 +224,9 @@ class WastedProductsFragment : Fragment(R.layout.fragment_wasted_products) {
                 axisMaximum = data.size.toFloat() - 0.5f
             }
 
-            axisLeft.apply {
-                granularity = 1f
-                axisMinimum = 0f
-                setDrawGridLines(false)
-            }
+            // Añadir marcadores para mejorar la legibilidad
+            var marker = CustomMarkerView(requireContext(), R.layout.chart_marker_layout)
+            marker.chartView = binding.barChart
 
             invalidate()
         }
