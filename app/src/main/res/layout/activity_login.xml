@@ -32,7 +32,7 @@
     <!-- Input de Correo Electrónico -->
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/emailInputLayout"
-        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+        style="@style/AppTextInputLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="@string/mail"
@@ -45,21 +45,21 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:drawableStart="@drawable/ic_email"
-            app:tint="@color/purpleButton"
             android:drawablePadding="10dp"
-            android:textColor="@android:color/black" />
+            app:drawableTint="@color/purpleButton"
+            android:textColor="@color/purpleButton" />
     </com.google.android.material.textfield.TextInputLayout>
 
     <!-- Input de Contraseña -->
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/passwordInputLayout"
-        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+        style="@style/AppTextInputLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="@string/password"
         android:textColorHint="#757575"
         app:endIconMode="password_toggle"
-        app:endIconTint="@color/black"
+        app:endIconTint="@color/purpleButton"
         app:boxBackgroundMode="filled"
         app:boxBackgroundColor="@android:color/white"
         android:layout_marginTop="10dp">
@@ -70,9 +70,9 @@
             android:layout_height="wrap_content"
             android:inputType="textPassword"
             android:drawableStart="@drawable/ic_lock"
-            app:tint="@color/purpleButton"
             android:drawablePadding="10dp"
-            android:textColor="@android:color/black" />
+            app:drawableTint="@color/purpleButton"
+            android:textColor="@color/purpleButton" />
     </com.google.android.material.textfield.TextInputLayout>
 
     <!-- Olvidaste la contraseña -->

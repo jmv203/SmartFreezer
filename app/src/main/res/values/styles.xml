@@ -45,5 +45,17 @@
         <item name="android:fontFamily">@font/roboto_light</item>
     </style>
 
+    <!-- Estilo para el TextInputLayout -->
+    <style name="AppTextInputLayout" parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+        <item name="boxStrokeErrorColor">@color/red</item> <!-- Borde rojo cuando hay error -->
+        <item name="errorTextAppearance">@style/AppTextInputLayoutError</item> <!-- Estilo del texto de error -->
+    </style>
+
+    <!-- Estilo para el texto de error -->
+    <style name="AppTextInputLayoutError" parent="TextAppearance.MaterialComponents.Caption">
+        <item name="android:textColor">@color/red</item> <!-- Texto de error en rojo -->
+    </style>
+
+
 
 </resources>

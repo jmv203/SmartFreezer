@@ -372,6 +372,61 @@
 
 
 
+    <!-- Login Activity -->
+    <string name="login_email_empty">Email cannot be empty</string>
+    <string name="login_email_too_long">Email must not exceed 40 characters</string>
+    <string name="login_email_invalid">Invalid email format</string>
+    <string name="login_password_empty">Password cannot be empty</string>
+    <string name="login_password_short">Password must be at least 8 characters long</string>
+    <string name="login_password_requirements">Must include an uppercase letter and a number</string>
+    <string name="login_success">Login successful</string>
+    <string name="login_email_not_verified">You must verify your email before logging in</string>
+    <string name="login_error">Error: %s</string>
+    <string name="login_forgot_password">Forgot password</string>
+    <string name="forgot_password_title">Reset password</string>
+    <string name="forgot_password_message">Enter your email to receive a reset link</string>
+    <string name="forgot_password_hint">Email</string>
+    <string name="forgot_password_send">Send</string>
+    <string name="forgot_password_cancel">Cancel</string>
+    <string name="forgot_password_success">Reset email sent</string>
+    <string name="forgot_password_error">Error sending email: %s</string>
+
+    <!-- Register Activity -->
+    <string name="register_name_empty">Name cannot be empty</string>
+    <string name="register_name_invalid">Maximum 15 letters, no symbols allowed</string>
+    <string name="register_email_empty">Email cannot be empty</string>
+    <string name="register_email_too_long">Email must not exceed 40 characters</string>
+    <string name="register_email_invalid">Invalid email format</string>
+    <string name="register_password_empty">Password cannot be empty</string>
+    <string name="register_password_short">Password must be at least 8 characters long</string>
+    <string name="register_password_requirements">Must include an uppercase letter, a number, and a special character</string>
+    <string name="register_password_mismatch">Passwords do not match</string>
+    <string name="register_confirm_empty">Confirm your password</string>
+    <string name="register_terms_not_accepted">You must accept the terms and conditions</string>
+    <string name="register_verification_sent">Verification email sent to %s</string>
+    <string name="register_save_error">Error saving data: %s</string>
+    <string name="register_verification_error">Error sending verification email: %s</string>
+    <string name="register_error">Error: %s</string>
+    <string name="verify_email_title">Verify your email</string>
+    <string name="verify_email_message">A verification email has been sent to %s. Please verify your email before logging in.\n\nDidn’t receive the email?</string>
+    <string name="verify_email_resend">Resend email</string>
+    <string name="verify_email_understood">Got it</string>
+    <string name="verify_email_resent">Email resent</string>
+    <string name="login_keep_logged_in">Keep me signed in</string>
+    <string name="error_email_already_exists">This email is already registered</string>
+
+
+    <!-- Error messages -->
+    <string name="error_desconocido">Unknown error</string>
+
+    <!-- Progress messages -->
+    <string name="actualizando_nombre">Updating name...</string>
+    <string name="actualizando_contrase_a">Updating password...</string>
+
+
+
+
+
 
 
 

@@ -372,4 +372,60 @@
 
 
 
+    <!-- Login Activity -->
+    <string name="login_email_empty">El correo no puede estar vacío</string>
+    <string name="login_email_too_long">El correo no debe superar 40 caracteres</string>
+    <string name="login_email_invalid">Formato de correo no válido</string>
+    <string name="login_password_empty">La contraseña no puede estar vacía</string>
+    <string name="login_password_short">Debe tener al menos 8 caracteres</string>
+    <string name="login_password_requirements">Debe incluir una mayúscula y un número</string>
+    <string name="login_success">Inicio de sesión exitoso</string>
+    <string name="login_email_not_verified">Debes verificar tu correo antes de iniciar sesión</string>
+    <string name="login_error">Error: %s</string>
+    <string name="login_forgot_password">Recuperar contraseña</string>
+    <string name="forgot_password_title">Restablecer contraseña</string>
+    <string name="forgot_password_message">Ingresa tu correo electrónico para recibir un enlace de restablecimiento</string>
+    <string name="forgot_password_hint">Correo electrónico</string>
+    <string name="forgot_password_send">Enviar</string>
+    <string name="forgot_password_cancel">Cancelar</string>
+    <string name="forgot_password_success">Correo de restablecimiento enviado</string>
+    <string name="forgot_password_error">Error al enviar correo: %s</string>
+
+    <!-- Register Activity -->
+    <string name="register_name_empty">El nombre no puede estar vacío</string>
+    <string name="register_name_invalid">Máximo 15 letras, sin símbolos</string>
+    <string name="register_email_empty">El correo no puede estar vacío</string>
+    <string name="register_email_too_long">El correo no debe superar 40 caracteres</string>
+    <string name="register_email_invalid">Formato de correo no válido</string>
+    <string name="register_password_empty">La contraseña no puede estar vacía</string>
+    <string name="register_password_short">Debe tener al menos 8 caracteres</string>
+    <string name="register_password_requirements">Debe incluir una mayúscula, un número y un caracter especial</string>
+    <string name="register_password_mismatch">Las contraseñas no coinciden</string>
+    <string name="register_confirm_empty">Confirma tu contraseña</string>
+    <string name="register_terms_not_accepted">Debes aceptar los términos y condiciones</string>
+    <string name="register_verification_sent">Verificación enviada a %s</string>
+    <string name="register_save_error">Error al guardar datos: %s</string>
+    <string name="register_verification_error">Error al enviar verificación: %s</string>
+    <string name="register_error">Error: %s</string>
+    <string name="verify_email_title">Verifica tu correo</string>
+    <string name="verify_email_message">Hemos enviado un correo de verificación a %s. Por favor verifica tu correo antes de iniciar sesión.\n\n¿No recibiste el correo?</string>
+    <string name="verify_email_resend">Reenviar correo</string>
+    <string name="verify_email_understood">Entendido</string>
+    <string name="verify_email_resent">Correo reenviado</string>
+    <string name="login_keep_logged_in">Mantener sesión iniciada</string>
+    <string name="error_email_already_exists">El correo electrónico ya está registrado</string>
+
+
+    <!-- Mensajes de error -->
+    <string name="error_desconocido">Error desconocido</string>
+
+    <!-- Mensajes de progreso -->
+    <string name="actualizando_nombre">Actualizando nombre...</string>
+
+    <string name="actualizando_contrase_a">Actualizando contraseña...</string>
+
+
+
+
+
 </resources>

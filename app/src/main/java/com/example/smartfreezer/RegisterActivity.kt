@@ -1,22 +1,25 @@
 package com.example.smartfreezer
 
+import android.app.AlertDialog
 import android.content.Intent
 import android.os.Bundle
-import android.util.Patterns
+import android.view.View
 import android.widget.TextView
 import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
-import com.google.android.material.textfield.TextInputLayout
+import androidx.core.content.ContextCompat
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.checkbox.MaterialCheckBox
 import com.google.android.material.textfield.TextInputEditText
+import com.google.android.material.textfield.TextInputLayout
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseAuthUserCollisionException
 import com.google.firebase.firestore.FirebaseFirestore
 
 class RegisterActivity : BaseActivity() {
 
     private lateinit var auth: FirebaseAuth
     private lateinit var db: FirebaseFirestore
+    private var verificationEmailSent = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -55,11 +58,11 @@ class RegisterActivity : BaseActivity() {
             // Validar nombre
             when {
                 name.isEmpty() -> {
-                    nameInputLayout.error = "El nombre no puede estar vacío"
+                    nameInputLayout.error = getString(R.string.register_name_empty)
                     isValid = false
                 }
                 !name.matches(Regex("^[a-zA-ZáéíóúÁÉÍÓÚñÑ ]{1,15}$")) -> {
-                    nameInputLayout.error = "Máximo 15 letras, sin símbolos"
+                    nameInputLayout.error = getString(R.string.register_name_invalid)
                     isValid = false
                 }
                 else -> nameInputLayout.error = null
@@ -68,15 +71,15 @@ class RegisterActivity : BaseActivity() {
             // Validar email
             when {
                 email.isEmpty() -> {
-                    emailInputLayout.error = "El correo no puede estar vacío"
+                    emailInputLayout.error = getString(R.string.register_email_empty)
                     isValid = false
                 }
                 email.length > 40 -> {
-                    emailInputLayout.error = "El correo no debe superar 40 caracteres"
+                    emailInputLayout.error = getString(R.string.register_email_too_long)
                     isValid = false
                 }
-                !Patterns.EMAIL_ADDRESS.matcher(email).matches() -> {
-                    emailInputLayout.error = "Formato de correo no válido"
+                !android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches() -> {
+                    emailInputLayout.error = getString(R.string.register_email_invalid)
                     isValid = false
                 }
                 else -> emailInputLayout.error = null
@@ -85,15 +88,15 @@ class RegisterActivity : BaseActivity() {
             // Validar contraseña
             when {
                 password.isEmpty() -> {
-                    passwordInputLayout.error = "La contraseña no puede estar vacía"
+                    passwordInputLayout.error = getString(R.string.register_password_empty)
                     isValid = false
                 }
                 password.length < 8 -> {
-                    passwordInputLayout.error = "Debe tener al menos 8 caracteres"
+                    passwordInputLayout.error = getString(R.string.register_password_short)
                     isValid = false
                 }
-                !password.matches(Regex("^(?=.*[A-Z])(?=.*\\d)[A-Za-z\\d@\$!%*?&]+$")) -> {
-                    passwordInputLayout.error = "Debe incluir una mayúscula y un número"
+                !password.matches(Regex("^(?=.*[A-Z])(?=.*\\d)(?=.*[@\$!%*?&])[A-Za-z\\d@\$!%*?&]+$")) -> {
+                    passwordInputLayout.error = getString(R.string.register_password_requirements)
                     isValid = false
                 }
                 else -> passwordInputLayout.error = null
@@ -102,61 +105,120 @@ class RegisterActivity : BaseActivity() {
             // Validar confirmación
             when {
                 confirmPassword.isEmpty() -> {
-                    confirmPasswordInputLayout.error = "Confirma tu contraseña"
+                    confirmPasswordInputLayout.error = getString(R.string.register_confirm_empty)
                     isValid = false
                 }
                 confirmPassword != password -> {
-                    confirmPasswordInputLayout.error = "Las contraseñas no coinciden"
+                    confirmPasswordInputLayout.error = getString(R.string.register_password_mismatch)
                     isValid = false
                 }
                 else -> confirmPasswordInputLayout.error = null
             }
 
-            // Términos y condiciones
             if (!acceptTermsCheckBox.isChecked) {
-                Toast.makeText(this, "Debes aceptar los términos y condiciones", Toast.LENGTH_LONG).show()
+                showErrorToast(getString(R.string.register_terms_not_accepted))
                 isValid = false
             }
 
-            // Registro en Firebase
             if (isValid) {
+                showProgressDialog()
                 auth.createUserWithEmailAndPassword(email, password)
                     .addOnCompleteListener(this) { task ->
                         if (task.isSuccessful) {
                             val user = auth.currentUser
-                            val uuid = user?.uid ?: return@addOnCompleteListener
-
-                            user.sendEmailVerification()
-                                .addOnCompleteListener { verifyTask ->
+                            user?.sendEmailVerification()
+                                ?.addOnCompleteListener { verifyTask ->
                                     if (verifyTask.isSuccessful) {
-                                        val userMap = hashMapOf(
-                                            "name" to name,
-                                            "email" to email,
-                                            "uuid" to uuid
-                                        )
-
-                                        db.collection("users").document(uuid)
-                                            .set(userMap)
-                                            .addOnSuccessListener {
-                                                Toast.makeText(this, "Verificación enviada a $email", Toast.LENGTH_LONG).show()
-                                                auth.signOut()
-                                                startActivity(Intent(this, LoginActivity::class.java).apply {
-                                                    putExtra("emailPendingVerification", true)
-                                                })
-                                                finish()
-                                            }
-                                            .addOnFailureListener { e ->
-                                                Toast.makeText(this, "Error al guardar datos: ${e.message}", Toast.LENGTH_LONG).show()
-                                            }
+                                        verificationEmailSent = true
+                                        showVerificationDialog(email, user.uid, name)
                                     } else {
-                                        Toast.makeText(this, "Error al enviar verificación: ${verifyTask.exception?.message}", Toast.LENGTH_LONG).show()
+                                        user.delete()
+                                        showErrorToast(getString(R.string.register_verification_error, verifyTask.exception?.message))
                                     }
+                                    dismissProgressDialog()
                                 }
                         } else {
-                            Toast.makeText(this, "Error: ${task.exception?.message}", Toast.LENGTH_LONG).show()
+                            dismissProgressDialog()
+                            when (task.exception) {
+                                is FirebaseAuthUserCollisionException -> {
+                                    showErrorToast(getString(R.string.error_email_already_exists))
+                                }
+                                else -> {
+                                    showErrorToast(getString(R.string.register_error, task.exception?.message))
+                                }
+                            }
                         }
                     }
             }
         }
+
+        // Limpiar errores al enfocar
+        nameInput.setOnFocusChangeListener { _, hasFocus -> if (hasFocus) nameInputLayout.error = null }
+        emailInput.setOnFocusChangeListener { _, hasFocus -> if (hasFocus) emailInputLayout.error = null }
+        passwordInput.setOnFocusChangeListener { _, hasFocus ->
+            if (hasFocus) {
+                passwordInputLayout.error = null
+                passwordInputLayout.endIconMode = TextInputLayout.END_ICON_PASSWORD_TOGGLE
+            }
+        }
+        confirmPasswordInput.setOnFocusChangeListener { _, hasFocus ->
+            if (hasFocus) confirmPasswordInputLayout.error = null
+        }
+    }
+
+    private fun showVerificationDialog(email: String, userId: String, name: String) {
+        val builder = AlertDialog.Builder(this)
+        builder.setTitle(getString(R.string.verify_email_title))
+        builder.setMessage(getString(R.string.verify_email_message, email))
+
+        builder.setPositiveButton(getString(R.string.verify_email_resend)) { dialog, _ ->
+            auth.currentUser?.sendEmailVerification()
+                ?.addOnCompleteListener { task ->
+                    if (task.isSuccessful) {
+                        Toast.makeText(this, getString(R.string.verify_email_resent), Toast.LENGTH_SHORT).show()
+                    } else {
+                        showErrorToast(getString(R.string.register_verification_error, task.exception?.message))
+                    }
+                }
+        }
+
+        builder.setNegativeButton(getString(R.string.verify_email_understood)) { dialog, _ ->
+            // Solo guardar en Firestore después de verificación
+            val userRef = db.collection("users").document(userId)
+            userRef.set(hashMapOf(
+                "name" to name,
+                "email" to email,
+                "verified" to false
+            ))
+
+            auth.signOut()
+            startActivity(Intent(this, LoginActivity::class.java).apply {
+                putExtra("emailPendingVerification", true)
+            })
+            finish()
+        }
+
+        builder.setOnCancelListener {
+            if (!verificationEmailSent) {
+                auth.currentUser?.delete()
+            }
+        }
+
+        builder.setCancelable(false)
+        builder.show()
+    }
+
+    private fun showErrorToast(message: String) {
+        val toast = Toast.makeText(this, message, Toast.LENGTH_LONG)
+        toast.view?.setBackgroundColor(ContextCompat.getColor(this, R.color.error))
+        toast.show()
+    }
+
+    private fun showProgressDialog() {
+        // Implementa tu diálogo de progreso aquí
+    }
+
+    private fun dismissProgressDialog() {
+        // Implementa el cierre del diálogo de progreso aquí
     }
 }

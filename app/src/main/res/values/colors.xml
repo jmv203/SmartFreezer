@@ -30,6 +30,7 @@
     <color name="barChartTextColor">#000000</color> <!-- Color para texto en el gráfico -->
 
     <color name="error">#FF0000</color>
+
     <color name="success">#00AA00</color>
 
     <!-- Colores para gráficos -->
@@ -44,6 +45,7 @@
     <!-- Colores para scanner -->
     <color name="light_gray">#F0F0F0</color>
     <color name="gray">#BDBDBD</color>
+
 
 
 </resources>

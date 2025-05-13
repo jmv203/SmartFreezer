@@ -16,7 +16,7 @@
 
     <!-- Colores específicos de la app -->
     <color name="background">#121212</color> <!-- Fondo oscuro estándar -->
-    <color name="purpleButton">#7F4BFF</color> <!-- Versión más clara para contraste -->
+    <color name="purpleButton">#321B6F</color> <!-- Versión más clara para contraste -->
     <color name="colorNavBar">#1E1E1E</color> <!-- Barra de navegación oscura -->
     <color name="colorHeader">#212121</color> <!-- Versión oscura del encabezado -->
     <color name="boneWhite">#2D2D2D</color> <!-- Fondo de popups en oscuro -->

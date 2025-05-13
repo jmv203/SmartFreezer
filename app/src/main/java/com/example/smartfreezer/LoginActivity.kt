@@ -1,113 +1,155 @@
 package com.example.smartfreezer
 
+import android.app.AlertDialog
+import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
 import android.os.Bundle
-import android.util.Patterns
+import android.view.View
 import android.widget.TextView
 import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.checkbox.MaterialCheckBox
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
+import com.google.firebase.auth.FirebaseAuthInvalidUserException
 
 class LoginActivity : BaseActivity() {
 
     private lateinit var auth: FirebaseAuth
+    private lateinit var sharedPreferences: SharedPreferences
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
 
-        // Inicializar Firebase Auth
         auth = FirebaseAuth.getInstance()
+        sharedPreferences = getSharedPreferences("login_prefs", Context.MODE_PRIVATE)
 
-        // Mostrar aviso si viene de registro sin verificar correo
-        val emailPending = intent.getBooleanExtra("emailPendingVerification", false)
-        if (emailPending) {
-            Toast.makeText(this, "Verifica tu correo antes de iniciar sesión", Toast.LENGTH_LONG).show()
+        // Verificar sesión guardada
+        if (sharedPreferences.getBoolean("keep_logged_in", false)) {
+            val currentUser = auth.currentUser
+            if (currentUser != null && currentUser.isEmailVerified) {
+                startActivity(Intent(this, HomeActivity::class.java))
+                finish()
+                return
+            }
         }
 
-        // Referencias a los elementos del layout
         val emailInputLayout = findViewById<TextInputLayout>(R.id.emailInputLayout)
         val passwordInputLayout = findViewById<TextInputLayout>(R.id.passwordInputLayout)
         val emailInput = findViewById<TextInputEditText>(R.id.emailInput)
         val passwordInput = findViewById<TextInputEditText>(R.id.passwordInput)
-
         val keepLoggedInCheckBox = findViewById<MaterialCheckBox>(R.id.keepLoggedIn)
         val loginButton = findViewById<MaterialButton>(R.id.loginButton)
         val registerRedirect = findViewById<TextView>(R.id.registerLink)
         val forgotPasswordLink = findViewById<TextView>(R.id.forgotPassword)
 
-        // Manejar el clic del botón de inicio de sesión
+        keepLoggedInCheckBox.text = getString(R.string.login_keep_logged_in)
+
+        // Mostrar aviso si viene de registro sin verificar
+        if (intent.getBooleanExtra("emailPendingVerification", false)) {
+            showErrorToast(getString(R.string.login_email_not_verified))
+        }
+
         loginButton.setOnClickListener {
             val email = emailInput.text.toString().trim()
             val password = passwordInput.text.toString().trim()
 
-            var isValid = true
-
-            // Validar email
             if (email.isEmpty()) {
-                emailInputLayout.error = "El correo no puede estar vacío"
-                isValid = false
-            } else if (email.length > 40) {
-                emailInputLayout.error = "El correo no debe superar 40 caracteres"
-                isValid = false
-            } else if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
-                emailInputLayout.error = "Formato de correo no válido"
-                isValid = false
-            } else {
-                emailInputLayout.error = null
+                emailInputLayout.error = getString(R.string.login_email_empty)
+                return@setOnClickListener
             }
 
-            // Validar contraseña
             if (password.isEmpty()) {
-                passwordInputLayout.error = "La contraseña no puede estar vacía"
-                isValid = false
-            } else if (password.length < 8) {
-                passwordInputLayout.error = "Debe tener al menos 8 caracteres"
-                isValid = false
-            } else if (!password.matches(Regex("^(?=.*[A-Z])(?=.*\\d)[A-Za-z\\d@\$!%*?&]+$"))) {
-                passwordInputLayout.error = "Debe incluir una mayúscula y un número"
-                isValid = false
-            } else {
-                passwordInputLayout.error = null
+                passwordInputLayout.error = getString(R.string.login_password_empty)
+                return@setOnClickListener
             }
 
-            if (isValid) {
-                // Iniciar sesión con Firebase
-                auth.signInWithEmailAndPassword(email, password)
-                    .addOnCompleteListener(this) { task ->
-                        if (task.isSuccessful) {
-                            val user = auth.currentUser
-                            if (user != null && user.isEmailVerified) {
-                                Toast.makeText(this, "Inicio de sesión exitoso", Toast.LENGTH_SHORT).show()
-                                val intent = Intent(this, HomeActivity::class.java)
-                                startActivity(intent)
-                                finish()
-                            } else {
-                                auth.signOut()
-                                Toast.makeText(this, "Debes verificar tu correo antes de iniciar sesión", Toast.LENGTH_LONG).show()
+            auth.signInWithEmailAndPassword(email, password)
+                .addOnCompleteListener(this) { task ->
+                    if (task.isSuccessful) {
+                        val user = auth.currentUser
+                        if (user != null && user.isEmailVerified) {
+                            // Guardar preferencia de mantener sesión
+                            sharedPreferences.edit().apply {
+                                putBoolean("keep_logged_in", keepLoggedInCheckBox.isChecked)
+                                apply()
                             }
+
+                            startActivity(Intent(this, HomeActivity::class.java))
+                            finish()
                         } else {
-                            Toast.makeText(this, "Error: ${task.exception?.message}", Toast.LENGTH_LONG).show()
+                            auth.signOut()
+                            showErrorToast(getString(R.string.login_email_not_verified))
+                        }
+                    } else {
+                        val error = when (task.exception) {
+                            is FirebaseAuthInvalidUserException -> getString(R.string.login_error, "Usuario no registrado")
+                            is FirebaseAuthInvalidCredentialsException -> getString(R.string.login_error, "Credenciales incorrectas")
+                            else -> getString(R.string.login_error, task.exception?.message)
+                        }
+                        showErrorToast(error)
+                    }
+                }
+        }
+
+        registerRedirect.setOnClickListener {
+            startActivity(Intent(this, RegisterActivity::class.java))
+            finish()
+        }
+
+        forgotPasswordLink.setOnClickListener {
+            showForgotPasswordDialog()
+        }
+
+        // Limpiar errores al enfocar
+        emailInput.setOnFocusChangeListener { _, hasFocus ->
+            if (hasFocus) emailInputLayout.error = null
+        }
+
+        passwordInput.setOnFocusChangeListener { _, hasFocus ->
+            if (hasFocus) {
+                passwordInputLayout.error = null
+                passwordInputLayout.endIconMode = TextInputLayout.END_ICON_PASSWORD_TOGGLE
+            }
+        }
+    }
+
+    private fun showForgotPasswordDialog() {
+        val builder = AlertDialog.Builder(this)
+        builder.setTitle(getString(R.string.forgot_password_title))
+        builder.setMessage(getString(R.string.forgot_password_message))
+
+        val input = TextInputEditText(this).apply {
+            hint = getString(R.string.forgot_password_hint)
+            setPadding(32, 16, 32, 16)
+        }
+
+        builder.setView(input)
+        builder.setPositiveButton(getString(R.string.forgot_password_send)) { dialog, _ ->
+            val email = input.text.toString().trim()
+            if (email.isNotEmpty()) {
+                auth.sendPasswordResetEmail(email)
+                    .addOnCompleteListener { task ->
+                        if (task.isSuccessful) {
+                            Toast.makeText(this, getString(R.string.forgot_password_success), Toast.LENGTH_LONG).show()
+                        } else {
+                            showErrorToast(getString(R.string.forgot_password_error, task.exception?.message))
                         }
                     }
             }
         }
+        builder.setNegativeButton(getString(R.string.forgot_password_cancel), null)
+        builder.show()
+    }
 
-        // Redirección al registro
-        registerRedirect.setOnClickListener {
-            val intent = Intent(this, RegisterActivity::class.java)
-            startActivity(intent)
-            finish()
-        }
-
-        // Redirección para recuperar contraseña
-        forgotPasswordLink.setOnClickListener {
-            Toast.makeText(this, "Recuperar contraseña", Toast.LENGTH_SHORT).show()
-            // Aquí podrías redirigir a una pantalla de recuperación
-        }
+    private fun showErrorToast(message: String) {
+        val toast = Toast.makeText(this, message, Toast.LENGTH_LONG)
+        toast.view?.setBackgroundColor(ContextCompat.getColor(this, R.color.error))
+        toast.show()
     }
 }

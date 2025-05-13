@@ -6,6 +6,7 @@ import android.util.Log
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
+import androidx.core.content.ContextCompat
 import com.example.smartfreezer.databinding.ActivityProfileBinding
 import com.google.android.gms.tasks.Tasks
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -156,17 +157,19 @@ class ProfileActivity : BaseActivity() {
     }
 
     private fun updateUserName(newName: String) {
+        showProgressDialog(getString(R.string.actualizando_nombre))
+
         db.collection("users").document(userId)
             .update("name", newName)
             .addOnSuccessListener {
+                dismissProgressDialog()
                 binding.userNameTextView.text = newName
                 binding.tvGreetingProfile.text = getString(R.string.hola, newName)
-                Toast.makeText(this,
-                    getString(R.string.nombre_actualizado_correctamente), Toast.LENGTH_SHORT).show()
+                showSuccessSnackbar(getString(R.string.nombre_actualizado_correctamente))
             }
             .addOnFailureListener { e ->
-                Toast.makeText(this,
-                    getString(R.string.error_al_actualizar_el_nombre, e.message), Toast.LENGTH_SHORT).show()
+                dismissProgressDialog()
+                showErrorSnackbar(getString(R.string.error_al_actualizar_el_nombre, e.message))
             }
     }
 
@@ -214,20 +217,15 @@ class ProfileActivity : BaseActivity() {
                             if (task.isSuccessful) {
                                 showEmailVerificationDialog(newEmail)
                             } else {
-                                Toast.makeText(
-                                    this,
-                                    getString(
-                                        R.string.error_al_enviar_correo,
-                                        task.exception?.message
-                                    ),
-                                    Toast.LENGTH_SHORT
-                                ).show()
+                                showErrorSnackbar(getString(
+                                    R.string.error_al_enviar_correo,
+                                    task.exception?.message ?: getString(R.string.error_desconocido)
+                                ))
                             }
                         }
                 } else {
                     dismissProgressDialog()
-                    Toast.makeText(this,
-                        getString(R.string.contrase_a_incorrecta), Toast.LENGTH_SHORT).show()
+                    showErrorSnackbar(getString(R.string.contrase_a_incorrecta))
                 }
             }
     }
@@ -423,6 +421,8 @@ class ProfileActivity : BaseActivity() {
     }
 
     private fun resetPassword(currentPassword: String, newPassword: String) {
+        showProgressDialog(getString(R.string.actualizando_contrase_a))
+
         val user = auth.currentUser ?: return
         val credential = EmailAuthProvider.getCredential(user.email!!, currentPassword)
 
@@ -432,19 +432,19 @@ class ProfileActivity : BaseActivity() {
                     user.updatePassword(newPassword)
                         .addOnCompleteListener { updateTask ->
                             if (updateTask.isSuccessful) {
-                                Toast.makeText(this,
-                                    getString(R.string.contrase_a_actualizada_correctamente), Toast.LENGTH_SHORT).show()
+                                dismissProgressDialog()
+                                showSuccessSnackbar(getString(R.string.contrase_a_actualizada_correctamente))
                             } else {
-                                Toast.makeText(this,
-                                    getString(
-                                        R.string.error_al_actualizar_la_contrase_a,
-                                        updateTask.exception?.message
-                                    ), Toast.LENGTH_SHORT).show()
+                                dismissProgressDialog()
+                                showErrorSnackbar(getString(
+                                    R.string.error_al_actualizar_la_contrase_a,
+                                    updateTask.exception?.message ?: getString(R.string.error_desconocido)
+                                ))
                             }
                         }
                 } else {
-                    Toast.makeText(this,
-                        getString(R.string.contrase_a_actual_incorrecta), Toast.LENGTH_SHORT).show()
+                    dismissProgressDialog()
+                    showErrorSnackbar(getString(R.string.contrase_a_actual_incorrecta))
                 }
             }
     }
@@ -609,6 +609,19 @@ class ProfileActivity : BaseActivity() {
                     Toast.makeText(this, getString(R.string.contrase_a_incorrecta), Toast.LENGTH_SHORT).show()
                 }
             }
+    }
+
+    //Funciones para evitar operaciones en email,name y password
+    private fun showSuccessSnackbar(message: String) {
+        Snackbar.make(binding.root, message, Snackbar.LENGTH_LONG)
+            .setBackgroundTint(ContextCompat.getColor(this, R.color.green))
+            .show()
+    }
+
+    private fun showErrorSnackbar(message: String) {
+        Snackbar.make(binding.root, message, Snackbar.LENGTH_LONG)
+            .setBackgroundTint(ContextCompat.getColor(this, R.color.error))
+            .show()
     }
 
 
