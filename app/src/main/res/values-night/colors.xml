@@ -1,12 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Colores principales adaptados para modo oscuro -->
-    <color name="purple_200">#BB86FC</color> <!-- Más claro en oscuro -->
-    <color name="purple_500">#7F4BFF</color> <!-- Versión más suave del morado -->
-    <color name="purple_700">#3700B3</color> <!-- Mantenido para consistencia -->
 
-    <color name="teal_200">#03DAC5</color> <!-- Puede mantenerse igual -->
-    <color name="teal_700">#018786</color> <!-- Puede mantenerse igual -->
+    <color name="purple_200">#BB86FC</color>
+    <color name="purple_500">#7F4BFF</color>
+    <color name="purple_700">#3700B3</color>
+
+    <color name="teal_200">#03DAC5</color>
+    <color name="teal_700">#018786</color>
+
+    <color name="colorAccent">#FF80AB</color>
+    <color name="yellow">#F0E68C</color>
+    <color name="orange">#FFB74D</color>
+    <color name="purple">#BA68C8</color>
+
 
     <!-- Colores específicos de la app -->
     <color name="background">#121212</color> <!-- Fondo oscuro estándar -->
@@ -21,10 +27,17 @@
     <color name="darker_gray">#9E9E9E</color> <!-- Gris más claro para texto secundario -->
     <color name="switch_track">#424242</color> <!-- Gris oscuro para switch -->
     <color name="switch_track_night">#7F4BFF</color> <!-- Morado claro para estado activo -->
-    <color name="tab_color">#212121</color>
+    <color name="tab_color">#2D2D2D</color>
     <color name="colorPrimary">#BB86FC</color> <!-- Color principal oscuro -->
     <color name="colorPrimaryDark">#3700B3</color> <!-- Color oscuro oscuro -->
     <color name="barChartColor">#FF5722</color> <!-- Color para gráfico -->
     <color name="barChartTextColor">#FFFFFF</color> <!-- Color para texto en el gráfico -->
+
+    <color name="error">#FF0000</color>
+    <color name="success">#00AA00</color>
+
+    <!-- Colores para scanner -->
+    <color name="light_gray">#F0F0F0</color>
+    <color name="gray">#BDBDBD</color>
 
 </resources>

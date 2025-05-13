@@ -164,7 +164,7 @@
     <string name="confirmar_acci_n">Confirm action</string>
     <string name="est_s_seguro_que_deseas_a_adir_a_la_lista_de_la_compra">Are you sure you want to add %1$s to the shopping list?</string>
     <string name="error_al_cargar_inventario">Error loading inventory</string>
-    <string name="productos_encontrados">%1$s products found</string>
+    <string name="productos_encontrados">%1$d products found</string>
     <string name="usuario_no_autenticado">User not authenticated</string>
     <string name="nombre_no_disponible">Name not available</string>
     <string name="producto_no_encontrado">Product not found</string>
@@ -307,7 +307,9 @@
     <string name="next">Next</string>
 
 
-    <string name="total_wasted">Total: %d products has been wasted</string>
+    <string name="total_wasted">Total: %d products has been wasted this %2$s</string>
+    <string name="week">week</string>
+    <string name="month">month</string>
 
     <!-- Días de la semana abreviados -->
     <string name="monday">M</string>
@@ -324,5 +326,53 @@
     <string name="month_range_format">%1$s - %2$s %3$s</string>
 
     <string name="productos_desperdiciados">Waste</string>
+
+
+    <string name="select_location">Select location</string>
+    <string name="mark_as_fresh">Mark as fresh</string>
+    <string name="confirm_mark_as_rotten">Are you sure you want to mark \"%s\" as rotten? This will record the product as wasted.</string>
+    <string name="confirm_mark_as_fresh">Are you sure you want to mark \"%s\" as fresh? This will remove the waste record if one exists.</string>
+    <string name="product_marked_fresh">Product marked as fresh</string>
+    <string name="error_marking_fresh">Error marking as fresh</string>
+    <string name="error_updating_location">Error updating location</string>
+    <string name="error_updating_quantity">Error updating quantity</string>
+
+    <string name="bar_chart">Bar chart</string>
+    <string name="pie_chart">Pie chart</string>
+    <string name="wasted_by_type">Wasted products</string>
+    <string name="no_wasted_data">No hay desperdicios para esta fecha registrados</string>
+
+    <string name="aqu_se_mostrar_la_imagen_escaneada">The scanned image will appear here</string>
+    <string name="esperando_escaneo">Waiting for scan...</string>
+    <string name="escanear_producto">Scan Product</string>
+
+    <string name="proceso_completado_listo_para_nuevo_escaneo">Process completed. Ready for a new scan.</string>
+    <string name="agregar_al_inventario">Add to inventory?</string>
+    <string name="cantidad_actualizada_en_el_inventario">%1$s quantity updated in inventory</string>
+    <string name="error_al_actualizar">Error updating %1$s.</string>
+    <string name="error_usuario_no_autenticado">Error: User not authenticated.</string>
+    <string name="guardando">Saving %1$s...</string>
+    <string name="agregado_al_inventario">%1$s added to inventory</string>
+    <string name="error_al_agregar_al_inventario">Error adding to inventory</string>
+    <string name="error_al_agregar">Error adding %1$s.</string>
+    <string name="error_al_verificar_el_inventario">Error checking inventory</string>
+    <string name="error_al_verificar_inventario">Error checking inventory.</string>
+    <string name="omitir">Skip</string>
+    <string name="agregar">Add</string>
+    <string name="error_al_procesar_la_imagen">Error processing image.</string>
+    <string name="error_al_procesar_imagen">Error processing image: %1$s</string>
+    <string name="fallo_en_la_inferencia_del_modelo">Model inference failed.</string>
+    <string name="no_se_detectaron_productos_reintentelo_de_nuevo">No products detected. Please try again.</string>
+    <string name="analizando_imagen">Analyzing image...</string>
+    <string name="error_al_cargar_modelo_reinicie_la_aplicacion">Error loading model. Please restart the application.</string>
+    <string name="error_al_cargar_el_modelo">Error loading model: %1$s</string>
+    <string name="cargando_modelo_de_ia">Loading AI model...</string>
+    <string name="estado_interaccion_dialogo">Adding %1$s (%2$s)...</string>
+    <string name="mensaje_dialogo_producto">Product: %1$s\nStatus: %2$s\nCategory: %3$s\nLikelihood of success: %4$.2f%%</string>
+
+
+
+
+
 
 </resources>

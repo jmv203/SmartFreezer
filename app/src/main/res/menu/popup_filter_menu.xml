@@ -2,7 +2,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <group android:checkableBehavior="single">
         <item
-            android:title="Categoría">
+            android:title="@string/categor_a">
             <menu>
                 <item
                     android:id="@+id/filter_fruit"
@@ -16,7 +16,7 @@
         </item>
 
         <item
-            android:title="Condición">
+            android:title="@string/condici_n">
             <menu>
                 <item
                     android:id="@+id/filter_fresh"

@@ -12,6 +12,8 @@
     <attr name="colorTextButton" format="reference|color"/>
     <attr name="colorSearchBarBackground" format="reference|color"/>
     <attr name="tabBackgroundColor" format="reference|color"/>
+    <attr name="barChartColor" format="reference|color" />
+    <attr name="pieChartCenterTextColor" format="reference|color" />
 
 
 

@@ -17,6 +17,7 @@
         android:layout_height="wrap_content"
         android:padding="16dp"
         android:gravity="center"
+        android:foreground="?attr/selectableItemBackground"
         tools:ignore="UseCompoundDrawables">
 
         <ImageView

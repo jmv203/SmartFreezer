@@ -80,6 +80,24 @@ class RecipesFragment : Fragment(R.layout.fragment_recipes) {
         }
 
 
+        // Aquí, revisamos si hay filtros aplicados
+        if (recipesViewModel.selectedType.isEmpty() && recipesViewModel.selectedDiet.isEmpty()) {
+            // Si no hay filtros, aseguramos los botones estén ocultos
+            binding.filterCountRecipe.visibility = View.GONE
+            binding.btnClearFilters.visibility = View.GONE
+        } else {
+            // Si hay filtros, mostramos los filtros
+            binding.filterCountRecipe.visibility = View.VISIBLE
+            binding.btnClearFilters.visibility = View.VISIBLE
+        }
+
+        // Aquí, debes hacer la consulta a la API solo si no hay datos previos
+        if (recipesViewModel.recipesResponse.value == null) {
+            recipesViewModel.getRecipes(recipesViewModel.applyQueries())
+        }
+
+
+
         setupTabLayout()
         setupGreeting()
         setupRecyclerView()
@@ -410,6 +428,8 @@ class RecipesFragment : Fragment(R.layout.fragment_recipes) {
     override fun onResume() {
         super.onResume()
         binding.tabSelectorRecipe.selectTab(binding.tabSelectorRecipe.getTabAt(0))
+
+
     }
 
     override fun onDestroyView() {

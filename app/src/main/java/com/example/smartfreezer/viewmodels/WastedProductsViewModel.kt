@@ -17,6 +17,8 @@ class WastedProductsViewModel : ViewModel() {
     private val auth = FirebaseAuth.getInstance()
     private val _wastedProductsData = MutableLiveData<List<Pair<String, Int>>>()
     val wastedProductsData: LiveData<List<Pair<String, Int>>> = _wastedProductsData
+    private val _wastedProductsByType = MutableLiveData<List<Pair<String, Int>>>()
+    val wastedProductsByType: LiveData<List<Pair<String, Int>>> = _wastedProductsByType
     private val _currentPeriod = MutableLiveData<Date>(Calendar.getInstance().time)
     val currentPeriod: LiveData<Date> = _currentPeriod
     private val _selectedPeriod = MutableLiveData<String>().apply { value = "weekly" }
@@ -24,21 +26,25 @@ class WastedProductsViewModel : ViewModel() {
 
     private var daysOfWeek: List<String> = emptyList()
 
-
-    fun setStringResources(
-        days: List<String>,
-
-    ) {
+    fun setStringResources(days: List<String>) {
         daysOfWeek = days
-
     }
 
     fun loadWeeklyData(referenceDate: Date = Calendar.getInstance().time) {
-        val calendar = Calendar.getInstance().apply { time = referenceDate }
-        calendar.add(Calendar.DAY_OF_YEAR, -7)
+        val calendar = Calendar.getInstance().apply {
+            time = referenceDate
+            // Ajustar al lunes de la semana actual
+            val dayOfWeek = get(Calendar.DAY_OF_WEEK)
+            val diffToMonday = if (dayOfWeek == Calendar.SUNDAY) -6 else Calendar.MONDAY - dayOfWeek
+            add(Calendar.DAY_OF_MONTH, diffToMonday)
+        }
+
         val startDate = calendar.time
 
-        loadDataBetweenDates(startDate, referenceDate, "weekly")
+        calendar.add(Calendar.DAY_OF_MONTH, 6) // Domingo de esa semana
+        val endDate = calendar.time
+
+        loadDataBetweenDates(startDate, endDate, "weekly")
     }
 
     fun loadMonthlyData(referenceDate: Date = Calendar.getInstance().time) {
@@ -65,15 +71,7 @@ class WastedProductsViewModel : ViewModel() {
         when(period) {
             "weekly" -> loadWeeklyData()
             "monthly" -> loadMonthlyData()
-            "yearly" -> loadYearlyData()
         }
-    }
-
-    private fun loadYearlyData() {
-        val calendar = Calendar.getInstance()
-        calendar.add(Calendar.YEAR, -1)
-        val startDate = calendar.time
-        loadDataBetweenDates(startDate, Calendar.getInstance().time, "yearly")
     }
 
     fun loadData(periodOffset: Int = 0) {
@@ -92,11 +90,11 @@ class WastedProductsViewModel : ViewModel() {
     }
 
     private fun loadDataBetweenDates(startDate: Date, endDate: Date, period: String) {
-
         val currentUser = auth.currentUser
         Log.d("FirestoreQuery", "Consultando desde ${SimpleDateFormat("dd/MM/yyyy").format(startDate)} hasta ${SimpleDateFormat("dd/MM/yyyy").format(endDate)}")
         if (currentUser == null) {
             _wastedProductsData.value = emptyList()
+            _wastedProductsByType.value = emptyList()
             return
         }
 
@@ -117,10 +115,19 @@ class WastedProductsViewModel : ViewModel() {
                 }
                 val processedData = processData(products, period)
                 _wastedProductsData.postValue(processedData)
+
+                // Procesar datos para el gráfico circular (agrupar por tipo)
+                val byType = products.groupBy { it.icon to it.name }
+                    .map { (key, items) ->
+                        val (icon, name) = key
+                        "$name (${items.size})" to items.size
+                    }
+                    .sortedByDescending { it.second }
+                _wastedProductsByType.postValue(byType)
             }
             .addOnFailureListener { exception ->
-                // Manejar el error adecuadamente
                 _wastedProductsData.postValue(emptyList())
+                _wastedProductsByType.postValue(emptyList())
             }
     }
 

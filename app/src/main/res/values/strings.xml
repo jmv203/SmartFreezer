@@ -164,7 +164,7 @@
     <string name="confirmar_acci_n">Confirmar acción</string>
     <string name="est_s_seguro_que_deseas_a_adir_a_la_lista_de_la_compra">¿Estás seguro que deseas añadir %1$s a la lista de la compra?</string>
     <string name="error_al_cargar_inventario">Error al cargar inventario</string>
-    <string name="productos_encontrados">%1$s productos encontrados</string>
+    <string name="productos_encontrados">Se encontraron %1$d producto(s).</string>
     <string name="usuario_no_autenticado">Usuario no autenticado</string>
     <string name="nombre_no_disponible">Nombre no disponible</string>
     <string name="producto_no_encontrado">Producto no encontrado</string>
@@ -305,7 +305,9 @@
     <string name="previous">Anterior</string>
     <string name="next">Siguiente</string>
 
-    <string name="total_wasted">Total: %d productos han sido desperdiciados</string>
+    <string name="total_wasted">Total: %1$d productos desperdiciados esta %2$s</string>
+    <string name="week">semana</string>
+    <string name="month">mes</string>
 
     <!-- Días de la semana abreviados -->
     <string name="monday">L</string>
@@ -321,4 +323,53 @@
     <string name="week_range_format">%1$s - %2$s %3$s</string>
     <string name="month_range_format">%1$s - %2$s %3$s</string>
     <string name="productos_desperdiciados">Desperdicios</string>
+
+    <!-- Inventario -->
+    <string name="select_location">Seleccionar ubicación</string>
+    <string name="mark_as_fresh">Marcar como fresco</string>
+    <string name="confirm_mark_as_rotten">¿Estás seguro de que quieres marcar \"%s\" como podrido? Esto registrará el producto como desperdiciado.</string>
+    <string name="confirm_mark_as_fresh">¿Estás seguro de que quieres marcar \"%s\" como fresco? Esto eliminará el registro de desperdicio si existe.</string>
+    <string name="product_marked_fresh">Producto marcado como fresco</string>
+    <string name="error_marking_fresh">Error al marcar como fresco</string>
+    <string name="error_updating_location">Error al actualizar la ubicación</string>
+    <string name="error_updating_quantity">Error al actualizar la cantidad</string>
+
+    <!-- Graficos -->
+    <string name="bar_chart">Gráfico de Barras</string>
+    <string name="pie_chart">Gráfico Circular</string>
+    <string name="wasted_by_type">Productos Desperdiciados</string>
+    <string name="no_wasted_data">No hay desperdicios para esta fecha registrados</string>
+
+    <!-- Scanner -->
+    <string name="aqu_se_mostrar_la_imagen_escaneada">Aquí se mostrará la imagen escaneada</string>
+    <string name="esperando_escaneo">Esperando escaneo...</string>
+    <string name="escanear_producto">Escanear Producto</string>
+    <string name="proceso_completado_listo_para_nuevo_escaneo">Proceso completado. Listo para nuevo escaneo.</string>
+    <string name="agregar_al_inventario">¿Agregar al inventario?</string>
+    <string name="cantidad_actualizada_en_el_inventario">%1$s cantidad actualizada en el inventario</string>
+    <string name="error_al_actualizar">Error al actualizar %1$s.</string>
+    <string name="error_usuario_no_autenticado">Error: Usuario no autenticado.</string>
+    <string name="guardando">Guardando %1$s...</string>
+    <string name="agregado_al_inventario">%1$s agregado al inventario</string>
+    <string name="error_al_agregar_al_inventario">Error al agregar al inventario</string>
+    <string name="error_al_agregar">Error al agregar %1$s.</string>
+    <string name="error_al_verificar_el_inventario">Error al verificar el inventario</string>
+    <string name="error_al_verificar_inventario">Error al verificar inventario.</string>
+    <string name="omitir">Omitir</string>
+    <string name="agregar">Agregar</string>
+    <string name="error_al_procesar_la_imagen">Error al procesar la imagen.</string>
+    <string name="error_al_procesar_imagen">Error al procesar imagen: %1$s</string>
+    <string name="fallo_en_la_inferencia_del_modelo">Fallo en la inferencia del modelo.</string>
+    <string name="no_se_detectaron_productos_reintentelo_de_nuevo">No se detectaron productos. Reintentelo de nuevo</string>
+    <string name="analizando_imagen">Analizando imagen...</string>
+    <string name="error_al_cargar_modelo_reinicie_la_aplicacion">Error al cargar modelo. Reinicie la aplicacion.</string>
+    <string name="error_al_cargar_el_modelo">Error al cargar el modelo: %1$s</string>
+    <string name="cargando_modelo_de_ia">Cargando modelo de IA...</string>
+    <string name="estado_interaccion_dialogo">Añadiendo %1$s (%2$s)...</string>
+    <string name="mensaje_dialogo_producto">Producto: %1$s\nStatus: %2$s\nCategoria: %3$s\nProbabilidad de acierto: %4$.2f%%</string>
+
+
+
+
+
 </resources>

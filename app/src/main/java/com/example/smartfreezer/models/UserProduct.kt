@@ -8,9 +8,9 @@ data class UserProduct(
     val condition: String = "",
     val location: String = "",
     val idUser: String = "",
-    val nutritionFacts: Map<String, String> = emptyMap(),
     val startSeason: Int = 0,
     val lastSeason: Int = 0,
-    var iconDrawableRes: Int = 0 // ← esto es para guardar el ID del recurso drawable
+    var iconDrawableRes: Int = 0, // ← esto es para guardar el ID del recurso drawable
+    val quantity: Int
 )
 

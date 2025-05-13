@@ -15,6 +15,8 @@
         <item name="colorBackgroundButton">@color/purpleButton</item>
         <item name="colorTextButton">@color/white</item>
         <item name="tabBackgroundColor">@color/tab_color</item>
+        <item name="barChartColor">@color/white</item>
+        <item name="pieChartCenterTextColor">@color/chart_text_light</item>
 
 
 

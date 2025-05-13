@@ -118,6 +118,7 @@
             app:iconGravity="textStart"
             app:iconTint="?attr/colorTextPrimary"
             app:strokeColor="?attr/colorTextPrimary"
+            android:foreground="?attr/selectableItemBackground"
             app:strokeWidth="2dp" />
 
         <TextView

@@ -41,11 +41,11 @@
                 android:layout_height="wrap_content"
                 android:layout_margin="8dp"
                 android:src="@drawable/ic_save"
-                app:tint="?attr/colorTextTertiary"
+                app:tint="#FFEB3B"
                 app:fabSize="normal"
                 android:contentDescription="@string/icono"
                 android:backgroundTint="?attr/colorTextPrimary"
-                android:alpha="0.7"
+                android:alpha="0.85"
                 app:layout_constraintTop_toTopOf="@id/recipeImage"
                 app:layout_constraintEnd_toEndOf="@id/recipeImage" />
 

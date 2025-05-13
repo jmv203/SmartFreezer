@@ -21,8 +21,10 @@ import com.example.smartfreezer.adapters.UserProductAdapter
 import com.example.smartfreezer.models.UserProduct
 import com.example.smartfreezer.models.WastedProduct
 import com.example.smartfreezer.util.OnInventoryTabSelectedListener
+import com.google.android.material.button.MaterialButton
 import com.google.android.material.tabs.TabLayout
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.FirebaseFirestore
 import com.skydoves.powerspinner.PowerSpinnerView
 
@@ -230,7 +232,7 @@ class InventoryFragment : Fragment(R.layout.fragment_inventory), OnInventoryTabS
                         condition = condition,
                         location = doc.getString("location") ?: "",
                         idUser = user.email ?: "",
-                        nutritionFacts = mapOf()
+                        quantity = 1
                     ).apply { iconDrawableRes = iconRes }
                 }
                 applyFilters()
@@ -336,8 +338,10 @@ class InventoryFragment : Fragment(R.layout.fragment_inventory), OnInventoryTabS
         val tvCondition = dialog.findViewById<TextView>(R.id.conditionTextView)
         val tvLocation = dialog.findViewById<TextView>(R.id.locationTextView)
         val tvQuantity = dialog.findViewById<TextView>(R.id.quantityTextView)
-        val btnDelete = dialog.findViewById<Button>(R.id.tvDeleteProduct)
-        val btnMarkAsRotten = dialog.findViewById<Button>(R.id.btnMarkAsRotten) // Asegúrate de tener este botón en tu layout
+        val btnDelete = dialog.findViewById<MaterialButton>(R.id.tvDeleteProduct)
+        val btnMarkAsRotten = dialog.findViewById<MaterialButton>(R.id.btnMarkAsRotten)
+        val btnDecrease = dialog.findViewById<MaterialButton>(R.id.btnDecrease)
+        val btnIncrease = dialog.findViewById<MaterialButton>(R.id.btnIncrease)
 
         val uid = FirebaseAuth.getInstance().currentUser?.uid
         if (uid == null) {
@@ -357,6 +361,7 @@ class InventoryFragment : Fragment(R.layout.fragment_inventory), OnInventoryTabS
                 if (!documents.isEmpty) {
                     val document = documents.first()
                     val productRef = document.reference
+                    val currentQuantity = (document.getLong("quantity") ?: 1).toInt()
                     val product = UserProduct(
                         idProduct = document.id,
                         name = document.getString("name") ?: "",
@@ -365,7 +370,7 @@ class InventoryFragment : Fragment(R.layout.fragment_inventory), OnInventoryTabS
                         condition = document.getString("condition") ?: "",
                         location = document.getString("location") ?: "",
                         idUser = uid,
-                        nutritionFacts = mapOf()
+                        quantity = currentQuantity
                     )
 
                     val iconRes = resources.getIdentifier(iconName, "drawable", requireContext().packageName)
@@ -375,36 +380,31 @@ class InventoryFragment : Fragment(R.layout.fragment_inventory), OnInventoryTabS
                     tvCategory.text = "${document.getString("category") ?: "Desconocida"}"
                     tvCondition.text = "${document.getString("condition") ?: "Desconocida"}"
                     tvLocation.text = "${document.getString("location") ?: "Desconocida"}"
-                    tvQuantity.text = "${document.get("quantity") ?: 0}"
+                    tvQuantity.text = currentQuantity.toString()
+
+                    // Configurar el selector de ubicación
+                    setupLocationSelector(tvLocation, productRef)
+
+                    // Configurar los botones de cantidad
+                    setupQuantityControls(tvQuantity, btnDecrease, btnIncrease, productRef, currentQuantity)
 
                     // Configurar el botón de marcar como podrido
-                    btnMarkAsRotten.text = getString(R.string.mark_as_rotten)
-                    btnMarkAsRotten.setOnClickListener {
-                        // Actualizar condición en Firestore
-                        productRef.update("condition", "podrido")
-                            .addOnSuccessListener {
-                                // Registrar como desperdiciado
-                                registerWastedProduct(product)
-                                Toast.makeText(requireContext(),
-                                    getString(R.string.product_marked_rotten), Toast.LENGTH_SHORT).show()
-                                dialog.dismiss()
-                                loadItemsFromFirestore() // Recargar lista
-                            }
-                            .addOnFailureListener {
-                                Toast.makeText(requireContext(),
-                                    getString(R.string.error_marking_rotten), Toast.LENGTH_SHORT).show()
-                            }
+                    if (product.condition == "podrido") {
+                        btnMarkAsRotten.text = getString(R.string.mark_as_fresh)
+                        btnMarkAsRotten.setOnClickListener {
+                            showMarkAsFreshConfirmation(product, productRef, dialog)
+                        }
+                    } else {
+                        btnMarkAsRotten.text = getString(R.string.mark_as_rotten)
+                        btnMarkAsRotten.setOnClickListener {
+                            showMarkAsRottenConfirmation(product, productRef, dialog)
+                        }
                     }
 
                     // Configurar el botón de eliminar
                     btnDelete.setOnClickListener {
                         dialog.dismiss()
                         showDeleteConfirmation(product)
-                    }
-
-                    // Ocultar botón si ya está podrido
-                    if (product.condition == "podrido") {
-                        btnMarkAsRotten.visibility = View.GONE
                     }
                 } else {
                     Toast.makeText(requireContext(),
@@ -419,6 +419,145 @@ class InventoryFragment : Fragment(R.layout.fragment_inventory), OnInventoryTabS
             }
 
         dialog.show()
+    }
+
+    private fun setupLocationSelector(tvLocation: TextView, productRef: DocumentReference) {
+        val locations = listOf(
+            "nevera" to getString(R.string.filter_fridge),
+            "congelador" to getString(R.string.filter_freezer),
+            "despensa" to getString(R.string.filter_pantry)
+        )
+
+        tvLocation.setOnClickListener {
+            val items = locations.map { it.second }.toTypedArray()
+            AlertDialog.Builder(requireContext())
+                .setTitle(getString(R.string.select_location))
+                .setItems(items) { _, which ->
+                    val selectedLocation = locations[which].first
+                    productRef.update("location", selectedLocation)
+                        .addOnSuccessListener {
+                            tvLocation.text = locations[which].second
+                            loadItemsFromFirestore() // Actualizar la lista
+                        }
+                        .addOnFailureListener {
+                            Toast.makeText(requireContext(),
+                                getString(R.string.error_updating_location), Toast.LENGTH_SHORT).show()
+                        }
+                }
+                .show()
+        }
+    }
+
+    private fun setupQuantityControls(
+        tvQuantity: TextView,
+        btnDecrease: MaterialButton,
+        btnIncrease: MaterialButton,
+        productRef: DocumentReference,
+        initialQuantity: Int
+    ) {
+        var currentQuantity = initialQuantity
+        tvQuantity.text = currentQuantity.toString()
+
+        // Deshabilitar el botón de disminuir si la cantidad es 1
+        btnDecrease.isEnabled = currentQuantity > 1
+
+        btnDecrease.setOnClickListener {
+            if (currentQuantity > 1) {
+                currentQuantity--
+                tvQuantity.text = currentQuantity.toString()
+                btnDecrease.isEnabled = currentQuantity > 1
+                updateQuantityInFirestore(productRef, currentQuantity)
+            }
+        }
+
+        btnIncrease.setOnClickListener {
+            currentQuantity++
+            tvQuantity.text = currentQuantity.toString()
+            btnDecrease.isEnabled = true
+            updateQuantityInFirestore(productRef, currentQuantity)
+        }
+    }
+
+    private fun updateQuantityInFirestore(productRef: DocumentReference, newQuantity: Int) {
+        productRef.update("quantity", newQuantity)
+            .addOnSuccessListener {
+                loadItemsFromFirestore() // Actualizar la lista principal
+            }
+            .addOnFailureListener {
+                Toast.makeText(requireContext(),
+                    getString(R.string.error_updating_quantity), Toast.LENGTH_SHORT).show()
+            }
+    }
+
+    private fun showMarkAsRottenConfirmation(product: UserProduct, productRef: DocumentReference, dialog: Dialog) {
+        AlertDialog.Builder(requireContext())
+            .setTitle(getString(R.string.mark_as_rotten))
+            .setMessage(getString(R.string.confirm_mark_as_rotten, product.name))
+            .setPositiveButton(getString(R.string.confirmar)) { _, _ ->
+                // Actualizar condición en Firestore
+                productRef.update("condition", "podrido")
+                    .addOnSuccessListener {
+                        // Registrar como desperdiciado
+                        registerWastedProduct(product)
+                        Toast.makeText(requireContext(),
+                            getString(R.string.product_marked_rotten), Toast.LENGTH_SHORT).show()
+                        dialog.dismiss()
+                        loadItemsFromFirestore() // Recargar lista
+                    }
+                    .addOnFailureListener {
+                        Toast.makeText(requireContext(),
+                            getString(R.string.error_marking_rotten), Toast.LENGTH_SHORT).show()
+                    }
+            }
+            .setNegativeButton(getString(R.string.cancelar), null)
+            .show()
+    }
+
+    private fun showMarkAsFreshConfirmation(product: UserProduct, productRef: DocumentReference, dialog: Dialog) {
+        AlertDialog.Builder(requireContext())
+            .setTitle(getString(R.string.mark_as_fresh))
+            .setMessage(getString(R.string.confirm_mark_as_fresh, product.name))
+            .setPositiveButton(getString(R.string.confirmar)) { _, _ ->
+                // Actualizar condición en Firestore
+                productRef.update("condition", "fresco")
+                    .addOnSuccessListener {
+                        // Eliminar de productos desperdiciados si existe
+                        removeFromWastedProducts(product.idProduct)
+                        Toast.makeText(requireContext(),
+                            getString(R.string.product_marked_fresh), Toast.LENGTH_SHORT).show()
+                        dialog.dismiss()
+                        loadItemsFromFirestore() // Recargar lista
+                    }
+                    .addOnFailureListener {
+                        Toast.makeText(requireContext(),
+                            getString(R.string.error_marking_fresh), Toast.LENGTH_SHORT).show()
+                    }
+            }
+            .setNegativeButton(getString(R.string.cancelar), null)
+            .show()
+    }
+
+    private fun removeFromWastedProducts(productId: String) {
+        val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return
+
+        firestore.collection("users").document(userId)
+            .collection("wasted_products")
+            .whereEqualTo("original_product_id", productId)
+            .get()
+            .addOnSuccessListener { documents ->
+                for (document in documents) {
+                    document.reference.delete()
+                        .addOnSuccessListener {
+                            Log.d("Inventory", "Producto eliminado de wasted_products: $productId")
+                        }
+                        .addOnFailureListener { e ->
+                            Log.e("Inventory", "Error al eliminar de wasted_products", e)
+                        }
+                }
+            }
+            .addOnFailureListener { e ->
+                Log.e("Inventory", "Error al buscar en wasted_products", e)
+            }
     }
 
     private fun registerWastedProduct(product: UserProduct) {

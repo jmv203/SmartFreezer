@@ -18,6 +18,8 @@
         <item name="colorBackgroundButton">@color/purpleButton</item>
         <item name="colorTextButton">@color/white</item>
         <item name="tabBackgroundColor">@color/tab_color</item>
+        <item name="barChartColor">@color/purpleButton</item>
+        <item name="pieChartCenterTextColor">@color/purpleButton</item>
 
     </style>
 </resources>

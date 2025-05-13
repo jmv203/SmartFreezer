@@ -99,6 +99,11 @@ dependencies {
     implementation ("com.makeramen:roundedimageview:2.3.0")
     //Palette
     implementation("androidx.palette:palette-ktx:1.0.0")
+
+    implementation ("org.pytorch:pytorch_android:1.12.1")
+    implementation ("org.pytorch:pytorch_android_torchvision:1.12.1")
+
+    implementation ("com.microsoft.onnxruntime:onnxruntime-android:1.15.1")
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
