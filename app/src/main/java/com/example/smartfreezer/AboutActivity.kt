@@ -1,5 +1,6 @@
 package com.example.smartfreezer
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
@@ -21,6 +22,10 @@ class AboutActivity : BaseActivity() {
         binding.tvSpoonacular.text = getString(R.string.about_spoonacular)
         binding.tvVersion.text = getString(R.string.about_version)
         binding.tvContact.text = getString(R.string.about_contact)
+
+        binding.buttonFeedBack.setOnClickListener {
+            startActivity(Intent(this, FeedbackActivity::class.java))
+        }
 
         binding.btnBack.setOnClickListener {
             finish()

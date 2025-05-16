@@ -3,7 +3,8 @@ plugins {
     alias(libs.plugins.android.application) apply false
     alias(libs.plugins.kotlin.android) apply false
     alias(libs.plugins.kotlin.compose) apply false
-    id("com.google.gms.google-services") version "4.4.2" apply false //nueva linea firebase config
-    id("androidx.navigation.safeargs.kotlin") version "2.5.1" apply false
+    id("com.google.gms.google-services") version "4.4.2" apply false
+    id("com.google.firebase.crashlytics") version "3.0.3" apply false
+    id("androidx.navigation.safeargs.kotlin") version "2.9.0" apply false
     id("com.google.dagger.hilt.android") version "2.56.1" apply false
 }

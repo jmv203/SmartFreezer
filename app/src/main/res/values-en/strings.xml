@@ -422,12 +422,30 @@
     <!-- Progress messages -->
     <string name="actualizando_nombre">Updating name...</string>
     <string name="actualizando_contrase_a">Updating password...</string>
+    <string name="no_filtered_saved_recipes">No saved recipes match the selected filters.</string>
+
+    <string name="last_6_months">Last 6 months</string>
+    <string name="current_week">Current week</string>
+    <string name="wasted_items_label">Wasted Items</string>
+
+    <!-- Feedback -->
+    <string name="porfavor_valora_la_app">Please, rate the app</string>
+    <string name="enviando_valoraci_n">Sending feedback...</string>
+    <string name="por_favor_proporciona_alguna_valoraci_n_o_comentario">Please provide a rating or comment.</string>
+    <string name="valoraci_n_general_de_la_app">Overall App Rating</string>
+    <string name="cuestionario_0_5_estrellas">Questionnaire (0-5 stars)</string>
+    <string name="_1_te_result_f_cil_usar_la_app">1. Was the app easy to use?</string>
+    <string name="_2_te_gust_el_dise_o_de_la_interfaz">2. Did you like the interface design?</string>
+    <string name="_3_la_app_funcion_sin_errores_ni_bloqueos">3. Did the app run without errors or crashes?</string>
+    <string name="_4_te_parece_til_la_app_para_tus_necesidades">4. Is the app useful for your needs?</string>
+    <string name="_5_la_presentaci_n_de_la_informaci_n_es_clara">5. Is the presentation of information clear?</string>
+    <string name="tienes_alguna_sugerencia_de_mejora">Do you have any suggestions for improvement?</string>
+    <string name="enviar_valoraci_n">Submit Feedback</string>
+    <string name="describe_cualquier_error_que_hayas_encontrado">Describe any errors you encountered</string>
 
 
-
-
-
-
+    <string name="notificaciones_activadas">Notifications activated</string>
+    <string name="notificaciones_desactivadas">Notifications disabled</string>
 
 
 </resources>

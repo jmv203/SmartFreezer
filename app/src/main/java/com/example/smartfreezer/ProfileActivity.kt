@@ -8,6 +8,8 @@ import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import com.example.smartfreezer.databinding.ActivityProfileBinding
+import com.example.smartfreezer.models.User
+import com.example.smartfreezer.util.FCMTopicManager
 import com.google.android.gms.tasks.Tasks
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
@@ -499,19 +501,27 @@ class ProfileActivity : BaseActivity() {
     }
 
     private fun updateUserPreferences(preferences: Map<String, Any>) {
+        showProgressDialog("Actualizando preferencias...")
+
         db.collection("users").document(userId)
             .update(preferences)
             .addOnSuccessListener {
-                loadUserData() // Recargar datos para mostrar los cambios
-                Toast.makeText(this,
-                    getString(R.string.preferencias_actualizadas_correctamente), Toast.LENGTH_SHORT).show()
+                // Recargar usuario y actualizar suscripciones
+                db.collection("users").document(userId)
+                    .get()
+                    .addOnSuccessListener { document ->
+                        val updatedUser = document.toObject(User::class.java) ?: return@addOnSuccessListener
+                        FCMTopicManager.subscribeToDietTopics(updatedUser)
+                        loadUserData() // Recargar UI
+                        dismissProgressDialog()
+                        showSuccessSnackbar("Preferencias actualizadas correctamente")
+                    }
             }
             .addOnFailureListener { e ->
-                Toast.makeText(this,
-                    getString(R.string.error_al_actualizar_preferencias, e.message), Toast.LENGTH_SHORT).show()
+                dismissProgressDialog()
+                showErrorSnackbar("Error al actualizar preferencias: ${e.message}")
             }
     }
-
     private fun showLogoutConfirmationDialog() {
         MaterialAlertDialogBuilder(this)
             .setTitle(getString(R.string.cerrar_sesi_n))

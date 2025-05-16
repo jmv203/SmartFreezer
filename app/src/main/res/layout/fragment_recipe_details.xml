@@ -40,31 +40,31 @@
                     android:id="@+id/btnBackRecipeDetails"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_margin="16dp"
-                    android:src="@drawable/baseline_arrow_back_24"
-                    app:tint="?attr/colorTextTertiary"
-                    app:fabSize="normal"
-                    android:contentDescription="@string/icono"
                     android:layout_gravity="top|start"
-                    app:layout_constraintTop_toTopOf="@id/recipeDetailImage"
-                    app:layout_constraintStart_toStartOf="@id/recipeDetailImage"
+                    android:layout_margin="16dp"
+                    android:alpha="0.95"
                     android:backgroundTint="?attr/colorTextPrimary"
-                    android:alpha="0.75"/>
+                    android:contentDescription="@string/icono"
+                    android:src="@drawable/baseline_arrow_back_24"
+                    app:fabSize="normal"
+                    app:layout_constraintStart_toStartOf="@id/recipeDetailImage"
+                    app:layout_constraintTop_toTopOf="@id/recipeDetailImage"
+                    app:tint="?attr/colorTextTertiary" />
 
                 <com.google.android.material.floatingactionbutton.FloatingActionButton
                     android:id="@+id/fabSaveRecipeDetails"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_margin="16dp"
-                    android:src="@drawable/ic_save"
-                    app:tint="#FFEB3B"
-                    app:fabSize="normal"
-                    android:contentDescription="@string/icono"
                     android:layout_gravity="top|end"
-                    app:layout_constraintTop_toTopOf="@id/recipeDetailImage"
-                    app:layout_constraintEnd_toEndOf="@id/recipeDetailImage"
+                    android:layout_margin="16dp"
+                    android:alpha="0.95"
                     android:backgroundTint="?attr/colorTextPrimary"
-                    android:alpha="0.85"/>
+                    android:contentDescription="@string/icono"
+                    android:src="@drawable/ic_save"
+                    app:fabSize="normal"
+                    app:layout_constraintEnd_toEndOf="@id/recipeDetailImage"
+                    app:layout_constraintTop_toTopOf="@id/recipeDetailImage"
+                    app:tint="#FFEB3B" />
 
 
                 <androidx.cardview.widget.CardView

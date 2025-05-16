@@ -369,9 +369,6 @@
     <string name="mensaje_dialogo_producto">Producto: %1$s\nStatus: %2$s\nCategoria: %3$s\nProbabilidad de acierto: %4$.2f%%</string>
 
 
-
-
-
     <!-- Login Activity -->
     <string name="login_email_empty">El correo no puede estar vacío</string>
     <string name="login_email_too_long">El correo no debe superar 40 caracteres</string>
@@ -424,8 +421,27 @@
 
     <string name="actualizando_contrase_a">Actualizando contraseña...</string>
 
+    <string name="no_filtered_saved_recipes">No hay recetas guardadas que coincidan con los filtros seleccionados.</string>
+    <string name="last_6_months">últimos 6 meses</string>
+    <string name="current_week">esta semana</string>
+    <string name="wasted_items_label">Artículos Desperdiciados</string>
 
-
+    <!-- Feedback -->
+    <string name="porfavor_valora_la_app">Porfavor, valora la app</string>
+    <string name="enviando_valoraci_n">Enviando valoración...</string>
+    <string name="por_favor_proporciona_alguna_valoraci_n_o_comentario">Por favor, proporciona alguna valoración o comentario.</string>
+    <string name="valoraci_n_general_de_la_app">Valoración General de la App</string>
+    <string name="cuestionario_0_5_estrellas">Cuestionario (0-5 estrellas)</string>
+    <string name="_1_te_result_f_cil_usar_la_app">1. ¿Te resultó fácil usar la app?</string>
+    <string name="_2_te_gust_el_dise_o_de_la_interfaz">2. ¿Te gustó el diseño de la interfaz?</string>
+    <string name="_3_la_app_funcion_sin_errores_ni_bloqueos">3. ¿La app funcionó sin errores ni bloqueos?</string>
+    <string name="_4_te_parece_til_la_app_para_tus_necesidades">4. ¿Te parece útil la app para tus necesidades?</string>
+    <string name="_5_la_presentaci_n_de_la_informaci_n_es_clara">5. ¿La presentación de la información es clara?</string>
+    <string name="tienes_alguna_sugerencia_de_mejora">¿Tienes alguna sugerencia de mejora?</string>
+    <string name="enviar_valoraci_n">Enviar Valoración</string>
+    <string name="describe_cualquier_error_que_hayas_encontrado">Describe cualquier error que hayas encontrado</string>
+    <string name="notificaciones_activadas">Notificaciones activadas</string>
+    <string name="notificaciones_desactivadas">Notificaciones desactivadas</string>
 
 
 </resources>

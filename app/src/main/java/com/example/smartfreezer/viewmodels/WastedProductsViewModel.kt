@@ -15,83 +15,103 @@ class WastedProductsViewModel : ViewModel() {
 
     private val db = FirebaseFirestore.getInstance()
     private val auth = FirebaseAuth.getInstance()
+
     private val _wastedProductsData = MutableLiveData<List<Pair<String, Int>>>()
     val wastedProductsData: LiveData<List<Pair<String, Int>>> = _wastedProductsData
+
     private val _wastedProductsByType = MutableLiveData<List<Pair<String, Int>>>()
     val wastedProductsByType: LiveData<List<Pair<String, Int>>> = _wastedProductsByType
-    private val _currentPeriod = MutableLiveData<Date>(Calendar.getInstance().time)
-    val currentPeriod: LiveData<Date> = _currentPeriod
+
+    // Fechas de referencia separadas
+    private val _currentWeeklyReferenceDate = MutableLiveData<Date>(Calendar.getInstance().time)
+    val currentWeeklyReferenceDate: LiveData<Date> = _currentWeeklyReferenceDate
+
+    private val _currentMonthlyReferenceDate = MutableLiveData<Date>(Calendar.getInstance().time)
+    val currentMonthlyReferenceDate: LiveData<Date> = _currentMonthlyReferenceDate
+
+    // LiveData para exponer la fecha que el Fragment debe observar para el título
+    private val _displayPeriodDate = MutableLiveData<Date>()
+    val displayPeriodDate: LiveData<Date> = _displayPeriodDate
+
     private val _selectedPeriod = MutableLiveData<String>().apply { value = "weekly" }
     val selectedPeriod: LiveData<String> = _selectedPeriod
 
+    init {
+        // Inicializar displayPeriodDate con la fecha semanal por defecto
+        _displayPeriodDate.value = _currentWeeklyReferenceDate.value
+    }
     private var daysOfWeek: List<String> = emptyList()
 
     fun setStringResources(days: List<String>) {
         daysOfWeek = days
     }
 
-    fun loadWeeklyData(referenceDate: Date = Calendar.getInstance().time) {
+    // Carga los datos para la semana de la referenceDate
+    private fun loadWeeklyData(referenceDate: Date) {
         val calendar = Calendar.getInstance().apply {
             time = referenceDate
-            // Ajustar al lunes de la semana actual
             val dayOfWeek = get(Calendar.DAY_OF_WEEK)
             val diffToMonday = if (dayOfWeek == Calendar.SUNDAY) -6 else Calendar.MONDAY - dayOfWeek
             add(Calendar.DAY_OF_MONTH, diffToMonday)
         }
-
         val startDate = calendar.time
-
-        calendar.add(Calendar.DAY_OF_MONTH, 6) // Domingo de esa semana
+        calendar.add(Calendar.DAY_OF_MONTH, 6)
         val endDate = calendar.time
 
+        _displayPeriodDate.value = referenceDate // Actualizar la fecha para el título
         loadDataBetweenDates(startDate, endDate, "weekly")
     }
 
-    fun loadMonthlyData(referenceDate: Date = Calendar.getInstance().time) {
-        val dateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
-
+    // Carga los datos para el rango de 6 meses terminando en el mes de referenceDate
+    private fun loadMonthlyData(referenceDate: Date) {
         val endCal = Calendar.getInstance().apply {
             time = referenceDate
             set(Calendar.DAY_OF_MONTH, getActualMaximum(Calendar.DAY_OF_MONTH))
         }
-
         val startCal = Calendar.getInstance().apply {
             time = endCal.time
             add(Calendar.MONTH, -5)
             set(Calendar.DAY_OF_MONTH, 1)
         }
 
-        Log.d("DateRange", "Rango consultado: ${dateFormat.format(startCal.time)} - ${dateFormat.format(endCal.time)}")
-
+        _displayPeriodDate.value = referenceDate // Actualizar la fecha para el título
         loadDataBetweenDates(startCal.time, endCal.time, "monthly")
     }
 
     fun setPeriod(period: String) {
+        val oldPeriod = _selectedPeriod.value
         _selectedPeriod.value = period
-        when(period) {
-            "weekly" -> loadWeeklyData()
-            "monthly" -> loadMonthlyData()
+        if (oldPeriod != period) { // Solo recargar si el periodo realmente cambió
+            when (period) {
+                "weekly" -> loadWeeklyData(_currentWeeklyReferenceDate.value ?: Calendar.getInstance().time)
+                "monthly" -> loadMonthlyData(_currentMonthlyReferenceDate.value ?: Calendar.getInstance().time)
+            }
         }
     }
 
     fun loadData(periodOffset: Int = 0) {
-        val calendar = Calendar.getInstance().apply { time = _currentPeriod.value ?: Date() }
+        val currentSelectedPeriod = _selectedPeriod.value ?: "weekly"
+        val calendar = Calendar.getInstance()
 
-        when(selectedPeriod.value) {
-            "monthly" -> calendar.add(Calendar.MONTH, periodOffset * 6) // 6 meses
-            else -> calendar.add(Calendar.WEEK_OF_YEAR, periodOffset) // 1 semana
-        }
-        _currentPeriod.value = calendar.time
-
-        when(selectedPeriod.value) {
-            "monthly" -> loadMonthlyData(calendar.time)
-            else -> loadWeeklyData(calendar.time)
+        when (currentSelectedPeriod) {
+            "monthly" -> {
+                calendar.time = _currentMonthlyReferenceDate.value ?: Date()
+                calendar.add(Calendar.MONTH, periodOffset * 6) // Avanza/retrocede de 6 en 6 meses
+                _currentMonthlyReferenceDate.value = calendar.time
+                loadMonthlyData(calendar.time)
+            }
+            "weekly" -> {
+                calendar.time = _currentWeeklyReferenceDate.value ?: Date()
+                calendar.add(Calendar.WEEK_OF_YEAR, periodOffset)
+                _currentWeeklyReferenceDate.value = calendar.time
+                loadWeeklyData(calendar.time)
+            }
         }
     }
 
     private fun loadDataBetweenDates(startDate: Date, endDate: Date, period: String) {
         val currentUser = auth.currentUser
-        Log.d("FirestoreQuery", "Consultando desde ${SimpleDateFormat("dd/MM/yyyy").format(startDate)} hasta ${SimpleDateFormat("dd/MM/yyyy").format(endDate)}")
+        Log.d("FirestoreQuery", "Consultando desde ${SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(startDate)} hasta ${SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(endDate)} para periodo $period")
         if (currentUser == null) {
             _wastedProductsData.value = emptyList()
             _wastedProductsByType.value = emptyList()
@@ -103,68 +123,70 @@ class WastedProductsViewModel : ViewModel() {
             .collection("wasted_products")
             .whereGreaterThanOrEqualTo("date", startDate)
             .whereLessThanOrEqualTo("date", endDate)
-            .orderBy("date", Query.Direction.DESCENDING)
+            .orderBy("date", Query.Direction.DESCENDING) // O ASCENDING si processData lo espera así
             .get()
             .addOnSuccessListener { querySnapshot ->
                 val products = querySnapshot.documents.mapNotNull { document ->
                     try {
                         document.toObject(WastedProduct::class.java)
                     } catch (e: Exception) {
+                        Log.e("FirestoreConversion", "Error converting document: ${document.id}", e)
                         null
                     }
                 }
-                val processedData = processData(products, period)
+                val processedData = processData(products, period, if (period == "monthly") _currentMonthlyReferenceDate.value!! else _currentWeeklyReferenceDate.value!!)
                 _wastedProductsData.postValue(processedData)
 
-                // Procesar datos para el gráfico circular (agrupar por tipo)
-                val byType = products.groupBy { it.icon to it.name }
+                val byType = products.groupBy { it.icon to it.name } // O solo por it.name si el icono no es relevante para la etiqueta
                     .map { (key, items) ->
-                        val (icon, name) = key
-                        "$name (${items.size})" to items.size
+                        // val (icon, name) = key
+                        val name = key.second // Asumiendo que quieres el nombre como etiqueta principal
+                        "$name (${items.size})" to items.size // Puedes ajustar la etiqueta aquí
                     }
                     .sortedByDescending { it.second }
                 _wastedProductsByType.postValue(byType)
             }
             .addOnFailureListener { exception ->
+                Log.e("FirestoreQuery", "Error cargando datos", exception)
                 _wastedProductsData.postValue(emptyList())
                 _wastedProductsByType.postValue(emptyList())
             }
     }
 
-    private fun processData(products: List<WastedProduct>, period: String): List<Pair<String, Int>> {
+    private fun processData(products: List<WastedProduct>, period: String, referenceDateForMonth: Date): List<Pair<String, Int>> {
         return when (period) {
             "weekly" -> {
-                val dayFormat = SimpleDateFormat("u", Locale.getDefault())
-                daysOfWeek.mapIndexed { index, day ->
-                    val dayNumber = index + 1
-                    day to products.count { product ->
-                        dayFormat.format(product.date.toDate()).toInt() == dayNumber
+                val dayFormat = SimpleDateFormat("u", Locale.getDefault()) // Lunes=1, Domingo=7
+                daysOfWeek.mapIndexed { index, dayName ->
+                    val dayNumberInWeek = index + 1 // Asumiendo que daysOfWeek está [Lun, Mar, ..., Dom]
+                    dayName to products.count { product ->
+                        val calProduct = Calendar.getInstance().apply { time = product.date.toDate() }
+                        // Ajuste para que Lunes sea 1 y Domingo 7 consistentemente con 'u'
+                        val productDayOfWeek = if (calProduct.get(Calendar.DAY_OF_WEEK) == Calendar.SUNDAY) 7 else calProduct.get(Calendar.DAY_OF_WEEK) -1
+                        productDayOfWeek == dayNumberInWeek
                     }
                 }
             }
             "monthly" -> {
-                val currentCal = Calendar.getInstance().apply {
-                    time = _currentPeriod.value ?: Date()
-                    set(Calendar.DAY_OF_MONTH, getActualMaximum(Calendar.DAY_OF_MONTH))
-                }
+                // Usar referenceDateForMonth para calcular el rango de 6 meses
+                val currentDisplayCal = Calendar.getInstance().apply { time = referenceDateForMonth }
 
-                (0..5).map { i ->
+                (0..5).map { i -> // 0 es el mes más reciente del rango, 5 el más antiguo
                     val targetCal = Calendar.getInstance().apply {
-                        time = currentCal.time
-                        add(Calendar.MONTH, -i)
+                        time = currentDisplayCal.time
+                        add(Calendar.MONTH, -i) // Retrocede 'i' meses desde el mes de referencia del rango
                     }
-
                     val monthName = SimpleDateFormat("MMM", Locale.getDefault())
                         .format(targetCal.time)
-                        .replace(".", "")
+                        .replace(".", "") // Quita el punto si tu locale lo añade (ej. "ene.")
 
-                    monthName to products.count { product ->
-                        val productDate = product.date.toDate()
-                        val productCal = Calendar.getInstance().apply { time = productDate }
+                    val count = products.count { product ->
+                        val productCal = Calendar.getInstance().apply { time = product.date.toDate() }
                         productCal.get(Calendar.MONTH) == targetCal.get(Calendar.MONTH) &&
                                 productCal.get(Calendar.YEAR) == targetCal.get(Calendar.YEAR)
                     }
-                }.reversed()
+                    monthName to count
+                }.reversed() // Para que el gráfico muestre de más antiguo a más reciente
             }
             else -> emptyList()
         }

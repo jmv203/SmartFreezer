@@ -24,6 +24,7 @@ import com.example.smartfreezer.R
 import com.example.smartfreezer.SettingsActivity
 import com.example.smartfreezer.databinding.FragmentScannerBinding
 import com.example.smartfreezer.models.Detection
+import com.example.smartfreezer.models.UserProduct
 
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
@@ -88,7 +89,7 @@ class ScannerFragment : Fragment() {
         FirebaseFirestore.getInstance().collection("users").document(currentUser.uid).get()
             .addOnSuccessListener { document ->
                 document.getString("name")?.let { name ->
-                    binding.tvGreetingScanner?.text = getString(R.string.hola, name)
+                    binding.tvGreetingScanner.text = getString(R.string.hola, name)
                 }
             }
     }
@@ -335,7 +336,7 @@ class ScannerFragment : Fragment() {
         val productLocation = "nevera"
         val productsRef = db.collection("users").document(userId).collection("products")
 
-        updateTextStatus(getString(R.string.guardando, spanishName), true) // Indicar que se está guardando
+        updateTextStatus(getString(R.string.guardando, spanishName), true)
 
         productsRef
             .whereEqualTo("name", spanishName)
@@ -347,7 +348,7 @@ class ScannerFragment : Fragment() {
             .addOnSuccessListener { querySnapshot ->
                 if (!querySnapshot.isEmpty) {
                     val documentSnapshot = querySnapshot.documents[0]
-                    val currentQuantity = documentSnapshot.getLong("quantity") ?: 0L
+                    val currentQuantity = (documentSnapshot.getLong("quantity") ?: 0L).toInt()
                     val newQuantity = currentQuantity + 1
                     documentSnapshot.reference.update("quantity", newQuantity)
                         .addOnSuccessListener {
@@ -356,7 +357,20 @@ class ScannerFragment : Fragment() {
                                     R.string.cantidad_actualizada_en_el_inventario,
                                     spanishName
                                 ))
-                            // El estado se actualizará en el callback de showMultipleDialogs o al final
+
+                            // Registrar como desperdiciado si está podrido
+                            if (condition == "podrido") {
+                                val product = UserProduct(
+                                    idProduct = documentSnapshot.id,
+                                    name = spanishName,
+                                    icon = englishNameForIcon.lowercase(),
+                                    category = category,
+                                    condition = condition,
+                                    location = productLocation,
+                                    quantity = newQuantity
+                                )
+                                registerWastedProduct(product)
+                            }
                         }
                         .addOnFailureListener { e ->
                             showError(getString(R.string.error_al_actualizar_cantidad))
@@ -366,22 +380,69 @@ class ScannerFragment : Fragment() {
                     val productData = hashMapOf(
                         "name" to spanishName, "icon" to englishNameForIcon.lowercase(),
                         "category" to category, "condition" to condition,
-                        "location" to productLocation, "quantity" to 1L
+                        "location" to productLocation, "quantity" to 1
                     )
                     productsRef.add(productData)
-                        .addOnSuccessListener {
+                        .addOnSuccessListener { documentReference ->
                             showSuccess(getString(R.string.agregado_al_inventario, spanishName))
+
+                            // Registrar como desperdiciado si está podrido
+                            if (condition == "podrido") {
+                                val product = UserProduct(
+                                    idProduct = documentReference.id,
+                                    name = spanishName,
+                                    icon = englishNameForIcon.lowercase(),
+                                    category = category,
+                                    condition = condition,
+                                    location = productLocation,
+                                    quantity = 1
+                                )
+                                registerWastedProduct(product)
+                            }
                         }
                         .addOnFailureListener { e ->
                             showError(getString(R.string.error_al_agregar_al_inventario))
                             updateTextStatus(getString(R.string.error_al_agregar, spanishName), false)
                         }
                 }
-                // El estado general se actualiza mejor en showMultipleDialogs cuando termina o avanza.
             }
             .addOnFailureListener { e ->
                 showError(getString(R.string.error_al_verificar_el_inventario))
                 updateTextStatus(getString(R.string.error_al_verificar_inventario), false)
+            }
+    }
+
+    private fun registerWastedProduct(product: UserProduct) {
+        val userId = auth.currentUser?.uid ?: return
+
+        db.collection("users").document(userId)
+            .collection("wasted_products")
+            .whereEqualTo("original_product_id", product.idProduct)
+            .get()
+            .addOnSuccessListener { documents ->
+                if (documents.isEmpty) {
+                    val wastedProduct = hashMapOf(
+                        "name" to product.name,
+                        "icon" to product.icon,
+                        "category" to product.category,
+                        "original_product_id" to product.idProduct,
+                        "date" to com.google.firebase.Timestamp.now()
+                    )
+
+                    db.collection("users").document(userId)
+                        .collection("wasted_products")
+                        .add(wastedProduct)
+                        .addOnSuccessListener {
+                            Log.d("ScannerFragment", "Producto podrido registrado como desperdiciado: ${product.name}")
+                        }
+                        .addOnFailureListener { e ->
+                            Log.e("ScannerFragment", "Error al registrar producto desperdiciado", e)
+                            showError("Error al registrar producto desperdiciado")
+                        }
+                }
+            }
+            .addOnFailureListener { e ->
+                Log.e("ScannerFragment", "Error al verificar producto desperdiciado", e)
             }
     }
 

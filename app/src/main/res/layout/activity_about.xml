@@ -21,6 +21,14 @@
             android:contentDescription="@string/icono"
             android:layout_marginBottom="16dp" />
 
+        <ImageView
+            android:id="@+id/iconSmartFreezer"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:src="@drawable/smartfreezer__3_"
+            android:contentDescription="@string/icono"
+            android:layout_marginBottom="16dp" />
+
         <TextView
             android:id="@+id/tvTitle"
             android:textSize="24sp"
@@ -62,6 +70,17 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textColor="#666" />
+
+        <Button
+            android:id="@+id/buttonFeedBack"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/porfavor_valora_la_app"
+            android:layout_marginTop="24dp"
+            android:textColor="?attr/colorTextButton"
+            android:backgroundTint="?attr/colorBackgroundButton"/>
+
+
 
     </LinearLayout>
 </ScrollView>

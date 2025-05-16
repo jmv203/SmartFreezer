@@ -45,7 +45,7 @@
                 app:fabSize="normal"
                 android:contentDescription="@string/icono"
                 android:backgroundTint="?attr/colorTextPrimary"
-                android:alpha="0.85"
+                android:alpha="0.95"
                 app:layout_constraintTop_toTopOf="@id/recipeImage"
                 app:layout_constraintEnd_toEndOf="@id/recipeImage" />
 

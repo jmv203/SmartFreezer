@@ -9,6 +9,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
@@ -80,6 +81,8 @@ class SavedRecipesFragment : Fragment(R.layout.fragment_saved_recipes) {
             startActivity(intent)
         }
 
+
+
         setupTabLayout()
         setupGreeting()
         setupRecyclerView()
@@ -89,6 +92,7 @@ class SavedRecipesFragment : Fragment(R.layout.fragment_saved_recipes) {
 
         updateFilterIndicatorsVisibility(false)
         requestSavedRecipes()
+
     }
 
     private fun setupTabLayout() {
@@ -189,9 +193,15 @@ class SavedRecipesFragment : Fragment(R.layout.fragment_saved_recipes) {
         savedRecipeRef.delete()
             .addOnSuccessListener {
                 Toast.makeText(requireContext(), getString(R.string.receta_eliminada), Toast.LENGTH_SHORT).show()
-                updateAdapterSavedRecipeIds() // Update saved IDs in adapter
-                recipesList.removeIf { it.id == result.id } // Remove deleted item from list
-                savedRecipeAdapter.setData(recipesList) // Update adapter data
+
+                // ✅ Eliminamos visualmente sin esperar nueva consulta a Firestore
+                val index = recipesList.indexOfFirst { it.id == result.id }
+                if (index != -1) {
+                    recipesList.removeAt(index)
+                    savedRecipeAdapter.setData(recipesList) // Si usas DiffUtil, usa submitList(recipesList)
+                }
+
+                updateAdapterSavedRecipeIds() // Asegura que los IDs guardados estén actualizados
             }
             .addOnFailureListener {
                 Toast.makeText(requireContext(), getString(R.string.error_al_eliminar), Toast.LENGTH_SHORT).show()
@@ -238,73 +248,55 @@ class SavedRecipesFragment : Fragment(R.layout.fragment_saved_recipes) {
             .addOnSuccessListener { snapshot ->
                 if (_binding == null) return@addOnSuccessListener
 
-                val recipesData = snapshot.documents.mapNotNull { document ->
-                    val recipeId = document.getLong("recipeId")?.toInt()
-                    val recipeTitle = document.getString("title")
-                    if (recipeId != null && recipeTitle != null) {
-                        Pair(recipeId, recipeTitle)
-                    } else {
-                        null
-                    }
+                val savedIds = snapshot.documents.mapNotNull {
+                    it.getLong("recipeId")?.toInt()
                 }
 
-                if (recipesData.isEmpty()) {
-                    hideLoading()
-                    savedRecipeAdapter.setData(emptyList())
-                    _binding?.tvEmpty?.visibility = View.VISIBLE
-                    return@addOnSuccessListener
-                }
-                _binding?.tvEmpty?.visibility = View.GONE
-
-                recipesList.clear()
-                val searchResults = mutableListOf<Result>()
-                var completedRequests = 0
-                val totalRequests = recipesData.size
-
-                if (totalRequests == 0) {
+                if (savedIds.isEmpty()) {
                     hideLoading()
                     savedRecipeAdapter.setData(emptyList())
                     return@addOnSuccessListener
                 }
 
-                recipesData.forEach { (recipeId, recipeTitle) ->
-                    recipesViewModel.searchRecipesByTitle(recipeTitle) { result ->
-                        if (_binding == null) return@searchRecipesByTitle
+                val queries = recipesViewModel.applyQueries()
+                recipesViewModel.getRecipes(queries)
 
-                        when (result) {
-                            is NetworkResult.Success -> {
-                                result.data?.let { recipes ->
-                                    if (recipes.isNotEmpty()) {
-                                        searchResults.add(recipes.first())
-                                    } else {
-                                        Log.w("SavedRecipes", "No recipe found for $recipeTitle")
-                                    }
-                                }
-                            }
-                            is NetworkResult.Error -> {
-                                Toast.makeText(requireContext(),
-                                    getString(R.string.error_en_buscar, recipeTitle, result.message), Toast.LENGTH_SHORT).show()
-                            }
-                            is NetworkResult.Loading -> {
-                                showLoading()
-                            }
-                        }
+                recipesViewModel.recipesResponse.observe(viewLifecycleOwner) { result ->
+                    if (_binding == null) return@observe
 
-                        completedRequests++
-                        if (completedRequests == totalRequests) {
+                    when (result) {
+                        is NetworkResult.Success -> {
+                            val filtered = result.data?.filter { it.id in savedIds } ?: emptyList()
+                            savedRecipeAdapter.setData(filtered)
+                            if (filtered.isEmpty()) {
+                                val topDrawable = ContextCompat.getDrawable(requireContext(), R.drawable.ic_empty_box)
+                                topDrawable?.setBounds(0, 0, 128, 128) // ancho y alto en píxeles (ajusta aquí)
+
+                                binding.tvNoFilteredRecipes.setCompoundDrawables(
+                                    null, topDrawable, null, null
+                                )
+                                _binding?.tvNoFilteredRecipes?.visibility = View.VISIBLE
+                            } else {
+                                _binding?.tvNoFilteredRecipes?.visibility = View.GONE
+                            }
+
+
                             hideLoading()
-                            val distinctRecipes = searchResults.distinctBy { it.id }
-                            savedRecipeAdapter.setData(distinctRecipes)
                         }
+                        is NetworkResult.Error -> {
+                            Toast.makeText(requireContext(), result.message, Toast.LENGTH_SHORT).show()
+                            hideLoading()
+                        }
+                        is NetworkResult.Loading -> showLoading()
                     }
                 }
             }
             .addOnFailureListener {
                 hideLoading()
-                Toast.makeText(requireContext(),
-                    getString(R.string.error_en_cargar_las_recetas_guardadas), Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireContext(), getString(R.string.error_en_cargar_las_recetas_guardadas), Toast.LENGTH_SHORT).show()
             }
     }
+
 
 
     private fun showLoading() {
@@ -428,13 +420,23 @@ class SavedRecipesFragment : Fragment(R.layout.fragment_saved_recipes) {
             recipesList.clear()
             requestSavedRecipes()
             updateFilterIndicatorsVisibility(false)
+
+            updateFilterIndicatorsVisibility(false)
+            binding.tvNoFilteredRecipes.visibility = View.GONE
+
         }
     }
 
     private fun updateFilterIndicatorsVisibility(filtersApplied: Boolean) {
-        binding.filterCountSavedRecipe.visibility = if (filtersApplied) View.VISIBLE else View.GONE
-        binding.btnClearFiltersSavedRecipe.visibility = if (filtersApplied) View.VISIBLE else View.GONE
+        binding.filterCountSavedRecipe.animate().alpha(if (filtersApplied) 1f else 0f).setDuration(200).withEndAction {
+            binding.filterCountSavedRecipe.visibility = if (filtersApplied) View.VISIBLE else View.GONE
+        }
+
+        binding.btnClearFiltersSavedRecipe.animate().alpha(if (filtersApplied) 1f else 0f).setDuration(200).withEndAction {
+            binding.btnClearFiltersSavedRecipe.visibility = if (filtersApplied) View.VISIBLE else View.GONE
+        }
     }
+
 
     private fun updateFilterCountRecipe(count: Int) {
         binding.filterCountSavedRecipe.text = count.toString()
@@ -477,8 +479,19 @@ class SavedRecipesFragment : Fragment(R.layout.fragment_saved_recipes) {
 
     override fun onResume() {
         super.onResume()
+
+        // Restaurar la pestaña seleccionada
         binding.tabSelectorSavedRecipe.selectTab(binding.tabSelectorSavedRecipe.getTabAt(1))
+
+        // Volver a mostrar filtros activos (si había)
+        val appliedFilterCount = calculateAppliedFilterCount()
+        updateFilterCountRecipe(appliedFilterCount)
+        updateFilterIndicatorsVisibility(appliedFilterCount > 0)
+
+        // Refrescar recetas guardadas con filtros activos
+        requestSavedRecipes()
     }
+
 
     override fun onDestroyView() {
         super.onDestroyView()

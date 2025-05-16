@@ -48,6 +48,18 @@
         android:id="@+id/recipesFragment"
         android:name="com.example.smartfreezer.navigation.RecipesFragment"
         android:label="Recetas">
+
+        <argument
+            android:name="FILTER_DIET_NOTIFICATION"
+            app:argType="string"
+            app:nullable="true"
+            android:defaultValue="@null" />
+
+        <argument
+            android:name="RECIPE_ID"
+            app:argType="string" app:nullable="true"
+            android:defaultValue="@null" />
+
         <action
             android:id="@+id/action_recipesFragment_to_recipeDetailsFragment"
             app:destination="@id/recipeDetailsFragment" />

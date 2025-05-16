@@ -3,6 +3,7 @@ package com.example.smartfreezer
 import android.content.Intent
 import android.content.res.Configuration
 import android.os.Bundle
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatDelegate
 import com.example.smartfreezer.databinding.ActivitySettingsBinding
 import com.example.smartfreezer.util.LocaleHelper
@@ -10,6 +11,7 @@ import com.example.smartfreezer.util.SharedPrefManager
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.messaging.FirebaseMessaging
 
 class SettingsActivity : BaseActivity() {
 
@@ -54,9 +56,27 @@ class SettingsActivity : BaseActivity() {
 
         binding.notificationsSwitch.setOnCheckedChangeListener { _, isChecked ->
             sharedPrefManager.setNotificationStatus(isChecked)
-            // Aquí podrías activar/desactivar notificaciones push si usas FCM
+
+            if (isChecked) {
+                FirebaseMessaging.getInstance().subscribeToTopic("all")
+                    .addOnCompleteListener { task ->
+                        if (task.isSuccessful) {
+                            Toast.makeText(this,
+                                getString(R.string.notificaciones_activadas), Toast.LENGTH_SHORT).show()
+                        }
+                    }
+            } else {
+                FirebaseMessaging.getInstance().unsubscribeFromTopic("all")
+                    .addOnCompleteListener { task ->
+                        if (task.isSuccessful) {
+                            Toast.makeText(this,
+                                getString(R.string.notificaciones_desactivadas), Toast.LENGTH_SHORT).show()
+                        }
+                    }
+            }
         }
     }
+
 
     private fun setupDarkModeSwitch() {
         // Configurar el switch según el modo actual

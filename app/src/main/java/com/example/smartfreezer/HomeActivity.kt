@@ -2,11 +2,13 @@ package com.example.smartfreezer
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import com.example.smartfreezer.databinding.ActivityHomeBinding
+import com.example.smartfreezer.navigation.RecipesFragmentDirections
 import com.example.smartfreezer.util.OnInventoryTabSelectedListener
 import com.example.smartfreezer.util.OnRecipeTabSelectedListener
 import com.example.smartfreezer.util.SharedPrefManager
@@ -94,8 +96,54 @@ class HomeActivity : BaseActivity(), OnRecipeTabSelectedListener, OnInventoryTab
             }
         }
 
-
+        handleIntentExtras(intent)
     }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        intent.let {
+            handleIntentExtras(it)
+        }
+    }
+    // En HomeActivity.kt, dentro de handleIntentExtras
+    private fun handleIntentExtras(intent: Intent) {
+        val filterDiet = intent.getStringExtra("FILTER_DIET") // Coincide con la clave de MyFirebaseMessagingService
+        val recipeIdString = intent.getStringExtra("RECIPE_ID") // Coincide con la clave de MyFirebaseMessagingService
+
+        var navigated = false
+        if (recipeIdString != null) {
+            try {
+                val recipeId = recipeIdString.toInt()
+                val bundle = Bundle().apply {
+                    putString("RECIPE_ID", recipeIdString) // Argumento para RecipesFragment o RecipeDetailsFragment
+                    if (filterDiet != null) {
+                        putString("FILTER_DIET_NOTIFICATION", filterDiet) // Argumento para RecipesFragment
+                    }
+                }
+                // Decide si navegar a detalles directamente o a RecipesFragment con el ID
+                // Esto depende de tu nav_graph y la acción disponible.
+                // Por ejemplo, para ir a RecipesFragment y que él decida:
+                navController.navigate(R.id.recipesFragment, bundle)
+                navigated = true
+            } catch (e: NumberFormatException) {
+                Log.e("HomeActivity", "Invalid recipeId from intent: $recipeIdString")
+            }
+        }
+
+        if (!navigated && filterDiet != null) { // Si no hubo recipeId o fue inválido, pero hay filtro de dieta
+            val bundle = Bundle().apply {
+                putString("FILTER_DIET_NOTIFICATION", filterDiet)
+            }
+            navController.navigate(R.id.recipesFragment, bundle)
+            navigated = true
+        }
+
+        // Limpiar extras para evitar reprocesamiento
+        if (intent.hasExtra("RECIPE_ID")) intent.removeExtra("RECIPE_ID")
+        if (intent.hasExtra("FILTER_DIET")) intent.removeExtra("FILTER_DIET")
+    }
+
+
     private fun applyLocale() {
         val sharedPrefManager = SharedPrefManager(this)
         val languageCode = sharedPrefManager.getAppLanguage()

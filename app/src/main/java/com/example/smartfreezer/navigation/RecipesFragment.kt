@@ -9,7 +9,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
+import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -39,10 +39,47 @@ class RecipesFragment : Fragment(R.layout.fragment_recipes) {
     private val binding get() = _binding!!
     private var tabSelectedListener: OnRecipeTabSelectedListener? = null
     private val recipesAdapter by lazy { RecipesAdapter() }
-    private val recipesViewModel: RecipesViewModel by viewModels()
+    private val recipesViewModel: RecipesViewModel by activityViewModels()
     private val firestore = FirebaseFirestore.getInstance()
 
+    private var notificationFilterDiet: String? = null
+    private var notificationRecipeId: String? = null
+
+    private var isObserverSet = false
+
+
     private var recipesList = mutableListOf<Result>()
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        // Recuperar argumentos pasados por Navigation Component
+        // Opción 1: Usando by navArgs() (recomendado si usas safe-args)
+        // Primero define los argumentos en tu nav_graph.xml para RecipesFragment:
+        // <argument
+        // android:name="FILTER_DIET_NOTIFICATION"
+        // app:argType="string"
+        // app:nullable="true"
+        // android:defaultValue="@null" />
+        // <argument
+        // android:name="RECIPE_ID"
+        // app:argType="string" // O int si lo prefieres y lo conviertes antes
+        // app:nullable="true"
+        // android:defaultValue="@null" />
+        // val args: RecipesFragmentArgs by navArgs()
+        // notificationFilterDiet = args.FILTERDIETNOTIFICATION
+        // notificationRecipeId = args.RECIPEID
+
+        // Opción 2: Manualmente si no usas safe-args
+        arguments?.let {
+            notificationFilterDiet = it.getString("FILTER_DIET_NOTIFICATION")
+            notificationRecipeId = it.getString("RECIPE_ID")
+            // Es importante removerlos o marcarlos como procesados si no quieres
+            // que se reapliquen en cada recreación del fragmento sin una nueva navegación.
+            // Sin embargo, con Navigation Component, los argumentos persisten mientras el fragmento
+            // esté en el backstack. Si se navega de nuevo con nuevos args, se actualizan.
+            // arguments?.remove("FILTER_DIET_NOTIFICATION") // Podría ser necesario si quieres que solo se aplique una vez
+        }
+    }
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -69,6 +106,20 @@ class RecipesFragment : Fragment(R.layout.fragment_recipes) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        // Aplicar filtros o navegar a detalles si vienen de una notificación
+        handleNotificationArguments()
+
+        // Si no vienes de una notificación con filtros, o después de aplicarlos:
+        if (notificationFilterDiet == null && notificationRecipeId == null) {
+            if (recipesViewModel.selectedType.isEmpty() && recipesViewModel.selectedDiet.isEmpty()) {
+                binding.filterCountRecipe.visibility = View.GONE
+                binding.btnClearFilters.visibility = View.GONE
+            } else {
+                binding.filterCountRecipe.visibility = View.VISIBLE
+                binding.btnClearFilters.visibility = View.VISIBLE
+            }
+        }
+
         binding.btnAccountRecipe.setOnClickListener {
             val intent = Intent(requireContext(), ProfileActivity::class.java)
             startActivity(intent)
@@ -91,13 +142,6 @@ class RecipesFragment : Fragment(R.layout.fragment_recipes) {
             binding.btnClearFilters.visibility = View.VISIBLE
         }
 
-        // Aquí, debes hacer la consulta a la API solo si no hay datos previos
-        if (recipesViewModel.recipesResponse.value == null) {
-            recipesViewModel.getRecipes(recipesViewModel.applyQueries())
-        }
-
-
-
         setupTabLayout()
         setupGreeting()
         setupRecyclerView()
@@ -108,6 +152,56 @@ class RecipesFragment : Fragment(R.layout.fragment_recipes) {
 
          // Inicialmente, no hay filtros aplicados
         requestApiData()
+    }
+
+    private fun handleNotificationArguments() {
+        var handled = false
+        if (notificationRecipeId != null) {
+            try {
+                val recipeIdInt = notificationRecipeId!!.toInt()
+                // Navegar a detalles de la receta
+                val action = RecipesFragmentDirections.actionRecipesFragmentToRecipeDetailsFragment(recipeIdInt)
+                findNavController().navigate(action)
+                // Marcar como manejado y limpiar para que no se procese de nuevo al volver atrás.
+                notificationRecipeId = null
+                arguments?.remove("RECIPE_ID") // Para evitar reprocesar al volver
+                handled = true
+            } catch (e: NumberFormatException) {
+                Log.e("RecipesFragment", "Invalid recipeId from notification: $notificationRecipeId")
+                notificationRecipeId = null // Limpiar para no reintentar
+                arguments?.remove("RECIPE_ID")
+            }
+        }
+
+        // Si no se navegó a detalles y hay un filtro de dieta
+        if (!handled && notificationFilterDiet != null) {
+            Log.d("RecipesFragment", "Applying filter from notification: $notificationFilterDiet")
+            // Aplicar el filtro de dieta al ViewModel
+            // Asumiendo que selectedDiet en tu ViewModel es la string como "vegan", "vegetarian", etc.
+            recipesViewModel.updateFilters(
+                type = recipesViewModel.selectedType, // Mantener otros filtros si existen
+                diet = notificationFilterDiet!!,
+                rating = recipesViewModel.selectedRating,
+                ingredients = recipesViewModel.selectedIngredients
+            )
+
+            // Actualizar UI de filtros
+            val appliedFilterCount = calculateAppliedFilterCount()
+            updateFilterCountRecipe(appliedFilterCount)
+            updateFilterIndicatorsVisibility(appliedFilterCount > 0)
+
+            recipesList.clear() // Limpiar lista actual antes de nueva petición con filtro
+            requestApiData()
+            // Marcar como manejado y limpiar para que no se procese de nuevo al volver atrás.
+            notificationFilterDiet = null
+            arguments?.remove("FILTER_DIET_NOTIFICATION") // Para evitar reprocesar al volver
+            handled = true
+        }
+
+        // Si no se manejó nada desde la notificación, cargar datos como de costumbre
+        if (!handled) {
+            requestApiData()
+        }
     }
 
     private fun setupTabLayout() {
@@ -250,7 +344,10 @@ class RecipesFragment : Fragment(R.layout.fragment_recipes) {
             recipesViewModel.resetOffset()
             recipesList.clear()
             requestApiData()
-            updateFilterIndicatorsVisibility(false) // Al refrescar, no hay filtros
+            val appliedFilterCount = calculateAppliedFilterCount()
+            updateFilterCountRecipe(appliedFilterCount)
+            updateFilterIndicatorsVisibility(appliedFilterCount > 0)
+
         }
     }
 
@@ -262,40 +359,44 @@ class RecipesFragment : Fragment(R.layout.fragment_recipes) {
     }
 
     private fun requestApiData(isLoadMore: Boolean = false) {
-        recipesViewModel.getRecipes(recipesViewModel.applyQueries())
+        if (!isObserverSet) {
+            recipesViewModel.recipesResponse.observe(viewLifecycleOwner) { result ->
+                when (result) {
+                    is NetworkResult.Success -> {
+                        binding.shimmerLayout.stopShimmer()
+                        binding.shimmerLayout.visibility = View.GONE
+                        binding.recipesRecyclerView.visibility = View.VISIBLE
+                        binding.swipeRefreshLayout.isRefreshing = false
 
-        recipesViewModel.recipesResponse.observe(viewLifecycleOwner) { result ->
-            when (result) {
-                is NetworkResult.Success -> {
-                    binding.shimmerLayout.stopShimmer()
-                    binding.shimmerLayout.visibility = View.GONE
-                    binding.recipesRecyclerView.visibility = View.VISIBLE
-                    binding.swipeRefreshLayout.isRefreshing = false
-
-                    result.data?.let { newRecipes ->
-                        if (!isLoadMore) {
-                            recipesList.clear()
+                        result.data?.let { newRecipes ->
+                            if (!isLoadMore) {
+                                recipesList.clear()
+                            }
+                            recipesList.addAll(newRecipes)
+                            recipesAdapter.setData(recipesList)
                         }
-                        recipesList.addAll(newRecipes)
-                        recipesAdapter.setData(recipesList)
+                    }
+
+                    is NetworkResult.Error -> {
+                        binding.shimmerLayout.stopShimmer()
+                        binding.shimmerLayout.visibility = View.GONE
+                        binding.recipesRecyclerView.visibility = View.GONE
+                        binding.swipeRefreshLayout.isRefreshing = false
+                    }
+
+                    is NetworkResult.Loading -> {
+                        binding.shimmerLayout.startShimmer()
+                        binding.shimmerLayout.visibility = View.VISIBLE
+                        binding.recipesRecyclerView.visibility = View.GONE
                     }
                 }
-
-                is NetworkResult.Error -> {
-                    binding.shimmerLayout.stopShimmer()
-                    binding.shimmerLayout.visibility = View.GONE
-                    binding.recipesRecyclerView.visibility = View.GONE
-                    binding.swipeRefreshLayout.isRefreshing = false
-                }
-
-                is NetworkResult.Loading -> {
-                    binding.shimmerLayout.startShimmer()
-                    binding.shimmerLayout.visibility = View.VISIBLE
-                    binding.recipesRecyclerView.visibility = View.GONE
-                }
             }
+            isObserverSet = true
         }
+
+        recipesViewModel.getRecipes(recipesViewModel.applyQueries())
     }
+
 
     private fun setupFilterButton() {
         binding.btnFilterRecipes.setOnClickListener {
@@ -409,9 +510,15 @@ class RecipesFragment : Fragment(R.layout.fragment_recipes) {
     }
 
     private fun updateFilterIndicatorsVisibility(filtersApplied: Boolean) {
-        binding.filterCountRecipe.visibility = if (filtersApplied) View.VISIBLE else View.GONE
-        binding.btnClearFilters.visibility = if (filtersApplied) View.VISIBLE else View.GONE
+        binding.filterCountRecipe.animate().alpha(if (filtersApplied) 1f else 0f).setDuration(200).withEndAction {
+            binding.filterCountRecipe.visibility = if (filtersApplied) View.VISIBLE else View.GONE
+        }
+
+        binding.btnClearFilters.animate().alpha(if (filtersApplied) 1f else 0f).setDuration(200).withEndAction {
+            binding.btnClearFilters.visibility = if (filtersApplied) View.VISIBLE else View.GONE
+        }
     }
+
 
     private fun updateFilterCountRecipe(count: Int) {
         binding.filterCountRecipe.text = count.toString()
@@ -427,7 +534,16 @@ class RecipesFragment : Fragment(R.layout.fragment_recipes) {
 
     override fun onResume() {
         super.onResume()
+        // Restaurar la pestaña seleccionada
         binding.tabSelectorRecipe.selectTab(binding.tabSelectorRecipe.getTabAt(0))
+
+        // Volver a mostrar filtros activos (si había)
+        val appliedFilterCount = calculateAppliedFilterCount()
+        updateFilterCountRecipe(appliedFilterCount)
+        updateFilterIndicatorsVisibility(appliedFilterCount > 0)
+
+        // Refrescar recetas guardadas con filtros activos
+        requestApiData()
 
 
     }

@@ -189,6 +189,20 @@
             tools:listitem="@layout/recipes_row_layout" />
 
         <TextView
+            android:id="@+id/tvNoFilteredRecipes"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:drawablePadding="8dp"
+            android:gravity="center"
+            android:padding="16dp"
+            android:text="@string/no_filtered_saved_recipes"
+            android:textAppearance="?attr/textAppearanceBody1"
+            android:textColor="@android:color/darker_gray"
+            android:visibility="gone" />
+
+
+        <TextView
             android:id="@+id/tvEmptySavedRecipes"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -200,19 +214,6 @@
             android:layout_gravity="center"
             android:visibility="gone"/>
     </FrameLayout>
-
-    <TextView
-        android:id="@+id/tvEmpty"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/no_saved_recipes_found"
-        android:textColor="?attr/colorTextPrimary"
-        android:textSize="18sp"
-        android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/filterButtonContainerSavedRecipe"/>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/btnClearSavedRecipes"

@@ -42,6 +42,11 @@ class RegisterActivity : BaseActivity() {
         val registerButton = findViewById<MaterialButton>(R.id.registerButton)
         val loginRedirect = findViewById<TextView>(R.id.loginRedirect)
 
+
+        acceptTermsCheckBox.setOnClickListener {
+            startActivity(Intent(this, TermsActivity::class.java))
+        }
+
         loginRedirect.setOnClickListener {
             startActivity(Intent(this, LoginActivity::class.java))
             finish()
@@ -188,7 +193,7 @@ class RegisterActivity : BaseActivity() {
             userRef.set(hashMapOf(
                 "name" to name,
                 "email" to email,
-                "verified" to false
+                "verified" to true
             ))
 
             auth.signOut()

@@ -2,7 +2,8 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
-    id("com.google.gms.google-services") // Agrega esta línea firebase config
+    id("com.google.gms.google-services")
+    id("com.google.firebase.crashlytics")
     id("androidx.navigation.safeargs.kotlin")
     id("com.google.dagger.hilt.android")
     id ("kotlin-kapt")
@@ -47,15 +48,25 @@ android {
 }
 
 dependencies {
-    implementation("com.google.code.gson:gson:2.8.8")
+    implementation("com.google.code.gson:gson:2.10.1")
+
     // Importa la BoM de Firebase para gestionar versiones automáticamente
-    implementation(platform("com.google.firebase:firebase-bom:33.12.0"))
+    implementation(platform("com.google.firebase:firebase-bom:33.13.0"))
+
+    // Dependencia de Firebase Crashlytics
+    implementation ("com.google.firebase:firebase-crashlytics-ktx")
+
+    //Firebase Analytics para obtener más contexto en los informes de Crashlytics
+    implementation ("com.google.firebase:firebase-analytics-ktx")
+
     // Servicios de Firebase (autenticación y Firestore)
     implementation("com.google.firebase:firebase-auth")
     implementation("com.google.firebase:firebase-firestore")
+    implementation ("com.google.firebase:firebase-messaging:24.1.1")
+
     // Also add the dependencies for the Credential Manager libraries and specify their versions
-    implementation("androidx.credentials:credentials:1.3.0")
-    implementation("androidx.credentials:credentials-play-services-auth:1.3.0")
+    implementation("androidx.credentials:credentials:1.5.0")
+    implementation("androidx.credentials:credentials-play-services-auth:1.5.0")
     implementation("com.google.android.libraries.identity.googleid:googleid:1.1.1")
     //Menu SmoothBottomBar
     implementation("com.github.ibrahimsn98:SmoothBottomBar:1.7.9")
@@ -70,8 +81,8 @@ dependencies {
     implementation ("androidx.lifecycle:lifecycle-viewmodel-ktx")
     implementation ("androidx.lifecycle:lifecycle-livedata-ktx")
     implementation ("androidx.lifecycle:lifecycle-extensions:2.2.0")
-    implementation ("androidx.hilt:hilt-common:1.1.0")
-    implementation ("androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.2")
+    implementation ("androidx.hilt:hilt-common:1.2.0")
+    implementation ("androidx.lifecycle:lifecycle-viewmodel-ktx:2.9.0")
 
     //Grafico
     implementation ("com.github.PhilJay:MPAndroidChart:v3.1.0")
@@ -85,6 +96,7 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
     // Hilt
     implementation("com.google.dagger:hilt-android:2.56.1")
+    implementation(libs.firebase.datatransport)
     kapt ("com.google.dagger:hilt-android-compiler:2.56.1")
     //Cargar imagen
     implementation("io.coil-kt:coil:2.4.0")
@@ -102,6 +114,9 @@ dependencies {
 
     implementation ("org.pytorch:pytorch_android:1.12.1")
     implementation ("org.pytorch:pytorch_android_torchvision:1.12.1")
+
+    //Timber
+    implementation ("com.jakewharton.timber:timber:5.0.1")
 
     implementation ("com.microsoft.onnxruntime:onnxruntime-android:1.15.1")
     implementation(libs.androidx.core.ktx)

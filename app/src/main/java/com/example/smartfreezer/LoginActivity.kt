@@ -5,26 +5,34 @@ import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
-import android.view.View
+import android.util.Log
 import android.widget.TextView
 import android.widget.Toast
 import androidx.core.content.ContextCompat
+import com.example.smartfreezer.models.User
+import com.example.smartfreezer.util.FCMTopicManager
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.checkbox.MaterialCheckBox
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
+import com.google.firebase.messaging.FirebaseMessaging
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
 import com.google.firebase.auth.FirebaseAuthInvalidUserException
+import com.google.firebase.firestore.FirebaseFirestore
+import kotlin.jvm.java
+
 
 class LoginActivity : BaseActivity() {
 
     private lateinit var auth: FirebaseAuth
     private lateinit var sharedPreferences: SharedPreferences
 
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
+        loadUserAndSubscribeToTopics()
 
         auth = FirebaseAuth.getInstance()
         sharedPreferences = getSharedPreferences("login_prefs", Context.MODE_PRIVATE)
@@ -117,6 +125,29 @@ class LoginActivity : BaseActivity() {
                 passwordInputLayout.endIconMode = TextInputLayout.END_ICON_PASSWORD_TOGGLE
             }
         }
+
+        //Obtener el token FCM
+        FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
+            if (task.isSuccessful) {
+                val token = task.result
+                // Puedes guardarlo en Firestore o loguearlo
+                println("FCM Token: $token")
+            }
+        }
+    }
+    private fun loadUserAndSubscribeToTopics() {
+        val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return
+
+        FirebaseFirestore.getInstance().collection("users")
+            .document(userId)
+            .get()
+            .addOnSuccessListener { document ->
+                val user = document.toObject(User::class.java) ?: return@addOnSuccessListener
+                FCMTopicManager.subscribeToDietTopics(user)
+            }
+            .addOnFailureListener { e ->
+                Log.e("HomeActivity", "Error loading user preferences", e)
+            }
     }
 
     private fun showForgotPasswordDialog() {
@@ -152,4 +183,6 @@ class LoginActivity : BaseActivity() {
         toast.view?.setBackgroundColor(ContextCompat.getColor(this, R.color.error))
         toast.show()
     }
+
+
 }
