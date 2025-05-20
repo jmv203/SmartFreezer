@@ -120,9 +120,7 @@ class HomeActivity : BaseActivity(), OnRecipeTabSelectedListener, OnInventoryTab
                         putString("FILTER_DIET_NOTIFICATION", filterDiet) // Argumento para RecipesFragment
                     }
                 }
-                // Decide si navegar a detalles directamente o a RecipesFragment con el ID
-                // Esto depende de tu nav_graph y la acción disponible.
-                // Por ejemplo, para ir a RecipesFragment y que él decida:
+
                 navController.navigate(R.id.recipesFragment, bundle)
                 navigated = true
             } catch (e: NumberFormatException) {

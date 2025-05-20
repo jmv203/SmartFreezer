@@ -180,7 +180,7 @@ class ScannerFragment : Fragment() {
 
     private fun processImage(bitmap: Bitmap) {
         try {
-            // (Tu lógica de preprocesamiento de imagen y ONNX ...)
+
             val resized = Bitmap.createScaledBitmap(bitmap, 416, 416, true)
             val bufferSize = 3 * 416 * 416
             val inputBuffer = FloatBuffer.allocate(bufferSize)
@@ -213,8 +213,6 @@ class ScannerFragment : Fragment() {
                 }
 
 
-                Log.d("ScannerDebug", "Detecciones encontradas (después de umbral ${confidenceThreshold}): ${detections.size}")
-
                 if (detections.isNotEmpty()) {
                     val bitmapWithDetections = showDetectionsOnImage(bitmap, detections) // Devuelve el bitmap con las cajas
                     updateScannedImageDisplay(bitmapWithDetections) // Muestra la imagen con las detecciones
@@ -227,17 +225,16 @@ class ScannerFragment : Fragment() {
                 }
 
             } ?: run {
-                Log.e("ScannerDebug", "La sesión ORT es nula o la inferencia falló")
                 updateTextStatus(getString(R.string.fallo_en_la_inferencia_del_modelo), false)
                 showError(getString(R.string.fallo_en_la_inferencia_del_modelo)) // Dialogo de error
             }
-            inputTensor.close()
+            inputTensor.close() // Cerrar tensor para liberar recursos
 
         } catch (e: Exception) {
             updateTextStatus(getString(R.string.error_al_procesar_la_imagen), false)
             showError(getString(R.string.error_al_procesar_imagen, e.message)) // Dialogo de error
             // Considerar resetear la imagen a la original o al placeholder en caso de error grave
-            updateScannedImageDisplay(bitmap) // O updateScannedImageDisplay(null)
+            updateScannedImageDisplay(bitmap)
         } finally {
             // Asegurar que el progressBar se oculte si alguna ruta no lo hizo
             if (binding.progressBar.visibility == View.VISIBLE) {

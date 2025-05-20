@@ -52,32 +52,10 @@ class RecipesFragment : Fragment(R.layout.fragment_recipes) {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        // Recuperar argumentos pasados por Navigation Component
-        // Opción 1: Usando by navArgs() (recomendado si usas safe-args)
-        // Primero define los argumentos en tu nav_graph.xml para RecipesFragment:
-        // <argument
-        // android:name="FILTER_DIET_NOTIFICATION"
-        // app:argType="string"
-        // app:nullable="true"
-        // android:defaultValue="@null" />
-        // <argument
-        // android:name="RECIPE_ID"
-        // app:argType="string" // O int si lo prefieres y lo conviertes antes
-        // app:nullable="true"
-        // android:defaultValue="@null" />
-        // val args: RecipesFragmentArgs by navArgs()
-        // notificationFilterDiet = args.FILTERDIETNOTIFICATION
-        // notificationRecipeId = args.RECIPEID
 
-        // Opción 2: Manualmente si no usas safe-args
         arguments?.let {
             notificationFilterDiet = it.getString("FILTER_DIET_NOTIFICATION")
             notificationRecipeId = it.getString("RECIPE_ID")
-            // Es importante removerlos o marcarlos como procesados si no quieres
-            // que se reapliquen en cada recreación del fragmento sin una nueva navegación.
-            // Sin embargo, con Navigation Component, los argumentos persisten mientras el fragmento
-            // esté en el backstack. Si se navega de nuevo con nuevos args, se actualizan.
-            // arguments?.remove("FILTER_DIET_NOTIFICATION") // Podría ser necesario si quieres que solo se aplique una vez
         }
     }
 

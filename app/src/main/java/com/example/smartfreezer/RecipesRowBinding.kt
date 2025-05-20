@@ -33,10 +33,10 @@ class RecipesRowBinding {
                 val dotIndex = it.lastIndexOf(".")
 
                 if (lastSlashIndex != -1 && dotIndex != -1 && dotIndex > lastSlashIndex) {
-                    val name = it.substring(lastSlashIndex + 1, dotIndex) // e.g. "1697885-312x231"
-                    val extension = it.substring(dotIndex + 1)             // e.g. "jpg"
+                    val name = it.substring(lastSlashIndex + 1, dotIndex)
+                    val extension = it.substring(dotIndex + 1)
 
-                    val id = name.substringBefore("-")                    // e.g. "1697885"
+                    val id = name.substringBefore("-")
                     val newUrl = "https://img.spoonacular.com/recipes/${id}-556x370.${extension}"
 
                     imageView.load(newUrl) {

@@ -43,8 +43,7 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
 
     override fun onNewToken(token: String) {
         Log.d(TAG, "Refreshed token: $token")
-        // Si es necesario, envía este token a tu servidor de aplicaciones.
-        // sendRegistrationToServer(token)
+
     }
 
     private fun sendNotification(

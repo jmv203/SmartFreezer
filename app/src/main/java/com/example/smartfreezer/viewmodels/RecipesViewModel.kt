@@ -84,7 +84,7 @@ class RecipesViewModel @Inject constructor(
         viewModelScope.launch {
             if (hasInternetConnection()) {
                 try {
-                    val response = foodRecipesApi.getRecipeDetails(recipeId, API_KEY, true) // Include nutrition
+                    val response = foodRecipesApi.getRecipeDetails(recipeId, API_KEY, true)
                     _recipeDetailsResponse.value = handleRecipeDetailsResponse(response)
                 } catch (e: Exception) {
                     _recipeDetailsResponse.value = NetworkResult.Error("Error: ${e.message}")

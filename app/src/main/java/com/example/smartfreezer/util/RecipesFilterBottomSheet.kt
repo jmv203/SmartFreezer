@@ -38,7 +38,7 @@ class RecipesFilterBottomSheet(
 
         setupRecyclerView()
         loadUserIngredients()
-        setupChipListeners() // Nueva función para configurar los listeners de los ChipGroup
+        setupChipListeners() // Función para configurar los listeners de los ChipGroup
 
         binding.btnApplyFilters.setOnClickListener {
             onApplyFilters(selectedType, selectedDiet, selectedIngredientIcons, selectedRating)
@@ -92,7 +92,7 @@ class RecipesFilterBottomSheet(
                 userIngredientsAdapter.setIngredients(ingredients)
             }
             .addOnFailureListener {
-                // Handle error
+
             }
     }
 

@@ -126,7 +126,6 @@ class RegisterActivity : BaseActivity() {
             }
 
             if (isValid) {
-                showProgressDialog()
                 auth.createUserWithEmailAndPassword(email, password)
                     .addOnCompleteListener(this) { task ->
                         if (task.isSuccessful) {
@@ -140,10 +139,8 @@ class RegisterActivity : BaseActivity() {
                                         user.delete()
                                         showErrorToast(getString(R.string.register_verification_error, verifyTask.exception?.message))
                                     }
-                                    dismissProgressDialog()
                                 }
                         } else {
-                            dismissProgressDialog()
                             when (task.exception) {
                                 is FirebaseAuthUserCollisionException -> {
                                     showErrorToast(getString(R.string.error_email_already_exists))
@@ -219,11 +216,5 @@ class RegisterActivity : BaseActivity() {
         toast.show()
     }
 
-    private fun showProgressDialog() {
-        // Implementa tu diálogo de progreso aquí
-    }
 
-    private fun dismissProgressDialog() {
-        // Implementa el cierre del diálogo de progreso aquí
-    }
 }
