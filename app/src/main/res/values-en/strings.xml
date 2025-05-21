@@ -126,7 +126,7 @@
     <string name="recetas_guardadas">Saved recipes</string>
     <string name="refresh">Refresh</string>
     <string name="recetas_favoritas">Favorite recipes</string>
-    <string name="no_se_pudieron_cargar_tus_recetas_guardadas_ndesliza_hacia_abajo_para_actualizar">Could not load your saved recipes.\nSwipe down to refresh.</string>
+    <string name="no_se_pudieron_cargar_tus_recetas_guardadas_ndesliza_hacia_abajo_para_actualizar">You do not have any saved recipe yet</string>
     <string name="no_saved_recipes_found">No saved recipes found</string>
     <string name="clear_saved_recipes">Clear Saved Recipes</string>
     <string name="seleccione_categor_a">Select category</string>
@@ -447,5 +447,12 @@
     <string name="notificaciones_activadas">Notifications activated</string>
     <string name="notificaciones_desactivadas">Notifications disabled</string>
 
+    <string name="a_adir_lista_al_inventario">Add list to inventory</string>
+    <string name="productos_a_adidos_al_inventario">Products added to inventory</string>
+    <string name="error_al_a_adir_productos">Error adding products</string>
+    <string name="la_lista_de_compras_est_vac_a">The shopping list is empty</string>
+    <string name="deseas_a_adir_todos_los_productos_comprados_al_inventario">Do you want to add all purchased products to the inventory?</string>
+
+    <string name="lista_de_compra_vacia">There are no products in your shopping list\nStart adding products!</string>
 
 </resources>

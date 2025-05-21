@@ -28,8 +28,10 @@ import com.example.smartfreezer.util.OnRecipeTabSelectedListener
 import com.example.smartfreezer.viewmodels.RecipesViewModel
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.toObject
+import com.google.firebase.perf.FirebasePerformance
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -337,6 +339,8 @@ class RecipesFragment : Fragment(R.layout.fragment_recipes) {
     }
 
     private fun requestApiData(isLoadMore: Boolean = false) {
+        val trace = FirebasePerformance.getInstance().newTrace("load_recipes")
+        trace.start()
         if (!isObserverSet) {
             recipesViewModel.recipesResponse.observe(viewLifecycleOwner) { result ->
                 when (result) {
@@ -353,6 +357,9 @@ class RecipesFragment : Fragment(R.layout.fragment_recipes) {
                             recipesList.addAll(newRecipes)
                             recipesAdapter.setData(recipesList)
                         }
+
+                        trace.incrementMetric("recipes_loaded", recipesList.size.toLong())
+                        trace.stop()
                     }
 
                     is NetworkResult.Error -> {
@@ -360,6 +367,10 @@ class RecipesFragment : Fragment(R.layout.fragment_recipes) {
                         binding.shimmerLayout.visibility = View.GONE
                         binding.recipesRecyclerView.visibility = View.GONE
                         binding.swipeRefreshLayout.isRefreshing = false
+                        trace.putAttribute("error", result.message ?: "unknown")
+                        trace.stop()
+                        // Reportar error no fatal a Crashlytics
+                        FirebaseCrashlytics.getInstance().log("Error loading recipes: ${result.message}")
                     }
 
                     is NetworkResult.Loading -> {

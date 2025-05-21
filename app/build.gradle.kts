@@ -4,6 +4,7 @@ plugins {
     alias(libs.plugins.kotlin.compose)
     id("com.google.gms.google-services")
     id("com.google.firebase.crashlytics")
+    id("com.google.firebase.firebase-perf")
     id("androidx.navigation.safeargs.kotlin")
     id("com.google.dagger.hilt.android")
     id ("kotlin-kapt")
@@ -19,7 +20,7 @@ android {
         minSdk = 24
         targetSdk = 35
         versionCode = 1
-        versionName = "1.0"
+        versionName = "1.1"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -53,8 +54,9 @@ dependencies {
     // Importa la BoM de Firebase para gestionar versiones automáticamente
     implementation(platform("com.google.firebase:firebase-bom:33.13.0"))
 
-    // Dependencia de Firebase Crashlytics
+    // Dependencia de Firebase Crashlytics y Performance Monitoring
     implementation ("com.google.firebase:firebase-crashlytics-ktx")
+    implementation("com.google.firebase:firebase-perf")
 
     //Firebase Analytics para obtener más contexto en los informes de Crashlytics
     implementation ("com.google.firebase:firebase-analytics-ktx")

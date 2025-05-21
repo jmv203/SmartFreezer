@@ -4,7 +4,6 @@ import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -234,69 +233,72 @@ class SavedRecipesFragment : Fragment(R.layout.fragment_saved_recipes) {
                 }
             }
     }
-
-    private fun requestSavedRecipes() {
-        showLoading()
-
+    private fun checkFirestoreEmptyState(onNonEmpty: (List<Int>) -> Unit) {
         val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return
-
         FirebaseFirestore.getInstance()
             .collection("users")
             .document(userId)
             .collection("savedRecipes")
             .get()
             .addOnSuccessListener { snapshot ->
-                if (_binding == null) return@addOnSuccessListener
-
-                val savedIds = snapshot.documents.mapNotNull {
-                    it.getLong("recipeId")?.toInt()
-                }
-
-                if (savedIds.isEmpty()) {
+                val ids = snapshot.documents
+                    .mapNotNull { it.getLong("recipeId")?.toInt() }
+                if (ids.isEmpty()) {
+                    // Si no hay recetas guardadas
+                    val topDrawable = ContextCompat.getDrawable(requireContext(), R.drawable.ic_empty_box)
+                    topDrawable?.setBounds(0, 0, 128, 128)
+                    binding.tvEmptySavedRecipes.setCompoundDrawables(null, topDrawable, null, null)
+                    binding.tvEmptySavedRecipes.visibility = View.VISIBLE
+                    binding.tvNoFilteredRecipes.visibility = View.GONE
                     hideLoading()
-                    savedRecipeAdapter.setData(emptyList())
-                    return@addOnSuccessListener
-                }
-
-                val queries = recipesViewModel.applyQueries()
-                recipesViewModel.getRecipes(queries)
-
-                recipesViewModel.recipesResponse.observe(viewLifecycleOwner) { result ->
-                    if (_binding == null) return@observe
-
-                    when (result) {
-                        is NetworkResult.Success -> {
-                            val filtered = result.data?.filter { it.id in savedIds } ?: emptyList()
-                            savedRecipeAdapter.setData(filtered)
-                            if (filtered.isEmpty()) {
-                                val topDrawable = ContextCompat.getDrawable(requireContext(), R.drawable.ic_empty_box)
-                                topDrawable?.setBounds(0, 0, 128, 128) // ancho y alto en píxeles (ajusta aquí)
-
-                                binding.tvNoFilteredRecipes.setCompoundDrawables(
-                                    null, topDrawable, null, null
-                                )
-                                _binding?.tvNoFilteredRecipes?.visibility = View.VISIBLE
-                            } else {
-                                _binding?.tvNoFilteredRecipes?.visibility = View.GONE
-                            }
-
-
-                            hideLoading()
-                        }
-                        is NetworkResult.Error -> {
-                            Toast.makeText(requireContext(), result.message, Toast.LENGTH_SHORT).show()
-                            hideLoading()
-                        }
-                        is NetworkResult.Loading -> showLoading()
-                    }
+                } else {
+                    // Hay una receta
+                    binding.tvEmptySavedRecipes.visibility = View.GONE
+                    onNonEmpty(ids)
                 }
             }
             .addOnFailureListener {
+                binding.tvEmptySavedRecipes.visibility = View.VISIBLE
                 hideLoading()
-                Toast.makeText(requireContext(), getString(R.string.error_en_cargar_las_recetas_guardadas), Toast.LENGTH_SHORT).show()
             }
     }
 
+
+    private fun requestSavedRecipes() {
+        showLoading()
+        //Comprueba si el usuario tiene receta
+        checkFirestoreEmptyState { savedIds ->
+
+            //Peticion a spoonacular
+            val queries = recipesViewModel.applyQueries()
+            recipesViewModel.getRecipes(queries)
+
+            recipesViewModel.recipesResponse.observe(viewLifecycleOwner) { result ->
+                when (result) {
+                    is NetworkResult.Success -> {
+                        val filtered = result.data?.filter { it.id in savedIds } ?: emptyList()
+                        savedRecipeAdapter.setData(filtered)
+
+                        // Mensaje para “no hay resultados tras filtro”
+                        if (filtered.isEmpty()) {
+                            val topDrawable = ContextCompat.getDrawable(requireContext(), R.drawable.ic_empty_box)
+                            topDrawable?.setBounds(0, 0, 128, 128)
+                            binding.tvNoFilteredRecipes.setCompoundDrawables(null, topDrawable, null, null)
+                            binding.tvNoFilteredRecipes.visibility = View.VISIBLE
+                        } else {
+                            binding.tvNoFilteredRecipes.visibility = View.GONE
+                        }
+                        hideLoading()
+                    }
+                    is NetworkResult.Error -> {
+                        Toast.makeText(requireContext(), result.message, Toast.LENGTH_SHORT).show()
+                        hideLoading()
+                    }
+                    is NetworkResult.Loading -> showLoading()
+                }
+            }
+        }
+    }
 
 
     private fun showLoading() {
@@ -483,7 +485,7 @@ class SavedRecipesFragment : Fragment(R.layout.fragment_saved_recipes) {
         // Restaurar la pestaña seleccionada
         binding.tabSelectorSavedRecipe.selectTab(binding.tabSelectorSavedRecipe.getTabAt(1))
 
-        // Volver a mostrar filtros activos (si había)
+        // Volver a mostrar filtros activos
         val appliedFilterCount = calculateAppliedFilterCount()
         updateFilterCountRecipe(appliedFilterCount)
         updateFilterIndicatorsVisibility(appliedFilterCount > 0)

@@ -238,6 +238,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         tools:listitem="@layout/item_product_inventory" />
 
+
     <!-- Botón Flotante para añadir producto -->
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fabAddProduct"

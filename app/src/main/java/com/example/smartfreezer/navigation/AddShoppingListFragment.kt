@@ -61,7 +61,8 @@ class AddShoppingListFragment : Fragment(R.layout.fragment_add_shopping_list) {
                 productList = snapshot.mapNotNull { doc ->
                     val name = doc.getString("name") ?: return@mapNotNull null
                     val icon = doc.getString("icon") ?: return@mapNotNull null
-                    BasicProduct(name = name, icon = icon)
+                    val category = doc.getString("category") ?: return@mapNotNull null
+                    BasicProduct(name = name, icon = icon, category = category)
                 }
                 adapter.updateData(productList)
             }
@@ -94,6 +95,7 @@ class AddShoppingListFragment : Fragment(R.layout.fragment_add_shopping_list) {
             val data = mapOf(
                 "name" to product.name,
                 "icon" to product.icon,
+                "category" to product.category,
                 "quantity" to newQuantity
             )
             transaction.set(shoppingListRef, data)

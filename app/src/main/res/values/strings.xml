@@ -126,7 +126,7 @@
     <string name="recetas_guardadas">Recetas guardadas</string>
     <string name="refresh">Refresh</string>
     <string name="recetas_favoritas">Recetas favoritas</string>
-    <string name="no_se_pudieron_cargar_tus_recetas_guardadas_ndesliza_hacia_abajo_para_actualizar">No se pudieron cargar tus recetas guardadas.\nDesliza hacia abajo para actualizar.</string>
+    <string name="no_se_pudieron_cargar_tus_recetas_guardadas_ndesliza_hacia_abajo_para_actualizar">Aún no tienes recetas guardadas</string>
     <string name="no_saved_recipes_found">No se ha encontrado recetas guardadas</string>
     <string name="clear_saved_recipes">Clear Saved Recipes</string>
     <string name="seleccione_categor_a">Seleccione categoría</string>
@@ -427,7 +427,7 @@
     <string name="wasted_items_label">Artículos Desperdiciados</string>
 
     <!-- Feedback -->
-    <string name="porfavor_valora_la_app">Porfavor, valora la app</string>
+    <string name="porfavor_valora_la_app">Por favor, valora la app</string>
     <string name="enviando_valoraci_n">Enviando valoración...</string>
     <string name="por_favor_proporciona_alguna_valoraci_n_o_comentario">Por favor, proporciona alguna valoración o comentario.</string>
     <string name="valoraci_n_general_de_la_app">Valoración General de la App</string>
@@ -442,6 +442,12 @@
     <string name="describe_cualquier_error_que_hayas_encontrado">Describe cualquier error que hayas encontrado</string>
     <string name="notificaciones_activadas">Notificaciones activadas</string>
     <string name="notificaciones_desactivadas">Notificaciones desactivadas</string>
+    <string name="a_adir_lista_al_inventario">Añadir lista al inventario</string>
+    <string name="productos_a_adidos_al_inventario">Productos añadidos al inventario</string>
+    <string name="error_al_a_adir_productos">Error al añadir productos</string>
+    <string name="la_lista_de_compras_est_vac_a">La lista de compras está vacía</string>
+    <string name="deseas_a_adir_todos_los_productos_comprados_al_inventario">¿Deseas añadir todos los productos comprados al inventario?</string>
 
+    <string name="lista_de_compra_vacia">No hay productos en tu lista de compra\n¡Empieza a añadir productos!</string>
 
 </resources>

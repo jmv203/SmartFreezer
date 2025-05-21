@@ -5,12 +5,15 @@ import android.content.Context
 import androidx.appcompat.app.AppCompatDelegate
 import com.example.smartfreezer.util.LocaleHelper
 import com.example.smartfreezer.util.SharedPrefManager
+import com.google.firebase.FirebaseApp
 import dagger.hilt.android.HiltAndroidApp
 
 @HiltAndroidApp
 class MyApplication : Application() {
     override fun onCreate() {
         super.onCreate()
+        FirebaseApp.initializeApp(this)
+
         // Configurar el tema según las preferencias guardadas
         val sharedPrefManager = SharedPrefManager(this)
         if (sharedPrefManager.isDarkModeEnabled()) {

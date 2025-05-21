@@ -211,6 +211,7 @@ class InventoryFragment : Fragment(R.layout.fragment_inventory), OnInventoryTabS
             }
     }
 
+
     private fun loadItemsFromFirestore() {
         val user = FirebaseAuth.getInstance().currentUser ?: return
         firestore.collection("users")

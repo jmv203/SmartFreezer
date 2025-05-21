@@ -21,7 +21,9 @@
     import com.example.smartfreezer.util.NetworkResult
     import com.example.smartfreezer.viewmodels.RecipesViewModel
     import com.google.firebase.auth.FirebaseAuth
+    import com.google.firebase.crashlytics.FirebaseCrashlytics
     import com.google.firebase.firestore.FirebaseFirestore
+    import com.google.firebase.perf.FirebasePerformance
     import dagger.hilt.android.AndroidEntryPoint
     import kotlin.math.roundToInt
 
@@ -104,6 +106,9 @@
         }
 
         private fun observeRecipeDetails() {
+            val trace = FirebasePerformance.getInstance().newTrace("load_recipe_details")
+            trace.start()
+
             recipesViewModel.recipeDetailsResponse.observe(viewLifecycleOwner, Observer { response ->
                 when (response) {
                     is NetworkResult.Success -> {
@@ -134,6 +139,7 @@
 
 
                         }
+                        trace.stop()
                     }
 
                     is NetworkResult.Error -> {
@@ -141,6 +147,9 @@
                         binding.recipeDetailsErrorTextView.visibility = View.VISIBLE
                         binding.recipeDetailsErrorTextView.text = response.message.toString()
                         Toast.makeText(context, response.message, Toast.LENGTH_SHORT).show()
+                        trace.putAttribute("error", response.message ?: "unknown")
+                        trace.stop()
+                        FirebaseCrashlytics.getInstance().recordException(Exception("RecipeDetailsError: ${response.message}"))
                     }
 
                     is NetworkResult.Loading -> {

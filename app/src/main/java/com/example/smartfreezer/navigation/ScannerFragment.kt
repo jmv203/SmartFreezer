@@ -27,7 +27,9 @@ import com.example.smartfreezer.models.Detection
 import com.example.smartfreezer.models.UserProduct
 
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.perf.FirebasePerformance
 import org.pytorch.torchvision.TensorImageUtils
 import java.io.File
 import java.io.FileOutputStream
@@ -179,6 +181,8 @@ class ScannerFragment : Fragment() {
     }
 
     private fun processImage(bitmap: Bitmap) {
+        val trace = FirebasePerformance.getInstance().newTrace("image_processing")
+        trace.start()
         try {
 
             val resized = Bitmap.createScaledBitmap(bitmap, 416, 416, true)
@@ -218,6 +222,7 @@ class ScannerFragment : Fragment() {
                     updateScannedImageDisplay(bitmapWithDetections) // Muestra la imagen con las detecciones
                     updateTextStatus("Se encontraron ${detections.size} producto(s).", false)
                     showMultipleDialogs(detections.sortedByDescending { it.confidence }, index = 0, processedClasses = mutableSetOf())
+                    trace.incrementMetric("detected_products", detections.size.toLong())
                 } else {
                     updateScannedImageDisplay(bitmap) // Muestra la imagen original sin detecciones
                     updateTextStatus(getString(R.string.no_se_detectaron_productos_reintentelo_de_nuevo), false)
@@ -235,7 +240,10 @@ class ScannerFragment : Fragment() {
             showError(getString(R.string.error_al_procesar_imagen, e.message)) // Dialogo de error
             // Considerar resetear la imagen a la original o al placeholder en caso de error grave
             updateScannedImageDisplay(bitmap)
+            FirebaseCrashlytics.getInstance().recordException(e)
         } finally {
+
+            trace.stop()
             // Asegurar que el progressBar se oculte si alguna ruta no lo hizo
             if (binding.progressBar.visibility == View.VISIBLE) {
                 updateTextStatus(binding.textStatus.text.toString(), false) // Mantiene el mensaje actual pero oculta el loader
