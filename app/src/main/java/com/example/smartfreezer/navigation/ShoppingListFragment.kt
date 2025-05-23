@@ -31,8 +31,8 @@ class ShoppingListFragment : Fragment(R.layout.fragment_shopping_list) {
     private lateinit var btnAddToInventory: Button
     private lateinit var fabAddProduct: FloatingActionButton
     private lateinit var btnAccountShoppingList: ImageView
-    private lateinit var btnSettingsShoppingList : ImageView
-    private lateinit var tvEmptyShoppingList : TextView
+    private lateinit var btnSettingsShoppingList: ImageView
+    private lateinit var tvEmptyShoppingList: TextView
 
 
     private val shoppingList = mutableListOf<ShoppingItem>()
@@ -59,7 +59,8 @@ class ShoppingListFragment : Fragment(R.layout.fragment_shopping_list) {
         tvProductCount = view.findViewById(R.id.tvProductCountShoppingList)
         fabAddProduct = view.findViewById(R.id.fabAddProductShoppingList)
 
-        adapter = ShoppingListAdapter(shoppingList,
+        adapter = ShoppingListAdapter(
+            shoppingList,
             onIncrease = { item ->
                 item.quantity++
                 updateItemInFirestore(item)
@@ -73,7 +74,8 @@ class ShoppingListFragment : Fragment(R.layout.fragment_shopping_list) {
                 }
             })
 
-        recyclerView.layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
+        recyclerView.layoutManager =
+            LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
         recyclerView.adapter = adapter
 
         fabAddProduct.setOnClickListener {
@@ -96,7 +98,8 @@ class ShoppingListFragment : Fragment(R.layout.fragment_shopping_list) {
         firestore.collection("users").document(currentUser.uid).get()
             .addOnSuccessListener { document ->
                 document.getString("name")?.let { name ->
-                    view.findViewById<TextView>(R.id.tvGreetingShoppingList).text = getString(R.string.hola, name)
+                    view.findViewById<TextView>(R.id.tvGreetingShoppingList).text =
+                        getString(R.string.hola, name)
                 }
             }
     }
@@ -115,15 +118,24 @@ class ShoppingListFragment : Fragment(R.layout.fragment_shopping_list) {
                     val icon = doc.getString("icon") ?: continue
                     val quantity = doc.getLong("quantity")?.toInt() ?: 1
                     val category = doc.getString("category") ?: continue
-                    shoppingList.add(ShoppingItem(name = name, icon = icon, quantity = quantity , category = category))
+                    shoppingList.add(
+                        ShoppingItem(
+                            name = name,
+                            icon = icon,
+                            quantity = quantity,
+                            category = category
+                        )
+                    )
                 }
                 adapter.notifyDataSetChanged()
                 updateProductCount()
                 checkEmptyState()
             }
             .addOnFailureListener {
-                Toast.makeText(requireContext(),
-                    getString(R.string.error_al_cargar_la_lista), Toast.LENGTH_SHORT).show()
+                Toast.makeText(
+                    requireContext(),
+                    getString(R.string.error_al_cargar_la_lista), Toast.LENGTH_SHORT
+                ).show()
             }
     }
 
@@ -144,11 +156,14 @@ class ShoppingListFragment : Fragment(R.layout.fragment_shopping_list) {
         val ref = firestore.collection("users").document(uid)
             .collection("shopping_list").document(item.name)
 
-        ref.set(mapOf(
-            "name" to item.name,
-            "icon" to item.icon,
-            "quantity" to item.quantity
-        )).addOnSuccessListener {
+        ref.set(
+            mapOf(
+                "name" to item.name,
+                "icon" to item.icon,
+                "quantity" to item.quantity,
+                "category" to item.category
+            )
+        ).addOnSuccessListener {
             adapter.notifyDataSetChanged()
             updateProductCount()
         }
@@ -177,8 +192,10 @@ class ShoppingListFragment : Fragment(R.layout.fragment_shopping_list) {
 
     private fun showAddToInventoryConfirmation() {
         if (shoppingList.isEmpty()) {
-            Toast.makeText(requireContext(),
-                getString(R.string.la_lista_de_compras_est_vac_a), Toast.LENGTH_SHORT).show()
+            Toast.makeText(
+                requireContext(),
+                getString(R.string.la_lista_de_compras_est_vac_a), Toast.LENGTH_SHORT
+            ).show()
             return
         }
 
@@ -202,6 +219,10 @@ class ShoppingListFragment : Fragment(R.layout.fragment_shopping_list) {
             .document(user.uid)
             .collection("shopping_list")
 
+        //Contador
+        var processedCount = 0
+        val totalItems = shoppingList.size
+
         shoppingList.forEach { item ->
             // Comprobamos si ya existe un producto igual
             productsCollection
@@ -222,10 +243,14 @@ class ShoppingListFragment : Fragment(R.layout.fragment_shopping_list) {
                             .addOnSuccessListener {
                                 // Eliminamos de la lista de la compra
                                 shoppingCollection.document(item.name).delete()
+                                    .addOnCompleteListener {
+                                        processedCount++
+                                        if (processedCount == totalItems) {
+                                            loadShoppingList()
+                                        }
+                                    }
                             }
-                            .addOnFailureListener {
-                                Toast.makeText(requireContext(), getString(R.string.error_al_actualizar_cantidad), Toast.LENGTH_SHORT).show()
-                            }
+
                     } else {
                         // No existe: lo añadimos al inventario
                         val newProduct = hashMapOf(
@@ -241,19 +266,32 @@ class ShoppingListFragment : Fragment(R.layout.fragment_shopping_list) {
                             .addOnSuccessListener {
                                 // Eliminamos de la lista de la compra
                                 shoppingCollection.document(item.name).delete()
-                            }
-                            .addOnFailureListener {
-                                Toast.makeText(requireContext(), getString(R.string.error_al_guardar), Toast.LENGTH_SHORT).show()
+                                    .addOnCompleteListener {
+                                        processedCount++
+                                        if (processedCount == totalItems) {
+                                            loadShoppingList()
+                                        }
+                                    }
                             }
                     }
                 }
                 .addOnFailureListener {
-                    Toast.makeText(requireContext(), getString(R.string.error_al_verificar_el_producto), Toast.LENGTH_SHORT).show()
+                    Toast.makeText(
+                        requireContext(),
+                        getString(R.string.error_al_verificar_el_producto),
+                        Toast.LENGTH_SHORT
+                    ).show()
+                    processedCount++
+                    if (processedCount == totalItems) {
+                        loadShoppingList()
+                    }
                 }
         }
 
-        Toast.makeText(requireContext(), getString(R.string.productos_a_adidos_al_inventario), Toast.LENGTH_SHORT).show()
-        loadShoppingList()
+        Toast.makeText(
+            requireContext(),
+            getString(R.string.productos_a_adidos_al_inventario),
+            Toast.LENGTH_SHORT
+        ).show()
     }
-
 }
