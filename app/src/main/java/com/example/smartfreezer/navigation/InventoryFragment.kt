@@ -13,6 +13,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import android.content.Intent
 import android.util.Log
+import androidx.core.content.ContextCompat
 import com.example.smartfreezer.ProfileActivity
 import androidx.recyclerview.widget.RecyclerView
 import com.example.smartfreezer.R
@@ -39,6 +40,8 @@ class InventoryFragment : Fragment(R.layout.fragment_inventory), OnInventoryTabS
     private lateinit var adapter: UserProductAdapter
     private lateinit var btnFilterOptions: Button
     private lateinit var filterBadge: TextView
+    private lateinit var tvEmptyInventory: TextView
+
 
 
     private var fullItemList: List<UserProduct> = emptyList()
@@ -110,6 +113,8 @@ class InventoryFragment : Fragment(R.layout.fragment_inventory), OnInventoryTabS
         setupAddButton(view)
 
         loadItemsFromFirestore()
+        tvEmptyInventory = view.findViewById(R.id.tvEmptyInventory)
+
     }
 
     override fun onInventoryTabSelected(tabIndex: Int) {
@@ -236,12 +241,25 @@ class InventoryFragment : Fragment(R.layout.fragment_inventory), OnInventoryTabS
                         quantity = 1
                     ).apply { iconDrawableRes = iconRes }
                 }
-                applyFilters()
+                checkEmptyState()
             }
             .addOnFailureListener {
                 Toast.makeText(requireContext(),
                     getString(R.string.error_al_cargar_inventario), Toast.LENGTH_SHORT).show()
             }
+    }
+
+    private fun checkEmptyState() {
+        if (fullItemList.isEmpty()) {
+            val topDrawable = ContextCompat.getDrawable(requireContext(), R.drawable.ic_empty_box)
+            topDrawable?.setBounds(0, 0, 128, 128)
+            tvEmptyInventory.setCompoundDrawables(null, topDrawable, null, null)
+            adapter.updateData(emptyList())
+            tvProductCount.text = getString(R.string.productos_encontrados, 0)
+            tvEmptyInventory.visibility = View.VISIBLE
+        } else {
+            applyFilters()
+        }
     }
 
     @SuppressLint("StringFormatMatches")
@@ -268,6 +286,7 @@ class InventoryFragment : Fragment(R.layout.fragment_inventory), OnInventoryTabS
 
         adapter.updateData(filtered)
         tvProductCount.text = getString(R.string.productos_encontrados, filtered.size)
+        tvEmptyInventory.visibility = if (filtered.isEmpty()) View.VISIBLE else View.GONE
     }
 
     private fun showPopupMenu(anchor: View) {

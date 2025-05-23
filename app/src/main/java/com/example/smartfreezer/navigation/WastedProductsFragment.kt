@@ -33,8 +33,8 @@ import java.util.*
 class WastedProductsFragment : Fragment(R.layout.fragment_wasted_products) {
 
     private var _binding: FragmentWastedProductsBinding? = null
-    // Esta propiedad solo es válida entre onCreateView y onDestroyView.
-    private val binding get() = _binding!! // Non-null assertion operator for safety
+
+    private val binding get() = _binding!!
     private lateinit var viewModel: WastedProductsViewModel
     private var tabSelectedListener: OnInventoryTabSelectedListener? = null
 
@@ -56,7 +56,7 @@ class WastedProductsFragment : Fragment(R.layout.fragment_wasted_products) {
         super.onViewCreated(view, savedInstanceState)
 
 
-        _binding = FragmentWastedProductsBinding.bind(view) // Initialize _binding here
+        _binding = FragmentWastedProductsBinding.bind(view)
         viewModel = ViewModelProvider(this)[WastedProductsViewModel::class.java]
 
         binding.tabSelectorWasted.getTabAt(1)?.select()
@@ -77,7 +77,7 @@ class WastedProductsFragment : Fragment(R.layout.fragment_wasted_products) {
         }
 
         setupGreeting()
-        setupUIListeners() // Renamed from setupUI to be more specific
+        setupUIListeners()
         setupTabLayout()
         setupCharts()
         setupObservers()
@@ -95,14 +95,13 @@ class WastedProductsFragment : Fragment(R.layout.fragment_wasted_products) {
             )
         )
 
-        // Establecer el periodo inicial basado en el botón chequeado por defecto
-        // Asegúrate que en tu XML, R.id.btnWeekly esté chequeado por defecto o cambia la lógica aquí.
+
         if (binding.periodToggle.checkedButtonId == R.id.btnWeekly) {
             viewModel.setPeriod("weekly")
         } else if (binding.periodToggle.checkedButtonId == R.id.btnMonthly) {
             viewModel.setPeriod("monthly")
         } else {
-            // Si ninguno está chequeado por alguna razón, establece uno por defecto.
+
             binding.periodToggle.check(R.id.btnWeekly)
             viewModel.setPeriod("weekly")
         }
@@ -214,7 +213,7 @@ class WastedProductsFragment : Fragment(R.layout.fragment_wasted_products) {
                 position = XAxis.XAxisPosition.BOTTOM
                 setDrawGridLines(false)
                 granularity = 1f
-                axisMinimum = -0.5f // Permite un poco de espacio antes de la primera barra
+                axisMinimum = -0.5f
                 axisLineColor = chartColor
                 axisLineWidth = 1.5f
                 textColor = chartColor
@@ -244,14 +243,12 @@ class WastedProductsFragment : Fragment(R.layout.fragment_wasted_products) {
     private fun setupPieChart() {
         with(binding.pieChart) {
             description.isEnabled = false
-            setExtraOffsets(20f, 5f, 20f, 5f) // Ajustar offsets
+            setExtraOffsets(20f, 5f, 20f, 5f)
             dragDecelerationFrictionCoef = 0.95f
             isDrawHoleEnabled = true
-            setHoleColor(Color.TRANSPARENT) // Fondo del agujero transparente
-            // setTransparentCircleColor(ContextCompat.getColor(requireContext(), R.color.chart_purple)) // Opcional
-            // setTransparentCircleAlpha(20) // Opcional
+            setHoleColor(Color.TRANSPARENT)
             holeRadius = 45f
-            transparentCircleRadius = 50f // Debe ser > holeRadius
+            transparentCircleRadius = 50f
             setDrawCenterText(true)
             rotationAngle = 0f
             isRotationEnabled = true
@@ -264,7 +261,6 @@ class WastedProductsFragment : Fragment(R.layout.fragment_wasted_products) {
 
             setCenterTextColor(centerTextColor)
             setCenterTextSize(14f)
-            // setCenterTextTypeface(ResourcesCompat.getFont(requireContext(), R.font.roboto_medium)) // Opcional
 
             legend.apply {
                 verticalAlignment = Legend.LegendVerticalAlignment.BOTTOM
@@ -275,11 +271,10 @@ class WastedProductsFragment : Fragment(R.layout.fragment_wasted_products) {
                 yEntrySpace = 5f
                 yOffset = 10f // Ajusta el offset si es necesario
                 textSize = 12f
-                // textColor = ContextCompat.getColor(requireContext(), R.color.colorPrimary) // Considera usar un color del tema
                 val legendTextColorArray = requireContext().obtainStyledAttributes(intArrayOf(R.attr.colorTextSecondary))
                 textColor = legendTextColorArray.getColor(0, Color.DKGRAY)
                 legendTextColorArray.recycle()
-                // typeface = ResourcesCompat.getFont(requireContext(), R.font.roboto_regular) // Opcional
+
             }
         }
     }
@@ -340,7 +335,8 @@ class WastedProductsFragment : Fragment(R.layout.fragment_wasted_products) {
                     updatePieChart(data)
                 } else {
                     binding.pieChart.clear()
-                    binding.pieChart.invalidate() // Importante
+                    binding.pieChart.invalidate()
+                    binding.tvSummary.text = "" // Limpiar el resumen cuando no hay datos
                 }
             }
         }
@@ -389,11 +385,9 @@ class WastedProductsFragment : Fragment(R.layout.fragment_wasted_products) {
 
         val dataSet = BarDataSet(entries, getString(R.string.wasted_items_label)).apply { // Añadido label
             color = barColor
-            valueTextColor = barColor // O un color de contraste
-            valueTextSize = 11f // Ligeramente más pequeño
+            valueTextColor = barColor
+            valueTextSize = 11f
             setDrawValues(true)
-            // highLightColor = barColor // Puedes definir un color de resaltado diferente
-            // barShadowColor = Color.LTGRAY // Sombra suave
             valueFormatter = object : ValueFormatter() {
                 override fun getFormattedValue(value: Float): String {
                     return if (value == 0f) "" else value.toInt().toString()
@@ -403,7 +397,7 @@ class WastedProductsFragment : Fragment(R.layout.fragment_wasted_products) {
 
         binding.barChart.apply {
             this.data = BarData(dataSet).apply {
-                barWidth = 0.6f // Ajusta según preferencia
+                barWidth = 0.6f
             }
 
             xAxis.apply {
@@ -412,21 +406,14 @@ class WastedProductsFragment : Fragment(R.layout.fragment_wasted_products) {
                         return data.getOrNull(value.toInt())?.first ?: ""
                     }
                 }
-                labelCount = data.size.coerceAtLeast(1) // Evitar 0 si data está vacía pero se llama
+                labelCount = data.size.coerceAtLeast(1)
                 axisMinimum = -0.5f
                 axisMaximum = data.size.toFloat() - 0.5f
             }
-            // marker = CustomMarkerView(requireContext(), R.layout.chart_marker_layout) // Habilitar si tienes este layout
             animateY(1000, Easing.EaseInOutQuad)
             invalidate()
         }
-
-        val periodText = when(viewModel.selectedPeriod.value) {
-            "monthly" -> getString(R.string.last_6_months) // Texto más descriptivo
-            else -> getString(R.string.current_week) // Texto más descriptivo
-        }
-        val total = data.sumOf { it.second }
-        binding.tvSummary.text = getString(R.string.total_wasted, total, periodText)
+        updateSummary(data)
     }
 
     private fun updatePieChart(data: List<Pair<String, Int>>) {
@@ -438,39 +425,33 @@ class WastedProductsFragment : Fragment(R.layout.fragment_wasted_products) {
         }
 
 
-        val entries = data.map { (name, value) -> // No se necesita index para PieEntry aquí
+        val entries = data.map { (name, value) ->
             PieEntry(value.toFloat(), name)
         }
 
         val dataSet = PieDataSet(entries, "").apply {
-            sliceSpace = 2f // Un poco de espacio entre slices
+            sliceSpace = 2f
             selectionShift = 8f
             colors = getPieChartColors(data.size)
             valueTextColor = getContrastColor()
-            valueTextSize = 13f // Ligeramente más pequeño
+            valueTextSize = 13f
             valueFormatter = object : ValueFormatter() {
                 override fun getFormattedValue(value: Float): String {
-                    // Mostrar valor solo si es significativo (ej. > 3% del total o un valor absoluto)
-                    // Aquí, simple: no mostrar si es muy pequeño (ej. < 3 unidades)
+
                     return if (value < 1) "" else value.toInt().toString()
                 }
             }
-            // valueLinePart1OffsetPercentage = 80f
-            // valueLinePart1Length = 0.5f
-            // valueLinePart2Length = 0.5f
-            // yValuePosition = PieDataSet.ValuePosition.OUTSIDE_ENSLICE // Posicionar valores fuera
         }
 
         binding.pieChart.apply {
             this.data = PieData(dataSet)
             centerText = getString(R.string.wasted_by_type)
-            setEntryLabelColor(getContrastColor()) // Color de las etiquetas de los slices
-            setEntryLabelTextSize(11f) // Tamaño de las etiquetas de los slices
-            // setUsePercentValues(true) // Opcional: mostrar valores como porcentajes
-            // legend.isEnabled = data.size <= 6 // Ocultar leyenda si hay muchos items
+            setEntryLabelColor(getContrastColor())
+            setEntryLabelTextSize(11f)
             animateY(1000, Easing.EaseInOutQuad)
             invalidate()
         }
+        updateSummary(data)
     }
 
     private fun updatePeriodTitle(referenceDate: Date) {
@@ -491,7 +472,6 @@ class WastedProductsFragment : Fragment(R.layout.fragment_wasted_products) {
                 val endDateStr = SimpleDateFormat("d", Locale.getDefault()).format(endCal.time)
                 val monthFormat = SimpleDateFormat("MMM", Locale.getDefault()).apply {
                     val month = cal.get(Calendar.MONTH)
-                    // Forzar abreviaciones sin punto (ej: "Dec" en lugar de "Dic.")
                     val symbols = DateFormatSymbols(Locale.getDefault()).apply {
                         shortMonths = arrayOf("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec")
                     }
@@ -522,6 +502,16 @@ class WastedProductsFragment : Fragment(R.layout.fragment_wasted_products) {
         }
         binding.tvPeriodTitle.text = title
     }
+
+    private fun updateSummary(data: List<Pair<String, Int>>) {
+        val periodText = when(viewModel.selectedPeriod.value) {
+            "monthly" -> getString(R.string.last_6_months)
+            else -> getString(R.string.current_week)
+        }
+        val total = data.sumOf { it.second }
+        binding.tvSummary.text = getString(R.string.total_wasted, total, periodText)
+    }
+
 
     override fun onDestroyView() {
         super.onDestroyView()

@@ -449,5 +449,6 @@
     <string name="deseas_a_adir_todos_los_productos_comprados_al_inventario">¿Deseas añadir todos los productos comprados al inventario?</string>
 
     <string name="lista_de_compra_vacia">No hay productos en tu lista de compra\n¡Empieza a añadir productos!</string>
+    <string name="inventario_vacio">No hay productos en tu inventario\n¡Empieza a añadir productos!</string>
 
 </resources>

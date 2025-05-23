@@ -123,7 +123,7 @@ class WastedProductsViewModel : ViewModel() {
             .collection("wasted_products")
             .whereGreaterThanOrEqualTo("date", startDate)
             .whereLessThanOrEqualTo("date", endDate)
-            .orderBy("date", Query.Direction.DESCENDING) // O ASCENDING si processData lo espera así
+            .orderBy("date", Query.Direction.DESCENDING)
             .get()
             .addOnSuccessListener { querySnapshot ->
                 val products = querySnapshot.documents.mapNotNull { document ->
@@ -137,11 +137,10 @@ class WastedProductsViewModel : ViewModel() {
                 val processedData = processData(products, period, if (period == "monthly") _currentMonthlyReferenceDate.value!! else _currentWeeklyReferenceDate.value!!)
                 _wastedProductsData.postValue(processedData)
 
-                val byType = products.groupBy { it.icon to it.name } // O solo por it.name si el icono no es relevante para la etiqueta
+                val byType = products.groupBy { it.icon to it.name }
                     .map { (key, items) ->
-                        // val (icon, name) = key
-                        val name = key.second // Asumiendo que quieres el nombre como etiqueta principal
-                        "$name (${items.size})" to items.size // Puedes ajustar la etiqueta aquí
+                        val name = key.second
+                        "$name (${items.size})" to items.size
                     }
                     .sortedByDescending { it.second }
                 _wastedProductsByType.postValue(byType)
@@ -158,27 +157,26 @@ class WastedProductsViewModel : ViewModel() {
             "weekly" -> {
                 val dayFormat = SimpleDateFormat("u", Locale.getDefault()) // Lunes=1, Domingo=7
                 daysOfWeek.mapIndexed { index, dayName ->
-                    val dayNumberInWeek = index + 1 // Asumiendo que daysOfWeek está [Lun, Mar, ..., Dom]
+                    val dayNumberInWeek = index + 1
                     dayName to products.count { product ->
                         val calProduct = Calendar.getInstance().apply { time = product.date.toDate() }
-                        // Ajuste para que Lunes sea 1 y Domingo 7 consistentemente con 'u'
+
                         val productDayOfWeek = if (calProduct.get(Calendar.DAY_OF_WEEK) == Calendar.SUNDAY) 7 else calProduct.get(Calendar.DAY_OF_WEEK) -1
                         productDayOfWeek == dayNumberInWeek
                     }
                 }
             }
             "monthly" -> {
-                // Usar referenceDateForMonth para calcular el rango de 6 meses
                 val currentDisplayCal = Calendar.getInstance().apply { time = referenceDateForMonth }
 
-                (0..5).map { i -> // 0 es el mes más reciente del rango, 5 el más antiguo
+                (0..5).map { i ->
                     val targetCal = Calendar.getInstance().apply {
                         time = currentDisplayCal.time
-                        add(Calendar.MONTH, -i) // Retrocede 'i' meses desde el mes de referencia del rango
+                        add(Calendar.MONTH, -i)
                     }
                     val monthName = SimpleDateFormat("MMM", Locale.getDefault())
                         .format(targetCal.time)
-                        .replace(".", "") // Quita el punto si tu locale lo añade (ej. "ene.")
+                        .replace(".", "")
 
                     val count = products.count { product ->
                         val productCal = Calendar.getInstance().apply { time = product.date.toDate() }
@@ -186,7 +184,7 @@ class WastedProductsViewModel : ViewModel() {
                                 productCal.get(Calendar.YEAR) == targetCal.get(Calendar.YEAR)
                     }
                     monthName to count
-                }.reversed() // Para que el gráfico muestre de más antiguo a más reciente
+                }.reversed()
             }
             else -> emptyList()
         }

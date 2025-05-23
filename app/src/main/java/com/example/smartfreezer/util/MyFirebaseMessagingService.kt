@@ -9,7 +9,7 @@ import android.media.RingtoneManager
 import android.os.Build
 import android.util.Log
 import androidx.core.app.NotificationCompat
-import com.example.smartfreezer.HomeActivity // Asegúrate que esta es tu actividad principal que contiene el NavHost
+import com.example.smartfreezer.HomeActivity
 import com.example.smartfreezer.R
 import com.example.smartfreezer.models.User
 import com.google.firebase.auth.FirebaseAuth

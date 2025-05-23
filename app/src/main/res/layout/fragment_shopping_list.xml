@@ -104,6 +104,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         tools:listitem="@layout/item_shopping_product" />
+
     <TextView
         android:id="@+id/tvEmptyShoppingList"
         android:layout_width="wrap_content"

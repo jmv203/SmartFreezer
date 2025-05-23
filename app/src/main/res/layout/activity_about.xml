@@ -80,7 +80,5 @@
             android:textColor="?attr/colorTextButton"
             android:backgroundTint="?attr/colorBackgroundButton"/>
 
-
-
     </LinearLayout>
 </ScrollView>

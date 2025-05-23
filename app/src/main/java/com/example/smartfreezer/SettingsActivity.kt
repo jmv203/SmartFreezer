@@ -181,7 +181,7 @@ class SettingsActivity : BaseActivity() {
             if (emailIntent.resolveActivity(packageManager) != null) {
                 startActivity(Intent.createChooser(emailIntent, "Enviar correo..."))
             } else {
-                // Mostrar algún mensaje si no hay cliente de email instalado
+
             }
         }
     }

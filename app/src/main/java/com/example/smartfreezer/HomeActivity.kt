@@ -4,11 +4,9 @@ import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import com.example.smartfreezer.databinding.ActivityHomeBinding
-import com.example.smartfreezer.navigation.RecipesFragmentDirections
 import com.example.smartfreezer.util.OnInventoryTabSelectedListener
 import com.example.smartfreezer.util.OnRecipeTabSelectedListener
 import com.example.smartfreezer.util.SharedPrefManager

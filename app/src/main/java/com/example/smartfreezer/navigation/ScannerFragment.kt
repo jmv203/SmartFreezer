@@ -491,6 +491,4 @@ class ScannerFragment : Fragment() {
         )
         return translationMap[englishName.lowercase()] ?: englishName
     }
-
-    // companion object { } // Puedes mantenerlo si es necesario para otras cosas
 }
