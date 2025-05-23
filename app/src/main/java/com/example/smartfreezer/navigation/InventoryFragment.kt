@@ -224,6 +224,7 @@ class InventoryFragment : Fragment(R.layout.fragment_inventory), OnInventoryTabS
             .collection("products")
             .get()
             .addOnSuccessListener { snapshot ->
+                if (!isAdded) return@addOnSuccessListener // El fragmento ya no está activo
                 fullItemList = snapshot.mapNotNull { doc ->
                     val name = doc.getString("name") ?: return@mapNotNull null
                     val icon = doc.getString("icon") ?: return@mapNotNull null
@@ -244,6 +245,7 @@ class InventoryFragment : Fragment(R.layout.fragment_inventory), OnInventoryTabS
                 checkEmptyState()
             }
             .addOnFailureListener {
+                if (!isAdded) return@addOnFailureListener
                 Toast.makeText(requireContext(),
                     getString(R.string.error_al_cargar_inventario), Toast.LENGTH_SHORT).show()
             }
@@ -251,6 +253,7 @@ class InventoryFragment : Fragment(R.layout.fragment_inventory), OnInventoryTabS
 
     private fun checkEmptyState() {
         if (fullItemList.isEmpty()) {
+            if (!isAdded) return
             val topDrawable = ContextCompat.getDrawable(requireContext(), R.drawable.ic_empty_box)
             topDrawable?.setBounds(0, 0, 128, 128)
             tvEmptyInventory.setCompoundDrawables(null, topDrawable, null, null)
@@ -264,6 +267,7 @@ class InventoryFragment : Fragment(R.layout.fragment_inventory), OnInventoryTabS
 
     @SuppressLint("StringFormatMatches")
     private fun applyFilters() {
+        if (!isAdded) return
         val location = spinnerLocation.text.toString()
         val query = searchBar.text.toString().lowercase()
 
@@ -284,6 +288,7 @@ class InventoryFragment : Fragment(R.layout.fragment_inventory), OnInventoryTabS
                     (query.isBlank() || item.name.lowercase().contains(query))
         }
 
+        if (!isAdded) return
         adapter.updateData(filtered)
         tvProductCount.text = getString(R.string.productos_encontrados, filtered.size)
         tvEmptyInventory.visibility = if (filtered.isEmpty()) View.VISIBLE else View.GONE

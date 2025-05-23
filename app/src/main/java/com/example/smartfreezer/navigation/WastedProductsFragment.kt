@@ -34,7 +34,9 @@ class WastedProductsFragment : Fragment(R.layout.fragment_wasted_products) {
 
     private var _binding: FragmentWastedProductsBinding? = null
 
-    private val binding get() = _binding!!
+    private val binding get() = _binding ?: throw IllegalStateException(
+        "Cannot access binding after onDestroyView or before onCreateView"
+    )
     private lateinit var viewModel: WastedProductsViewModel
     private var tabSelectedListener: OnInventoryTabSelectedListener? = null
 
@@ -129,10 +131,14 @@ class WastedProductsFragment : Fragment(R.layout.fragment_wasted_products) {
 
     private fun setupGreeting() {
         val currentUser = FirebaseAuth.getInstance().currentUser ?: return
-        FirebaseFirestore.getInstance().collection("users").document(currentUser.uid).get()
+        val localBinding = _binding ?: return
+
+        FirebaseFirestore.getInstance().collection("users")
+            .document(currentUser.uid)
+            .get()
             .addOnSuccessListener { document ->
-                document.getString("name")?.let { name ->
-                    binding.tvGreetingWastedProducts.text = getString(R.string.hola, name)
+                _binding?.tvGreetingWastedProducts?.text = document.getString("name")?.let { name ->
+                    getString(R.string.hola, name)
                 }
             }
     }
